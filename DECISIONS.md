@@ -11,3 +11,4 @@
 - 2026-10-05: OWNER RULE: header menu + sub-items must match the OLD site exactly (labels, order); Phase 8d restores it, runs after 8c.
 - 2026-10-05: owner found disclaimer text differs: seed paraphrased pages. Phase 8f = deterministic verbatim HTML->Markdown import + strict text-fidelity test.
 - 2026-10-05: owner asked for full re-crawl: Phase 8g, output research/v2.
+- 2026-10-05: ROADMAP v2: capture once (crawl v2) -> deterministic import -> strict parity tests -> section-by-section passes vs old screenshots -> menu/hero -> hardening.

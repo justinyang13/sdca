@@ -12,8 +12,5 @@ Phase 8 (owner feedback: PDFs new tab inline, section order, hero carousel, foot
 Phase 6 DONE+tests 112 pass (1:45PM). Admin demo login in data/ADMIN-DEMO-LOGIN.txt (gitignored). Next: Phase 8 then 7.
 Phase 8b (ledger by sha256, photo archive, document archive) started 3:34PM.
 Phase 8c (page images: relative-path bug, image parity audit, gaps on about/board/staff etc.) queued: auto-starts after 8b ends.
-Sponsor images: public/img/sponsors missing + relative paths -> in Phase 8c item 7.
-Phase 8d (restore original menu from nav_items table) queued after 8c.
-Phase 8e (hero: only 5 newest slides, unique images; slides seed dedupe) queued after 8d.
-Chain after 8c: 8f (verbatim text fidelity), 8d (original menu), 8e (hero 5 slides). work/run_chain.sh
-Chain after 8c: 8g (CRAWL v2 verbatim+images -> research/v2), 8f (verbatim import from v2), 8d (menu), 8e (hero).
+
+ROADMAP v2 (2026-10-05 4:35PM): chain work/run_chain.sh runs 9 -> 8g -> 8f -> S1 -> S2 -> S3 -> S4 -> 8d -> 8e, then Phase 7 hardening + release. Claude gate-reviews each report (screenshots vs old). 8c was cancelled (WIP committed); its items live in Phase 9 and S2.
