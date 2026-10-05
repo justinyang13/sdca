@@ -8,7 +8,7 @@ import { t, SUPPORTED } from './i18n/index.js';
 import { applyBaseMiddleware } from './middleware/index.js';
 import { openDb } from './db/open.js';
 import * as H from './helpers.js';
-import { imageManifest } from './helpers.js';
+import { imageManifest, withPdfTargets } from './helpers.js';
 import { registerPublicRoutes } from './routes-public.js';
 import { registerPhase5Routes } from './routes-phase5.js';
 import { registerAdminRoutes } from './admin/routes.js';
@@ -61,18 +61,20 @@ export function createApp({ db = openDb() } = {}) {
   function renderMarkdown(md) {
     if (!md) return '';
     const raw = marked.parse(md, { mangle: false, headerIds: false, breaks: false });
-    return sanitizeHtml(raw, {
+    return withPdfTargets(sanitizeHtml(raw, {
       allowedTags: ['h1','h2','h3','h4','h5','p','ul','ol','li','strong','em','del',
         'a','code','pre','blockquote','table','thead','tbody','tr','th','td','br','hr','span','img','details','summary'],
       allowedAttributes: { a: ['href','title','rel','target'], img: ['src','alt','width','height'] },
       allowedSchemes: ['http','https','mailto','tel'],
-    });
+    }));
   }
 
-  // Render a views/pages/*.ejs template with `renderPart` available in scope.
+  // Render a views/pages/*.ejs template with `renderPart` and `renderMarkdown`
+  // available in scope (so page templates can render markdown bodies).
   function pageView(viewFile, ctx) {
     const full = path.join(config.viewsDir, 'pages', viewFile);
-    return ejs.render(fs.readFileSync(full, 'utf8'), ctx);
+    const fullCtx = { renderMarkdown, ...ctx };
+    return ejs.render(fs.readFileSync(full, 'utf8'), fullCtx);
   }
 
   // JSON + form bodies

@@ -23,23 +23,12 @@
   };
 %>
 
-<section class="home-hero" role="region" aria-label="<%= L === 'zh' ? '歡迎' : 'Welcome' %>">
-  <div class="home-hero-media" aria-hidden="true">
-    <%- renderPart('partials/hero-media.ejs', {
-      heroImage: heroImg,
-      altEn: heroAltEn,
-      altZh: heroAltZh,
-    }) %>
-  </div>
-  <div class="home-hero-inner">
-    <h1><%= schoolName %></h1>
-    <p class="tagline"><%= tagline %></p>
-    <div class="home-hero-cta">
-      <a class="btn btn-primary btn-lg" href="/<%= L %>/programs"><%= L === 'zh' ? '探索課程' : 'Explore Programs' %> →</a>
-      <a class="btn btn-light btn-lg" href="<%= portalUrl %>" target="_blank" rel="noopener"><%= L === 'zh' ? '立即報名' : 'Enroll Now' %></a>
-    </div>
-  </div>
-</section>
+<%- renderPart('partials/hero-carousel.ejs', {
+  slides: slides,
+  schoolName: schoolName,
+  tagline: tagline,
+  portalUrl: portalUrl,
+}) %>
 
 <section class="section" aria-labelledby="home-tiles-h">
   <div class="container">
@@ -52,33 +41,6 @@
         tileDesc: L === 'zh' ? tl.descZh : tl.descEn,
       }) %>
       <% }) %>
-    </div>
-  </div>
-</section>
-
-<section class="section section-alt" aria-labelledby="home-programs-h">
-  <div class="container">
-    <div class="section-head">
-      <h2 id="home-programs-h"><%= L === 'zh' ? '我們的課程' : 'Our Programs' %></h2>
-      <p class="section-lead"><%= L === 'zh' ? '從學前班到 12 年級，加上成人與休閒課程。'
-                                              : 'From Pre-K through Grade 12, plus adult and recreational programs.' %></p>
-    </div>
-    <div class="grid grid-3 programs-strip">
-      <% programs.forEach(function(p) { %>
-      <article class="program-card card">
-        <% if (p.image) { %>
-        <div class="card-media"><img src="<%= imgUrl(p.image) %>" alt="<%= pick(p, 'name') %>" loading="lazy" width="480" height="320"></div>
-        <% } %>
-        <div class="card-body">
-          <h3 class="card-title"><a href="/<%= L %>/programs"><%= pick(p, 'name') %></a></h3>
-          <% const grades = L === 'zh' ? (p.grades_zh || p.grades_en) : (p.grades_en || p.grades_zh); %>
-          <% if (grades) { %><p class="card-desc"><%= grades %></p><% } %>
-        </div>
-      </article>
-      <% }) %>
-    </div>
-    <div class="section-cta">
-      <a class="btn btn-navy" href="/<%= L %>/programs"><%= L === 'zh' ? '查看全部課程' : 'View All Programs' %> →</a>
     </div>
   </div>
 </section>
@@ -113,6 +75,33 @@
         <% }) %>
       </div>
       <a class="btn btn-ghost" href="/<%= L %>/events"><%= L === 'zh' ? '查看全部活動' : 'View All Events' %> →</a>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt" aria-labelledby="home-programs-h">
+  <div class="container">
+    <div class="section-head">
+      <h2 id="home-programs-h"><%= L === 'zh' ? '我們的課程' : 'Our Programs' %></h2>
+      <p class="section-lead"><%= L === 'zh' ? '從學前班到 12 年級，加上成人與休閒課程。'
+                                              : 'From Pre-K through Grade 12, plus adult and recreational programs.' %></p>
+    </div>
+    <div class="grid grid-3 programs-strip">
+      <% programs.forEach(function(p) { %>
+      <article class="program-card card">
+        <% if (p.image) { %>
+        <div class="card-media"><img src="<%= imgUrl(p.image) %>" alt="<%= pick(p, 'name') %>" loading="lazy" width="480" height="320"></div>
+        <% } %>
+        <div class="card-body">
+          <h3 class="card-title"><a href="/<%= L %>/programs"><%= pick(p, 'name') %></a></h3>
+          <% const grades = L === 'zh' ? (p.grades_zh || p.grades_en) : (p.grades_en || p.grades_zh); %>
+          <% if (grades) { %><p class="card-desc"><%= grades %></p><% } %>
+        </div>
+      </article>
+      <% }) %>
+    </div>
+    <div class="section-cta">
+      <a class="btn btn-navy" href="/<%= L %>/programs"><%= L === 'zh' ? '查看全部課程' : 'View All Programs' %> →</a>
     </div>
   </div>
 </section>

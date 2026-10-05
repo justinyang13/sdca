@@ -19,8 +19,11 @@ export function createLimiter({ windowMs, max, message } = {}) {
   });
 }
 
-/** General limiter for public pages (generous). */
-export const generalLimiter = createLimiter({ max: 300 });
+/** General limiter for public pages (generous). RATE_LIMIT env overrides the
+    cap — used by the Phase 8 linkcheck crawler which legitimately makes
+    hundreds of requests. */
+const GENERAL_MAX = Number(process.env.RATE_LIMIT || 300);
+export const generalLimiter = createLimiter({ max: GENERAL_MAX });
 /** Contact form / login limiter (strict). */
 export const strictLimiter = createLimiter({ max: 10 });
 /** Admin login limiter (very strict). */

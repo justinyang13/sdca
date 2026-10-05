@@ -16,6 +16,7 @@ import { seedEvents } from './seed-data-events.js';
 import { seedMedia } from './seed-data-media.js';
 import { seedSettings } from './seed-data-settings.js';
 import { seedPress } from './seed-data-press.js';
+import { seedSlides } from './seed-data-slides.js';
 
 const log = [];
 const skipped = [];
@@ -58,13 +59,14 @@ function main() {
   counters.events = seedEvents(db, log, skipped);
   counters.media_items = seedMedia(db, log, skipped);
   counters.settings = seedSettings(db, log, skipped);
+  counters.slides = seedSlides(db, log, skipped);
 
   // 5. refresh FTS index from content tables
   rebuildSearch(db);
 
   // 6. report
   console.log('\n=== Seed summary (rows per table after seed) ===');
-  for (const t of ['pages', 'announcements', 'events', 'programs', 'people', 'sponsors', 'documents', 'media_items', 'settings', 'search_index']) {
+  for (const t of ['pages', 'announcements', 'events', 'programs', 'people', 'sponsors', 'documents', 'media_items', 'settings', 'slides', 'search_index']) {
     const n = db.prepare(`SELECT count(*) n FROM ${t}`).get().n;
     console.log(`  ${t.padEnd(14)} ${n}`);
   }

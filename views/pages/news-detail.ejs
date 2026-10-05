@@ -44,8 +44,8 @@
         <div class="doc-card-title"><%= L === 'zh' ? (doc.title_zh || doc.title_en) : (doc.title_en || doc.title_zh) %></div>
         <div class="doc-card-meta">PDF · <%= Math.max(1, Math.round(doc.bytes / 1024)) %> KB</div>
       </div>
-      <a class="btn btn-primary" href="/<%= L %>/documents/<%= doc.slug %>" rel="noopener">
-        <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 2v8M4 7l4 4 4-4M2 14h12"/></svg>
+      <a class="btn btn-primary" href="/pdf/<%= doc.slug %>" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 11L11 4M6 4h5v5M4 8v5h6"/></svg>
         <%= t('news.pdf') %>
       </a>
     </aside>

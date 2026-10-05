@@ -46,7 +46,7 @@
               </svg>
             </span>
             <div>
-              <h4 class="doc-title"><a href="/<%= L %>/documents/<%= d.slug %>"><%= L === 'zh' ? (d.title_zh || d.title_en) : (d.title_en || d.title_zh) %></a></h4>
+              <h4 class="doc-title"><a href="/pdf/<%= d.slug %>" target="_blank" rel="noopener"><%= L === 'zh' ? (d.title_zh || d.title_en) : (d.title_en || d.title_zh) %></a></h4>
               <div class="doc-meta"><%= Math.max(1, Math.round(d.bytes / 1024)) %> KB</div>
             </div>
           </li>

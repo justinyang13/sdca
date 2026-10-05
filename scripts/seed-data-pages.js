@@ -362,6 +362,37 @@ const PAGES = [
     ].join('\n\n'),
     hero_image: '',
   },
+
+  // ── Archive (Phase 8) ─────────────────────────────────────────────────────
+  {
+    slug: 'archive',
+    title_en: 'Archive',
+    title_zh: '檔案',
+    nav_section: 'News', nav_order: 9,
+    body_en: [
+      '## About this archive\n\nThis page preserves older posts, notices and PDFs from the original SDCA website so nothing is lost. Older items are listed with a link to where they now live on this site, or a direct download.',
+      '## Where to find things now\n\n- **Weekly parent announcements (家庭聯絡事項)** — [News & Announcements → Weekly tab](/en/news?kind=weekly)',
+      '- **Press / media coverage** — [News & Announcements → Press tab](/en/news?kind=press)',
+      '- **School-year calendars, handbooks & policies** — [Documents library](/en/documents)',
+      '- **Event photos & videos** — [Photos & Videos](/en/media)',
+      '- **Program descriptions (Pre-K through Credit, TCML, TA, Recreational)** — [Programs](/en/programs)',
+      '- **Registration (2026-27)** — [Enroll](/en/enroll)',
+      '',
+      '## Archived PDFs (direct download)\n\nOlder documents that no longer apply to the current school year are kept here for reference.',
+    ].join('\n\n'),
+    body_zh: [
+      '## 關於本檔案頁\n\n本頁保存原 SDCA 網站的舊文章、通告與 PDF，以免遺失。舊項目會列出它在新網站上的位置，或直接下載。',
+      '## 現在在哪裡找到\n\n- **每週家長聯絡事項** — [新聞與通告 → 每週分頁](/zh/news?kind=weekly)',
+      '- **媒體報導** — [新聞與通告 → 媒體分頁](/zh/news?kind=press)',
+      '- **學年行事曆、手冊與政策** — [文件庫](/zh/documents)',
+      '- **活動照片與影片** — [照片與影片](/zh/media)',
+      '- **課程說明（學前班至學分班、TCML、TA、休閒課程）** — [課程](/zh/programs)',
+      '- **註冊（2026-27）** — [報名註冊](/zh/enroll)',
+      '',
+      '## 檔案 PDF（直接下載）\n\n不再適用於目前學年的舊文件保留在此以供參考。',
+    ].join('\n\n'),
+    hero_image: '',
+  },
 ];
 
 export function seedPages(db, log, skipped) {

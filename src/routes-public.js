@@ -140,6 +140,7 @@ export function registerPublicRoutes(app, bridge) {
           descEn: 'A California non-profit funded by families, sponsors and Scrip sales.',
           descZh: '由家長、贊助商與禮券收入支持的加州非營利機構。' },
       ],
+      slides: db.prepare('SELECT * FROM slides WHERE published = 1 ORDER BY sort, id').all(),
       announcements: db.prepare(
         'SELECT a.*, d.title_en AS doc_title_en, d.title_zh AS doc_title_zh, d.file_path AS doc_path '
         + 'FROM announcements a LEFT JOIN documents d ON d.id = a.document_id '

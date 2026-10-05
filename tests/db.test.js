@@ -10,7 +10,7 @@ import { applyMigrations, MIGRATIONS_DIR } from '../src/db/migrate.js';
 const EXPECTED_TABLES = [
   'pages', 'announcements', 'events', 'programs', 'people', 'sponsors',
   'documents', 'media_items', 'contact_messages', 'newsletter_subscribers',
-  'admin_users', 'sessions', 'audit_log', 'settings', 'search_index',
+  'admin_users', 'sessions', 'audit_log', 'settings', 'search_index', 'slides',
 ];
 
 function makeTempDb() {
@@ -23,7 +23,7 @@ test('migration applies once and is idempotent', () => {
   try {
     const db = newDb(file);
     const first = applyMigrations(db);
-    assert.equal(first.length, 1, 'first run applies 001_schema.sql');
+    assert.equal(first.length, 2, 'first run applies 001_schema.sql + 002_slides.sql');
     const second = applyMigrations(db);
     assert.equal(second.length, 0, 'second run applies nothing');
     db.close();

@@ -252,3 +252,23 @@
 
 /* news-list (reuses announcement-item styling; just ensure spacing) */
 .news-list { gap: var(--sp-3); }
+
+/* hero thumbnail strip on /media */
+.hero-thumb-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+.hero-thumb {
+  display: block;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform .2s ease, border-color .2s ease;
+}
+.hero-thumb img {
+  width: 100%; height: 100px; object-fit: cover; display: block;
+}
+.hero-thumb:hover { transform: translateY(-2px); }
+.hero-thumb.is-active { border-color: var(--red, #B3112A); }
+.hero-thumb:focus-visible { outline: 3px solid var(--red, #B3112A); outline-offset: 2px; }

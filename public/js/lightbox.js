@@ -61,3 +61,17 @@
     else if (e.key === 'ArrowLeft') prev();
   });
 })();
+
+// Hero thumbnail strip on /media — clicking a thumbnail opens it in the lightbox.
+document.querySelectorAll('a[data-thumb]').forEach((a) => {
+  a.addEventListener('click', (e) => {
+    if (!lb) return;
+    e.preventDefault();
+    const base = a.dataset.thumb;
+    const alt = a.dataset.alt || '';
+    const src = `/img/${base}-1600.jpg`;
+    items = [{ src, alt, caption: alt }];
+    open(0);
+    document.querySelectorAll('a[data-thumb]').forEach((x) => x.classList.toggle('is-active', x === a));
+  });
+});

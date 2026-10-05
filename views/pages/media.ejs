@@ -23,6 +23,32 @@
   heroVariant: 'photo',
 }) %>
 
+<% if (typeof heroSlides !== 'undefined' && heroSlides && heroSlides.length) { %>
+<section class="section" aria-labelledby="media-hero-h">
+  <div class="container">
+    <div class="section-head">
+      <h2 id="media-hero-h"><%= L === 'zh' ? '歡迎橫幅照片' : 'Home banner photos' %></h2>
+      <p class="section-lead"><%= L === 'zh' ? '點一下縮圖即可在上方顯示。'
+                                          : 'Click a thumbnail to feature it above.' %></p>
+    </div>
+    <div class="hero-thumb-strip" role="list" aria-label="<%= L === 'zh' ? '歡迎橫幅縮圖' : 'Home banner thumbnails' %>">
+      <% heroSlides.forEach(function(s, i) {
+           const base = String(s.image || '').replace(/^\/img\//, '').replace(/^img\//, '');
+           const alt = L === 'zh' ? (s.caption_zh || s.caption_en || base) : (s.caption_en || s.caption_zh || base);
+      %>
+      <a class="hero-thumb <%= i === 0 ? 'is-active' : '' %>" role="listitem"
+         href="#gallery"
+         data-thumb="<%= base %>"
+         data-alt="<%= alt %>"
+         aria-label="<%= alt %>">
+        <img src="/img/<%= base %>-480.jpg" alt="<%= alt %>" loading="lazy" width="160" height="108">
+      </a>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<% } %>
+
 <section class="section" aria-labelledby="media-gal-h">
   <div class="container">
     <div class="section-head">

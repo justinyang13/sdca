@@ -30,10 +30,10 @@
           </svg>
         </span>
         <div>
-          <h3 class="doc-title"><a href="/<%= L %>/documents/<%= d.slug %>"><%= title(d) %></a></h3>
+          <h3 class="doc-title"><a href="/pdf/<%= d.slug %>" target="_blank" rel="noopener"><%= title(d) %></a></h3>
           <div class="doc-meta"><%= d.school_year || '' %> · <%= Math.max(1, Math.round(d.bytes / 1024)) %> KB</div>
         </div>
-        <a class="btn btn-ghost btn-sm" href="/<%= L %>/documents/<%= d.slug %>"><%= t('calendar.download_all') %></a>
+        <a class="btn btn-ghost btn-sm" href="/pdf/<%= d.slug %>" target="_blank" rel="noopener"><%= t('calendar.download_all') %></a>
       </li>
       <% }) %>
     </ul>

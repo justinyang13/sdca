@@ -1,0 +1,31 @@
+<%# slides-list.ejs %>
+<div class="list-head">
+  <h1>Hero Slides</h1>
+  <a class="btn btn-primary" href="/admin/slides/new">+ New slide</a>
+</div>
+<p class="hint">
+  Ordered by <code>sort</code>. Image is a manifest base name (e.g.
+  <code>cultural-day</code>) or a full <code>/img/...</code> path.
+</p>
+<table class="table">
+  <thead><tr><th>Sort</th><th>Image</th><th>Caption (EN)</th><th>Caption (ZH)</th><th>Link</th><th>Published</th><th>Actions</th></tr></thead>
+  <tbody>
+    <% for (const r of rows) { %>
+    <tr>
+      <td><%= r.sort %></td>
+      <td><a href="/img/<%= String(r.image).replace(/^img\//, '') %>-480.jpg" target="_blank" rel="noopener"><%= r.image %></a></td>
+      <td><%= r.caption_en || '—' %></td>
+      <td><%= r.caption_zh || '—' %></td>
+      <td><%= r.link_url || '—' %></td>
+      <td><%= r.published ? 'yes' : 'no' %></td>
+      <td>
+        <a href="/en/" target="_blank" rel="noopener">view home</a>
+        <form method="POST" action="/admin/slides/<%= r.id %>/delete" class="inline-form" onsubmit="return confirm('Delete?')">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>

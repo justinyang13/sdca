@@ -324,6 +324,49 @@ export function registerAdminRoutes(app, { db }) {
     res.redirect('/admin/events');
   });
 
+  // ---------- Slides (home hero carousel) ----------
+  app.get('/admin/slides', (req, res) => {
+    renderAdmin(req, res, 'slides-list.ejs', { rows: listRows('slides', 'sort, id') });
+  });
+  app.get('/admin/slides/new', (req, res) => {
+    renderAdmin(req, res, 'slide-edit.ejs', { item: null });
+  });
+  app.get('/admin/slides/:id', (req, res) => {
+    const item = getRow('slides', req.params.id);
+    if (!item) return res.status(404).send('Not found');
+    renderAdmin(req, res, 'slide-edit.ejs', { item });
+  });
+  app.post('/admin/slides', csrfMiddleware, (req, res) => {
+    const b = req.body || {};
+    const id = text(b.id);
+    if (id) {
+      db.prepare(`
+        UPDATE slides SET image=?, caption_en=?, caption_zh=?, link_url=?, sort=?, published=?
+        WHERE id=?
+      `).run(
+        text(b.image), text(b.caption_en), text(b.caption_zh), text(b.link_url),
+        parseInt(b.sort, 10) || 0, b.published ? 1 : 0, parseInt(id, 10)
+      );
+      audit(db, req.session.user.username, 'update', 'slides', id);
+    } else {
+      const info = db.prepare(`
+        INSERT INTO slides (image, caption_en, caption_zh, link_url, sort, published)
+        VALUES (?,?,?,?,?,?)
+      `).run(
+        text(b.image), text(b.caption_en), text(b.caption_zh), text(b.link_url),
+        parseInt(b.sort, 10) || 0, b.published ? 1 : 0
+      );
+      audit(db, req.session.user.username, 'create', 'slides', String(info.lastInsertRowid));
+    }
+    res.redirect('/admin/slides');
+  });
+  app.post('/admin/slides/:id/delete', csrfMiddleware, (req, res) => {
+    const id = req.params.id;
+    db.prepare('DELETE FROM slides WHERE id = ?').run(id);
+    audit(db, req.session.user.username, 'delete', 'slides', id);
+    res.redirect('/admin/slides');
+  });
+
   // ---------- Pages ----------
   app.get('/admin/pages', (req, res) => {
     renderAdmin(req, res, 'pages-list.ejs', { rows: listRows('pages', 'nav_order, slug') });

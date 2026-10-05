@@ -16,32 +16,26 @@
   "nav.breadcrumb": "breadcrumb",
   "nav.switch_lang_to_en": "English",
   "nav.switch_lang_to_zh": "繁體中文",
-
   "nav.about_about": "關於 SDCA",
   "nav.about_board": "董事會",
   "nav.about_staff": "工作人員",
   "nav.about_principal": "校長的話",
-
   "nav.programs_classes": "課程說明與分級",
   "nav.programs_tcml": "成人中文（TCML）",
   "nav.programs_recreational": "休閒與文化課程",
   "nav.programs_ta": "助教計劃",
   "nav.programs_bell": "鐘點表與教材",
-
   "nav.news_announcements": "家庭聯絡事項",
   "nav.news_events": "活動",
   "nav.news_press": "媒體與新聞",
   "nav.news_media": "照片與影片",
-
   "nav.parents_handbook": "手冊與政策",
   "nav.parents_volunteer": "志工",
   "nav.parents_scrip": "書券（Scrip）",
   "nav.parents_docs": "表單與下載",
-
   "nav.support_donate": "捐款",
   "nav.support_sponsors": "我們的贊助者",
   "nav.support_scrip": "書券 / AmazonSmile / iGive",
-
   "button.learn_more": "了解更多",
   "button.enroll_now": "立即報名",
   "button.read_more": "閱讀更多",
@@ -57,7 +51,6 @@
   "button.search": "搜尋",
   "button.clear": "清除",
   "button.all_categories": "全部類別",
-
   "footer.tagline": "非營利語言學校，自 1988 年起教授中文與中華文化。",
   "footer.school": "學校",
   "footer.about": "關於我們",
@@ -70,9 +63,7 @@
   "footer.privacy": "隱私政策",
   "footer.disclaimer": "免責聲明",
   "footer.rights": "版權所有。",
-
   "hero.default_title": "歡迎來到 SDCA",
-
   "tabs.announcements": "篩選通告",
   "tabs.all": "全部",
   "tabs.weekly": "每週通告",
@@ -80,7 +71,6 @@
   "tabs.press": "媒體",
   "tabs.notice": "通知",
   "tabs.no_results": "找不到項目。",
-
   "search.placeholder": "搜尋通告、活動、頁面…",
   "search.title": "搜尋",
   "search.results": "搜尋結果",
@@ -98,7 +88,6 @@
   "search.kind.document": "文件",
   "search.kind.media": "媒體",
   "search.no_query": "請輸入搜尋字詞。",
-
   "news.title": "新聞與通告",
   "news.sub": "每週通告、新聞、媒體剪報與通知。",
   "news.weekly": "家庭聯絡事項",
@@ -106,7 +95,6 @@
   "news.published": "發佈日期",
   "news.no_doc": "此項目沒有附件。",
   "news.other_announcements": "其他通告",
-
   "events.title": "活動",
   "events.sub": "即將舉行的活動與學年行事曆。",
   "events.past": "已結束的活動",
@@ -117,15 +105,19 @@
   "events.list_view": "清單檢視",
   "events.no_events": "當日沒有活動。",
   "events.ics_desc": "SDCA 活動",
-  "sun": "日", "mon": "一", "tue": "二", "wed": "三", "thu": "四", "fri": "五", "sat": "六",
-
+  "sun": "日",
+  "mon": "一",
+  "tue": "二",
+  "wed": "三",
+  "thu": "四",
+  "fri": "五",
+  "sat": "六",
   "calendar.title": "行事曆",
   "calendar.sub": "學年行事曆、教室地圖與重要日期。",
   "calendar.years": "學年行事曆",
   "calendar.this_year": "本學年重點日期",
   "calendar.first_day": "開學日",
   "calendar.download_all": "下載",
-
   "media.title": "照片與影片",
   "media.sub": "SDCA 課堂、節慶與活動的精彩瞬間。",
   "media.gallery": "照片集",
@@ -135,14 +127,12 @@
   "media.watch": "觀看播放清單",
   "media.open_album": "開啟相簿",
   "media.photos": "張照片",
-
   "parents.handbook_title": "手冊與政策",
   "parents.volunteer_title": "志工",
   "parents.scrip_title": "書券（Scrip）",
   "parents.forms_title": "表單與下載",
   "parents.related_forms": "相關表單",
   "parents.download": "下載",
-
   "documents.title": "文件與表單",
   "documents.sub": "學年行事曆、手冊、比賽規則、每週 PDF 等。",
   "documents.search_ph": "依標題篩選…",
@@ -161,7 +151,6 @@
   "documents.cat.scrip": "書券",
   "documents.bytes_kb": "KB",
   "documents.bytes_mb": "MB",
-
   "styleguide.title": "設計系統 — 樣式指南",
   "styleguide.sub": "SDCA 設計系統的所有元件，以英文與繁體中文呈現。",
   "styleguide.components": "元件",
@@ -177,7 +166,6 @@
   "styleguide.forms": "表單",
   "styleguide.tabs": "篩選分頁",
   "styleguide.icon": "圖示磚",
-
   "form.name": "姓名",
   "form.email": "電子郵件",
   "form.phone": "電話",
@@ -194,16 +182,15 @@
   "form.success": "感謝您！我們已收到您的訊息，將盡快回覆。",
   "form.spam_detected": "您的訊息疑似垃圾內容，已未送出。",
   "form.send_failed": "抱歉，發生錯誤，請稍後再試。",
-
   "errors.not_found_title": "找不到頁面",
   "errors.not_found_body": "您要找的頁面不存在或已移動。",
   "errors.server_title": "發生問題",
   "errors.server_body": "發生未預期的錯誤，請稍後再試。",
   "errors.back_home": "回到首頁",
   "errors.back_news": "回到新聞",
-
   "meta.only_english": "English only",
   "meta.only_zh": "僅提供中文",
   "meta.lang_note_en": "Chinese version is not available yet.",
-  "meta.lang_note_zh": "English version is not available yet."
+  "meta.lang_note_zh": "English version is not available yet.",
+  "button.open": "開啟"
 }

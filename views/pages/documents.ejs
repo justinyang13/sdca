@@ -59,13 +59,13 @@
           </svg>
         </span>
         <div>
-          <h3 class="doc-title"><a href="<%= href(d) %>"><%= title(d) %></a></h3>
+          <h3 class="doc-title"><a href="/pdf/<%= d.slug %>" target="_blank" rel="noopener"><%= title(d) %></a></h3>
           <div class="doc-meta">
             <% if (d.school_year) { %><%= d.school_year %> · <% } %>
             <%= t('documents.cat.' + d.category) || d.category %> · <%= size(d.bytes) %>
           </div>
         </div>
-        <a class="btn btn-ghost btn-sm" href="<%= href(d) %>" rel="noopener">
+        <a class="btn btn-ghost btn-sm" href="/pdf/<%= d.slug %>/download" download rel="noopener" title="<%= t('button.download') %>">
           <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 2v8M4 7l4 4 4-4M2 14h12"/></svg>
           <%= t('button.download') %>
         </a>

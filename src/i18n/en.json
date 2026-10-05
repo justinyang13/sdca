@@ -16,32 +16,26 @@
   "nav.breadcrumb": "Breadcrumb",
   "nav.switch_lang_to_en": "English",
   "nav.switch_lang_to_zh": "繁體中文",
-
   "nav.about_about": "About SDCA",
   "nav.about_board": "Board of Directors",
   "nav.about_staff": "Staff",
   "nav.about_principal": "Principal's Message",
-
   "nav.programs_classes": "Class Descriptions & Placement",
   "nav.programs_tcml": "Adult Chinese (TCML)",
   "nav.programs_recreational": "Recreational & Culture",
   "nav.programs_ta": "TA Program",
   "nav.programs_bell": "Bell Schedule & Textbooks",
-
   "nav.news_announcements": "Weekly Announcements",
   "nav.news_events": "Events",
   "nav.news_press": "Press & News Archive",
   "nav.news_media": "Photos & Videos",
-
   "nav.parents_handbook": "Handbook & Policies",
   "nav.parents_volunteer": "Volunteer",
   "nav.parents_scrip": "Scrip",
   "nav.parents_docs": "Forms & Downloads",
-
   "nav.support_donate": "Donate",
   "nav.support_sponsors": "Our Sponsors",
   "nav.support_scrip": "Scrip / AmazonSmile / iGive",
-
   "button.learn_more": "Learn more",
   "button.enroll_now": "Enroll now",
   "button.read_more": "Read more",
@@ -57,7 +51,6 @@
   "button.search": "Search",
   "button.clear": "Clear",
   "button.all_categories": "All categories",
-
   "footer.tagline": "Non-profit language school teaching Mandarin and Chinese culture since 1988.",
   "footer.school": "School",
   "footer.about": "About",
@@ -70,9 +63,7 @@
   "footer.privacy": "Privacy Policy",
   "footer.disclaimer": "Disclaimer",
   "footer.rights": "All rights reserved.",
-
   "hero.default_title": "Welcome to SDCA",
-
   "tabs.announcements": "Filter announcements",
   "tabs.all": "All",
   "tabs.weekly": "Weekly",
@@ -80,7 +71,6 @@
   "tabs.press": "Press",
   "tabs.notice": "Notices",
   "tabs.no_results": "No items found.",
-
   "search.placeholder": "Search announcements, events, pages…",
   "search.title": "Search",
   "search.results": "Search results",
@@ -98,7 +88,6 @@
   "search.kind.document": "Document",
   "search.kind.media": "Media",
   "search.no_query": "Please enter a search term.",
-
   "news.title": "News & Announcements",
   "news.sub": "Weekly announcements, news, press archive and notices.",
   "news.weekly": "Weekly Announcement",
@@ -106,7 +95,6 @@
   "news.published": "Published",
   "news.no_doc": "No attachment for this item.",
   "news.other_announcements": "Other announcements",
-
   "events.title": "Events",
   "events.sub": "Upcoming events and the school-year calendar.",
   "events.past": "Past events",
@@ -117,15 +105,19 @@
   "events.list_view": "List view",
   "events.no_events": "No events on this day.",
   "events.ics_desc": "SDCA event",
-  "sun": "Sun", "mon": "Mon", "tue": "Tue", "wed": "Wed", "thu": "Thu", "fri": "Fri", "sat": "Sat",
-
+  "sun": "Sun",
+  "mon": "Mon",
+  "tue": "Tue",
+  "wed": "Wed",
+  "thu": "Thu",
+  "fri": "Fri",
+  "sat": "Sat",
   "calendar.title": "Calendar",
   "calendar.sub": "School-year calendars, the classroom map and key dates.",
   "calendar.years": "School-year calendars",
   "calendar.this_year": "Current year at a glance",
   "calendar.first_day": "First day of school",
   "calendar.download_all": "Download",
-
   "media.title": "Photos & Videos",
   "media.sub": "Moments from SDCA classrooms, festivals and events.",
   "media.gallery": "Photo gallery",
@@ -135,14 +127,12 @@
   "media.watch": "Watch playlist",
   "media.open_album": "Open album",
   "media.photos": "photos",
-
   "parents.handbook_title": "Handbook & Policies",
   "parents.volunteer_title": "Volunteer",
   "parents.scrip_title": "Scrip",
   "parents.forms_title": "Forms & Downloads",
   "parents.related_forms": "Related forms",
   "parents.download": "Download",
-
   "documents.title": "Documents & Forms",
   "documents.sub": "School calendars, handbooks, contest rules, weekly PDFs and more.",
   "documents.search_ph": "Filter by title…",
@@ -161,7 +151,6 @@
   "documents.cat.scrip": "Scrip",
   "documents.bytes_kb": "KB",
   "documents.bytes_mb": "MB",
-
   "styleguide.title": "Design System — Style Guide",
   "styleguide.sub": "Every component in the SDCA design system, rendered in English and Traditional Chinese.",
   "styleguide.components": "Components",
@@ -177,7 +166,6 @@
   "styleguide.forms": "Forms",
   "styleguide.tabs": "Filter tabs",
   "styleguide.icon": "Icon tile",
-
   "form.name": "Name",
   "form.email": "Email",
   "form.phone": "Phone",
@@ -194,16 +182,15 @@
   "form.success": "Thank you! Your message has been received. We will get back to you soon.",
   "form.spam_detected": "Your message appears to contain spam and was not sent.",
   "form.send_failed": "Sorry, something went wrong. Please try again later.",
-
   "errors.not_found_title": "Page not found",
   "errors.not_found_body": "The page you are looking for does not exist or has moved.",
   "errors.server_title": "Something went wrong",
   "errors.server_body": "An unexpected error occurred. Please try again later.",
   "errors.back_home": "Back to home",
   "errors.back_news": "Back to news",
-
   "meta.only_english": "English only",
   "meta.only_zh": "僅提供中文",
   "meta.lang_note_en": "Chinese version is not available yet.",
-  "meta.lang_note_zh": "English version is not available yet."
+  "meta.lang_note_zh": "English version is not available yet.",
+  "button.open": "Open"
 }

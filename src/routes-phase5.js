@@ -11,7 +11,7 @@ import { searchContent } from './search.js';
 import { icsForEvents } from './ics.js';
 import { buildSitemap } from './sitemap.js';
 import { lookupRedirect } from './redirects.js';
-import { bodyFor } from './helpers.js';
+import { bodyFor, setting } from './helpers.js';
 
 const PER_PAGE = 12;
 const ANN_KINDS = ['all', 'weekly', 'news', 'press', 'notice'];
@@ -222,8 +222,9 @@ export function registerPhase5Routes(app, bridge) {
     const photos = db.prepare(`SELECT * FROM media_items WHERE kind = 'photo' AND image != '' ORDER BY taken_at DESC, id`).all();
     const videos = db.prepare(`SELECT * FROM media_items WHERE kind = 'video' AND url != '' ORDER BY id`).all();
     const albums = db.prepare(`SELECT * FROM media_items WHERE kind = 'album' AND url != '' ORDER BY id`).all();
+    const heroSlides = db.prepare('SELECT * FROM slides WHERE published = 1 ORDER BY sort, id').all();
     page(lang, req, res, '/media', 'media.ejs',
-      { photos, videos, albums },
+      { photos, videos, albums, heroSlides },
       lang === 'zh' ? '照片與影片' : 'Photos & Videos',
       lang === 'zh' ? 'SDCA 課堂、節慶與活動的精彩瞬間。' : 'Moments from SDCA classrooms, festivals and events.',
       {
@@ -288,18 +289,47 @@ export function registerPhase5Routes(app, bridge) {
       lang === 'zh' ? '學年行事曆、手冊、比賽規則、每週 PDF 等。' : 'School calendars, handbooks, contest rules, weekly PDFs and more.');
   });
 
+  // ---------- Inline PDF delivery (Phase 8) ----------
+  // /pdf/:slug — serve any published document's file inline (browser renders
+  // PDFs). Used by every PDF link on the site (documents library, news detail,
+  // parents, calendar, handbook, scrip, archive, markdown bodies…).
+  // /pdf/:slug/download — force-download variant (documents library icon).
+  function cleanFilename(doc) {
+    const base = path.basename(doc.file_path || '').replace(/\.[a-z0-9]+$/i, '');
+    return (base || doc.slug || 'document').replace(/[\\/:*?"<>|\s]+/g, '-');
+  }
+  function serveDocFile(req, res, doc, { disposition, forceType } = {}) {
+    const file = path.join(config.root, doc.file_path);
+    if (!fs.existsSync(file)) return false;
+    const mime = (doc.mime && doc.mime !== 'application/octet-stream') ? doc.mime
+      : (doc.file_path && doc.file_path.toLowerCase().endsWith('.pdf') ? 'application/pdf'
+      : (doc.mime || 'application/octet-stream'));
+    res.setHeader('Content-Type', mime);
+    res.setHeader('Content-Disposition', `${disposition}; filename="${cleanFilename(doc)}${path.extname(doc.file_path || '') || '.pdf'}"`);
+    res.setHeader('Cache-Control', 'private, max-age=3600');
+    res.sendFile(file);
+    return true;
+  }
+  app.get('/pdf/:slug', function (req, res, next) {
+    const doc = db.prepare('SELECT * FROM documents WHERE slug = ? AND published = 1').get(req.params.slug);
+    if (!doc) return next();
+    if (serveDocFile(req, res, doc, { disposition: 'inline' })) return;
+    return next();
+  });
+  app.get('/pdf/:slug/download', function (req, res, next) {
+    const doc = db.prepare('SELECT * FROM documents WHERE slug = ? AND published = 1').get(req.params.slug);
+    if (!doc) return next();
+    if (serveDocFile(req, res, doc, { disposition: 'attachment' })) return;
+    return next();
+  });
+
   // ---------- /documents/:slug (serves the PDF when present) ----------
   app.get('/:lang/documents/:slug', function (req, res) {
     const lang = req.params.lang;
     if (!SUPPORTED.includes(lang)) return notFound(req, res);
     const doc = db.prepare('SELECT * FROM documents WHERE slug = ? AND published = 1').get(req.params.slug);
     if (!doc) return notFound(req, res);
-    const file = path.join(config.root, doc.file_path);
-    if (fs.existsSync(file)) {
-      res.setHeader('Content-Type', doc.mime || 'application/octet-stream');
-      res.setHeader('Content-Disposition', `attachment; filename="${path.basename(doc.file_path)}"`);
-      return res.sendFile(file);
-    }
+    if (serveDocFile(req, res, doc, { disposition: 'inline' })) return;
     const related = db.prepare(
       `SELECT * FROM documents WHERE published = 1 AND category = ? AND slug != ? ORDER BY sort, id LIMIT 5`
     ).all(doc.category, doc.slug);
@@ -312,6 +342,53 @@ export function registerPhase5Routes(app, bridge) {
         name: lang === 'zh' ? (doc.title_zh || doc.title_en) : (doc.title_en || doc.title_zh),
         encodingFormat: doc.mime,
       });
+  });
+
+  // ---------- /archive (Phase 8 — content preservation) ----------
+  app.get('/:lang/archive', function (req, res) {
+    const lang = req.params.lang;
+    if (!SUPPORTED.includes(lang)) return notFound(req, res);
+    const pg = db.prepare('SELECT * FROM pages WHERE slug = ?').get('archive');
+    const bf = pg ? bodyFor(pg, lang) : { html: '', note: null };
+    // Archived PDFs: older documents not in the main library (school-year specific,
+    // contest rules, old calendars). Grouped by category.
+    const archivedDocs = db.prepare(
+      "SELECT * FROM documents WHERE published = 1 AND category IN ('weekly','contest','calendar','class-info') ORDER BY school_year DESC, sort, id LIMIT 40"
+    ).all();
+    page(lang, req, res, '/archive', 'content-page.ejs',
+      { pg, mdBody: bf.html, bodyNote: bf.note, archivedDocs },
+      lang === 'zh' ? '檔案' : 'Archive',
+      lang === 'zh' ? '保存原網站的舊文章、通告與 PDF。' : 'Older posts, notices and PDFs from the original site.',
+      {
+        '@context': 'https://schema.org', '@type': 'CollectionPage',
+        name: lang === 'zh' ? 'SDCA 檔案' : 'SDCA Archive',
+      });
+  });
+
+  // ---------- /programs/bell (Bell Schedule & Textbooks) ----------
+  app.get('/:lang/programs/bell', function (req, res) {
+    const lang = req.params.lang;
+    if (!SUPPORTED.includes(lang)) return notFound(req, res);
+    const bellTimes = setting(db, 'bell_times', lang);
+    const classDays = setting(db, 'class_days', lang);
+    const textbooks = db.prepare(
+      "SELECT * FROM documents WHERE published = 1 AND category = 'class-info' ORDER BY sort, id"
+    ).all();
+    const calendar = db.prepare(
+      "SELECT * FROM documents WHERE published = 1 AND category = 'calendar' ORDER BY sort, id"
+    ).all();
+    const bodyHtml = (lang === 'zh' ? (
+      `上課時間：${bellTimes || '週日 1:30 PM & 4:30 PM'}。上課日：${classDays || '週日'}。\n\n以下為教材清單與學年行事曆（PDF，點一下即可開啟）。`
+    ) : (
+      `Class times: ${bellTimes || '1:30 PM & 4:30 PM (Sundays)'} · Class days: ${classDays || 'Sundays'}.\n\nBelow are the textbook lists and school-year calendars (click to open the PDF).`
+    ));
+    // Combine textbooks + calendars into one archivedDocs list for the template
+    const allDocs = [...textbooks, ...calendar];
+    page(lang, req, res, '/programs/bell', 'content-page.ejs',
+      { pg: { title_en: 'Bell Schedule & Textbooks', title_zh: '鐘點表與教材' }, mdBody: bodyHtml, bodyNote: null, archivedDocs: allDocs },
+      lang === 'zh' ? '鐘點表與教材' : 'Bell Schedule & Textbooks',
+      lang === 'zh' ? '上課時間、教材清單與教室地圖。' : 'Class times, textbook lists and classroom maps.',
+      null);
   });
 
   // ---------- /search?q= ----------

@@ -1,0 +1,83 @@
+<%
+  // hero-carousel.ejs — home hero sliding bulletin board (Phase 8).
+  // Server renders all slides; JS (public/js/hero-carousel.js) enables
+  // auto-advance, prev/next, dots, keyboard, swipe, pause on hover/focus,
+  // and respects prefers-reduced-motion. Without JS: first slide visible.
+  //
+  // Read from L: slides (array of { image, caption_en, caption_zh, link_url, id })
+  // ctx: lang, t (i18n fn), imageManifest
+  const slides = (typeof L !== 'undefined' && L.slides && L.slides.length)
+    ? L.slides
+    : [{ image: 'classroom-bilingual', caption_en: 'SDCA Bilingual Class', caption_zh: 'SDCA 雙語班', link_url: '' }];
+  const manifest = (typeof imageManifest === 'function') ? imageManifest() : {};
+  const schoolName = (L && (L.schoolName)) || (lang === 'zh' ? '聖地牙哥中華學苑' : 'San Diego Chinese Academy');
+  const tagline = (L && L.tagline) || (lang === 'zh'
+    ? '非營利語言學校，自 1988 年起教授華語和中華文化'
+    : 'Non-profit language school teaching Mandarin and Chinese culture since 1988');
+  const portalUrl = (L && L.portalUrl) || 'https://register.sandiegochineseschool.com';
+  const escapeAttr = (v) => String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  const imgFor = (name) => {
+    const entry = manifest[name];
+    if (!entry || !entry.files || !entry.files.length) return null;
+    const best = entry.files[entry.files.length - 1];
+    const srcset = entry.files.map((f) => (f.file.startsWith('/') ? f.file : '/' + f.file) + ' ' + f.w + 'w').join(', ');
+    return { src: (best.file.startsWith('/') ? best.file : '/' + best.file), srcset, w: best.w, h: best.h, alt_en: entry.alt_en, alt_zh: entry.alt_zh };
+  };
+%>
+<section class="hero-carousel" role="region" aria-roledescription="carousel" aria-label="<%= lang === 'zh' ? '歡迎橫幅' : 'Welcome banner' %>" data-carousel>
+  <div class="hero-carousel-slides" data-carousel-slides>
+    <% slides.forEach(function(slide, i) {
+      const img = imgFor(slide.image);
+      const alt = (lang === 'zh') ? (slide.caption_zh || (img && img.alt_zh) || slide.caption_en || '') : (slide.caption_en || (img && img.alt_en) || slide.caption_zh || '');
+      const isHome = (i === 0);
+    %>
+    <article class="hero-carousel-slide <%= isHome ? 'is-home' : '' %>" role="group" aria-roledescription="slide" aria-label="<%= escapeAttr(alt) %>">
+      <div class="hero-carousel-media" aria-hidden="<%= isHome ? 'false' : 'true' %>">
+        <% if (img) { %>
+          <img class="hero-carousel-img"
+               src="<%= img.src %>"
+               srcset="<%= img.srcset %>"
+               sizes="(max-width: 768px) 100vw, 1600px"
+               width="<%= img.w %>" height="<%= img.h %>"
+               alt="<%= escapeAttr(alt) %>"
+               <%= isHome ? 'fetchpriority="high"' : 'loading="lazy"' %>>
+        <% } else { %>
+          <div class="hero-carousel-img hero-carousel-fallback"></div>
+        <% } %>
+      </div>
+      <div class="hero-carousel-inner">
+        <% if (isHome) { %>
+        <h1 class="hero-carousel-h1"><%= schoolName %></h1>
+        <p class="hero-carousel-tagline"><%= tagline %></p>
+        <div class="hero-carousel-cta">
+          <a class="btn btn-primary btn-lg" href="/<%= lang %>/programs"><%= lang === 'zh' ? '探索課程' : 'Explore Programs' %> →</a>
+          <a class="btn btn-light btn-lg" href="<%= portalUrl %>" target="_blank" rel="noopener"><%= lang === 'zh' ? '立即報名' : 'Enroll Now' %></a>
+        </div>
+        <% } else if (slide.caption_en || slide.caption_zh) { %>
+        <div class="hero-carousel-caption">
+          <span class="hero-carousel-caption-text"><%= lang === 'zh' ? (slide.caption_zh || slide.caption_en) : (slide.caption_en || slide.caption_zh) %></span>
+          <% if (slide.link_url) { %>
+            <a class="btn btn-light btn-sm" href="<%= slide.link_url %>"><%= lang === 'zh' ? '了解更多' : 'Learn more' %> →</a>
+          <% } %>
+        </div>
+        <% } %>
+      </div>
+    </article>
+    <% }) %>
+  </div>
+  <div class="hero-carousel-controls" aria-hidden="true">
+    <button type="button" class="hero-carousel-btn hero-carousel-prev" data-carousel-prev aria-label="<%= lang === 'zh' ? '上一張' : 'Previous slide' %>">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+    </button>
+    <button type="button" class="hero-carousel-btn hero-carousel-next" data-carousel-next aria-label="<%= lang === 'zh' ? '下一張' : 'Next slide' %>">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+  </div>
+  <div class="hero-carousel-dots" role="tablist" aria-label="<%= lang === 'zh' ? '選擇橫幅' : 'Choose slide' %>">
+    <% slides.forEach(function(slide, i) {
+      const alt = (lang === 'zh') ? (slide.caption_zh || slide.caption_en) : (slide.caption_en || slide.caption_zh);
+    %>
+    <button type="button" class="hero-carousel-dot <%= i === 0 ? 'is-active' : '' %>" role="tab" aria-selected="<%= String(i === 0) %>" aria-label="<%= escapeAttr(alt) %> — <%= lang === 'zh' ? '第' + (i + 1) + '張' : 'slide ' + (i + 1) %>" data-carousel-dot="<%= i %>"></button>
+    <% }) %>
+  </div>
+</section>

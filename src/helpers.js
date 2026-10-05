@@ -85,7 +85,7 @@ export function pageBySlug(db, slug) {
 export function mdToHtml(md, { title = '' } = {}) {
   if (!md) return '';
   const raw = marked.parse(md, { mangle: false, headerIds: false, breaks: false });
-  return sanitizeHtml(raw, {
+  return withPdfTargets(sanitizeHtml(raw, {
     allowedTags: [
       'h1', 'h2', 'h3', 'h4', 'h5', 'p', 'ul', 'ol', 'li', 'strong', 'em', 'del',
       'a', 'code', 'pre', 'blockquote', 'table', 'thead', 'tbody', 'tr', 'th', 'td',
@@ -96,7 +96,31 @@ export function mdToHtml(md, { title = '' } = {}) {
       img: ['src', 'alt', 'width', 'height'],
     },
     allowedSchemes: ['http', 'https', 'mailto', 'tel'],
-  });
+  }));
+}
+
+/**
+ * Auto-add target="_blank" rel="noopener" to any link whose href is a PDF
+ * (local or external). Per Phase 8, every PDF link must open in a new tab.
+ */
+export function withPdfTargets(html) {
+  if (!html) return '';
+  return String(html).replace(
+    /<a([^>]*?)href="([^"]*?\.pdf(?:\?[^"]*)?)"/g,
+    (m, attrs, href) => {
+      if (/\starget=/i.test(attrs)) return m;
+      const relPart = /\srel=/i.test(attrs) ? '' : ' rel="noopener"';
+      return `<a${attrs}${relPart} target="_blank" href="${href}"`;
+    }
+  );
+}
+
+/**
+ * Build the canonical inline-PDF URL for a document slug (no lang prefix,
+ * served by the /pdf/:slug route with Content-Disposition: inline).
+ */
+export function pdfUrl(slug) {
+  return `/pdf/${String(slug)}`;
 }
 
 /**

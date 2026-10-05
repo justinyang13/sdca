@@ -1,0 +1,30 @@
+<%# slide-edit.ejs %>
+<h1><%= item ? 'Edit slide' : 'New slide' %></h1>
+<form method="POST" action="/admin/slides" class="form">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <% if (item) { %><input type="hidden" name="id" value="<%= item.id %>"><% } %>
+
+  <label>Image (manifest base name or /img path)
+    <input name="image" required value="<%= item ? item.image : '' %>" placeholder="cultural-day">
+  </label>
+  <label>Caption (English)
+    <input name="caption_en" value="<%= item ? item.caption_en : '' %>" placeholder="Cultural Day — students show off what they learn">
+  </label>
+  <label>Caption (中文)
+    <input name="caption_zh" value="<%= item ? item.caption_zh : '' %>" placeholder="文化日 — 學生展示所學">
+  </label>
+  <label>Link URL (optional, e.g. /programs or /media)
+    <input name="link_url" value="<%= item ? item.link_url : '' %>" placeholder="/programs">
+  </label>
+  <label>Sort order (lower first)
+    <input name="sort" type="number" min="0" step="1" value="<%= item ? item.sort : 0 %>">
+  </label>
+  <label class="check">
+    <input type="checkbox" name="published" <%= (item ? !!item.published : true) ? 'checked' : '' %>>
+    Published
+  </label>
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary"><%= item ? 'Save' : 'Create' %></button>
+    <a class="btn btn-ghost" href="/admin/slides">Cancel</a>
+  </div>
+</form>
