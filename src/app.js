@@ -8,7 +8,7 @@ import { t, SUPPORTED } from './i18n/index.js';
 import { applyBaseMiddleware } from './middleware/index.js';
 import { openDb } from './db/open.js';
 import * as H from './helpers.js';
-import { imageManifest, withPdfTargets, assetUrl } from './helpers.js';
+import { imageManifest, withPdfTargets, assetUrl, withAssetUrls } from './helpers.js';
 import { registerPublicRoutes } from './routes-public.js';
 import { registerPhase5Routes } from './routes-phase5.js';
 import { registerAdminRoutes } from './admin/routes.js';

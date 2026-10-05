@@ -6,8 +6,8 @@
 const PEOPLE = [
   // ── Board of Directors (9) ─────────────────────────────────────────────────
   { name_en: 'ANA WANG',        name_zh: '王慧琪', role_en: 'President',              role_zh: '理事長',       group: 'board', bio_en: '', bio_zh: '', photo: 'img/board/ana-wang.jpg',  sort: 1 },
-  { name_en: 'CHUN-YU CHUANG',  name_zh: '莊淳宇', role_en: 'Vice President',         role_zh: '副理事長',     group: 'board', bio_en: '', bio_zh: '', photo: '',                    sort: 2 },
-  { name_en: 'GILLIAN LIN',     name_zh: '林子倫', role_en: 'Secretary',              role_zh: '執行祕書',     group: 'board', bio_en: '', bio_zh: '', photo: '',                    sort: 3 },
+  { name_en: 'CHUN-YU CHUANG',  name_zh: '莊淳宇', role_en: 'Vice President',         role_zh: '副理事長',     group: 'board', bio_en: '', bio_zh: '', photo: 'img/board/chun-yu-chuang.jpg', sort: 2 },
+  { name_en: 'GILLIAN LIN',     name_zh: '林子倫', role_en: 'Secretary',              role_zh: '執行祕書',     group: 'board', bio_en: '', bio_zh: '', photo: 'img/board/gillian-lin.jpg', sort: 3 },
   { name_en: 'CHRISTINE GIBBS', name_zh: '賴靜頴', role_en: 'Treasurer',              role_zh: '財務理事',     group: 'board', bio_en: '', bio_zh: '', photo: 'img/board/christine-gibbs.jpg', sort: 4 },
   { name_en: 'LING CHAN',       name_zh: '陳菱',   role_en: 'Editorial Director',     role_zh: '編輯組理事',   group: 'board', bio_en: '', bio_zh: '', photo: 'img/board/ling-chan.jpg',   sort: 5 },
   { name_en: 'KATHY KANG',      name_zh: '康欣汝', role_en: 'PTA Director',           role_zh: '家長會理事',   group: 'board', bio_en: '', bio_zh: '', photo: 'img/board/kathy-kang.jpg',  sort: 6 },

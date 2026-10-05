@@ -37,7 +37,7 @@ function rebuildSearch(db) {
   log.push(`search_index: ${n} rows`);
 }
 
-function main() {
+export function main() {
   const db = openDb();
   const counters = {};
 
@@ -81,4 +81,6 @@ function main() {
   }
 }
 
-main();
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main();
+}

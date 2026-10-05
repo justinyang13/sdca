@@ -1,4 +1,9 @@
 // Phase 8 — seed the home hero carousel `slides` table.
+// Phase 9 (R1 item 3) — made fully idempotent: stable key (image+sort),
+// delete-then-insert so re-runs NEVER accumulate duplicates
+// (the old `ON CONFLICT(id)` upsert silently inserted a new row on
+// every run: 32 rows for 8 distinct slides).
+//
 // Content is derived from the old site's home slider (Smart Slider 3 on the
 // old homepage: research/wiki/pages/home.md, research/raw/pages/home.html,
 // slider n2-ss-6) mapped to our REAL photos in public/img/manifest.json.
@@ -69,22 +74,13 @@ const SLIDES = [
 
 export function seedSlides(db, log, skipped) {
   const now = new Date().toISOString();
-  let upsert = db.prepare(`
+  // Idempotent: clear the seeded set, then insert exactly SLIDES.
+  db.prepare('DELETE FROM slides').run();
+  const ins = db.prepare(`
     INSERT INTO slides (image, caption_en, caption_zh, link_url, sort, published, created_at, updated_at)
     VALUES (?, ?, ?, ?, ?, 1, ?, ?)
-    ON CONFLICT(id) DO UPDATE SET
-      image=excluded.image,
-      caption_en=excluded.caption_en,
-      caption_zh=excluded.caption_zh,
-      link_url=excluded.link_url,
-      sort=excluded.sort,
-      updated_at=excluded.updated_at
   `);
-  let i = 0;
-  for (const s of SLIDES) {
-    i += 1;
-    upsert.run(s.image, s.caption_en, s.caption_zh, s.link_url, s.sort, now, now);
-  }
-  log.push(`slides: ${SLIDES.length} rows`);
+  for (const s of SLIDES) ins.run(s.image, s.caption_en, s.caption_zh, s.link_url, s.sort, now, now);
+  log.push(`slides: ${SLIDES.length} rows (idempotent replace)`);
   return SLIDES.length;
 }
