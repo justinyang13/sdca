@@ -6,3 +6,5 @@
 - 2026-10-05: stack decided: Express5+EJS+node:sqlite, no React; plan in ARCHITECTURE.md/BUILD-PLAN.md
 - 2026-10-05: logo family: public/brand/logo-1-badge, logo-2-badge-name, logo-3-full (+ -dark); built by scripts/build-logo-parts.py. Header: full >=1280px, compact 600-1279, badge <600.
 - 2026-10-05: owner feedback round 1 -> BUILD-PLAN Phase 8. All content must be preserved; unplaced items go to research/CONTENT-LEDGER.md for owner review.
+- 2026-10-05: owner: images missing on footer pages -> Phase 8c. Claude must visually QA every page after each phase.
+- 2026-10-05: OWNER RULE: layout may change, but content, images and ORDER of every old page must be preserved (BUILD-PLAN.md top, ARCHITECTURE.md, SPEC.md).
