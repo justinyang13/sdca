@@ -9,3 +9,4 @@
 - 2026-10-05: owner: images missing on footer pages -> Phase 8c. Claude must visually QA every page after each phase.
 - 2026-10-05: OWNER RULE: layout may change, but content, images and ORDER of every old page must be preserved (BUILD-PLAN.md top, ARCHITECTURE.md, SPEC.md).
 - 2026-10-05: OWNER RULE: header menu + sub-items must match the OLD site exactly (labels, order); Phase 8d restores it, runs after 8c.
+- 2026-10-05: owner found disclaimer text differs: seed paraphrased pages. Phase 8f = deterministic verbatim HTML->Markdown import + strict text-fidelity test.
