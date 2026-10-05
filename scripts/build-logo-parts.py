@@ -8,8 +8,8 @@ D = re.search(r' d="([^"]+)"', src).group(1)
 RED = '#B3112A'; NAVY = '#0B2545'; GRAY = '#5B6B84'
 SERIF_ZH = "'Noto Serif TC','Songti TC','PMingLiU',serif"
 SERIF_EN = "Georgia,'Times New Roman',serif"
-BW, BH = 150, 180                      # badge size
-PAD = 6; MH = BH - 2*PAD; S = MH / 446; MW = 353 * S   # shield almost touches the badge edges            # mark scale (fits badge with padding)
+BW, BH = 144, 180                      # badge size: aspect matches the shield so padding is equal on all sides
+PAD = 3; MH = BH - 2*PAD; S = MH / 446; MW = 353 * S   # shield almost touches the badge edges            # mark scale (fits badge with padding)
 badge = (f'<rect width="{BW}" height="{BH}" rx="14" fill="{RED}"/>'
          f'<g transform="translate({(BW-MW)/2:.2f} {PAD}) scale({S:.5f})"><path fill="#fff" stroke="#fff" stroke-width="1.4" stroke-linejoin="round" fill-rule="evenodd" d="{D}"/></g>')
 def wrap(w, body, title, h=BH):
