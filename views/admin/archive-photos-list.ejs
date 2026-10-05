@@ -1,0 +1,34 @@
+<%# archive-photos-list.ejs %>
+<div class="list-head">
+  <h1>Archive Photos</h1>
+  <span class="hint"><a href="/en/media/archive" target="_blank" rel="noopener">view /en/media/archive</a></span>
+</div>
+<p class="hint">
+  Photos from the original SDCA website, preserved at <code>/img/archive/full/</code> (originals, capped 1600px)
+  with 480px thumbnails at <code>/img/archive/</code>. Resize only — no content changes.
+</p>
+<table class="table">
+  <thead><tr><th>ID</th><th>Thumb</th><th>Path</th><th>Group (EN)</th><th>Group (ZH)</th><th>Caption (EN)</th><th>Year</th><th>Sort</th><th>Published</th><th>Actions</th></tr></thead>
+  <tbody>
+    <% for (const r of rows) { %>
+    <tr>
+      <td><%= r.id %></td>
+      <td><a href="<%= r.thumb %>" target="_blank" rel="noopener"><img src="<%= r.thumb %>" alt="" width="48" height="32" style="object-fit:cover;border-radius:4px"></a></td>
+      <td><a href="<%= r.path %>" target="_blank" rel="noopener"><code><%= r.path %></code></a></td>
+      <td><%= r.group_en || '—' %></td>
+      <td><%= r.group_zh || '—' %></td>
+      <td><%= r.caption_en || '—' %></td>
+      <td><%= r.taken_year || '—' %></td>
+      <td><%= r.sort %></td>
+      <td><%= r.published ? 'yes' : 'no' %></td>
+      <td>
+        <a href="/admin/archive-photos/<%= r.id %>">edit</a>
+        <form method="POST" action="/admin/archive-photos/<%= r.id %>/delete" class="inline-form" onsubmit="return confirm('Delete this archive photo row? (Files on disk are NOT deleted.)')">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>

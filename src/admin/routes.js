@@ -190,6 +190,7 @@ export function registerAdminRoutes(app, { db }) {
       sponsors: db.prepare('SELECT COUNT(*) c FROM sponsors').get().c,
       documents: db.prepare('SELECT COUNT(*) c FROM documents').get().c,
       media: db.prepare('SELECT COUNT(*) c FROM media_items').get().c,
+      archivePhotos: db.prepare('SELECT COUNT(*) c FROM archive_photos').get().c,
       newMessages: db.prepare("SELECT COUNT(*) c FROM contact_messages WHERE status='new'").get().c,
       subscribers: db.prepare('SELECT COUNT(*) c FROM newsletter_subscribers').get().c,
     };
@@ -365,6 +366,39 @@ export function registerAdminRoutes(app, { db }) {
     db.prepare('DELETE FROM slides WHERE id = ?').run(id);
     audit(db, req.session.user.username, 'delete', 'slides', id);
     res.redirect('/admin/slides');
+  });
+
+  // ---------- Archive photos (Phase 8b) ----------
+  app.get('/admin/archive-photos', (req, res) => {
+    const rows = listRows('archive_photos', 'taken_year DESC, sort, id');
+    renderAdmin(req, res, 'archive-photos-list.ejs', { rows });
+  });
+  app.get('/admin/archive-photos/:id', (req, res) => {
+    const item = getRow('archive_photos', req.params.id);
+    if (!item) return res.status(404).send('Not found');
+    renderAdmin(req, res, 'archive-photo-edit.ejs', { item });
+  });
+  app.post('/admin/archive-photos', csrfMiddleware, (req, res) => {
+    const b = req.body || {};
+    const id = text(b.id);
+    if (id) {
+      db.prepare(
+        'UPDATE archive_photos SET group_en=?, group_zh=?, caption_en=?, caption_zh=?, ' +
+        'taken_year=?, sort=?, published=? WHERE id=?'
+      ).run(
+        text(b.group_en), text(b.group_zh), text(b.caption_en), text(b.caption_zh),
+        parseInt(b.taken_year, 10) || 0, parseInt(b.sort, 10) || 0,
+        b.published ? 1 : 0, parseInt(id, 10)
+      );
+      audit(db, req.session.user.username, 'update', 'archive_photos', id);
+    }
+    res.redirect('/admin/archive-photos');
+  });
+  app.post('/admin/archive-photos/:id/delete', csrfMiddleware, (req, res) => {
+    const id = req.params.id;
+    db.prepare('DELETE FROM archive_photos WHERE id = ?').run(id);
+    audit(db, req.session.user.username, 'delete', 'archive_photos', id);
+    res.redirect('/admin/archive-photos');
   });
 
   // ---------- Pages ----------

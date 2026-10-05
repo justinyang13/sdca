@@ -234,6 +234,33 @@ export function registerPhase5Routes(app, bridge) {
       });
   });
 
+  // ---------- /media/archive (Phase 8b — uncurated old-site photos) ----------
+  app.get('/:lang/media/archive', function (req, res) {
+    const lang = req.params.lang;
+    if (!SUPPORTED.includes(lang)) return notFound(req, res);
+    const photos = db.prepare(
+      'SELECT * FROM archive_photos WHERE published = 1 ORDER BY taken_year DESC, sort, id'
+    ).all();
+    // group by group_en, preserving order (year desc)
+    const groupOrder = [];
+    const byGroup = new Map();
+    for (const p of photos) {
+      const g = p.group_en || 'Other';
+      if (!byGroup.has(g)) { byGroup.set(g, []); groupOrder.push(g); }
+      byGroup.get(g).push(p);
+    }
+    const groups = groupOrder.map((g) => ({
+      group_en: g,
+      group_zh: (byGroup.get(g)[0] || {}).group_zh || '',
+      photos: byGroup.get(g),
+    }));
+    page(lang, req, res, '/media/archive', 'media-archive.ejs',
+      { groups, total: photos.length },
+      lang === 'zh' ? '照片檔案' : 'Photo Archive',
+      lang === 'zh' ? '原網站保存的真實活動照片。' : 'Real event photos preserved from the original SDCA website.',
+      { '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'SDCA Photo Archive' });
+  });
+
   // ---------- /parents/* ----------
   const PARENT_LINKS = [
     { p: '/parents/handbook', en: 'Handbook & Policies', zh: '手冊與政策' },

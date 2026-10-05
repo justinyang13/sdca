@@ -1,0 +1,64 @@
+<%
+  // media-archive.ejs — uncurated old-site photo archive (Phase 8b).
+  // ctx: { groups, total }
+  const L = lang;
+  const archGroups = (typeof groups !== 'undefined' && groups) ? groups : [];
+  const archTotal = (typeof total !== 'undefined') ? total : 0;
+%>
+<%- renderPart('partials/hero.ejs', {
+  heroTitle: L === 'zh' ? '舊站照片檔案' : 'Photo Archive',
+  heroSub: L === 'zh' ? '原網站的真實活動照片，依年份與活動分類。'
+                      : 'Real event photos from the original SDCA website, grouped by year and event.',
+  heroImage: '/img/banners/banner-paper-cut.png',
+  heroVariant: 'photo',
+}) %>
+
+<section class="section" aria-labelledby="archive-h">
+  <div class="container">
+    <div class="section-head">
+      <h2 id="archive-h"><%= L === 'zh' ? '照片檔案庫' : 'Photo archive' %></h2>
+      <p class="section-lead">
+        <%= archTotal %> <%= L === 'zh' ? '張照片（原網站保存的真實影像）' : 'photos preserved from the original website' %> ·
+        <a href="/<%= L %>/media"><%= L === 'zh' ? '回到精選照片與影片' : 'Back to curated Photos & Videos' %></a>
+      </p>
+    </div>
+
+    <% if (!archGroups.length) { %>
+      <p class="empty-note"><%= L === 'zh' ? '（尚無已發佈的檔案照片。）' : '(No published archive photos yet.)' %></p>
+    <% } %>
+
+    <% archGroups.forEach(function(g) { %>
+    <div class="archive-group" id="grp-<%= g.group_en.toLowerCase().replace(/[^a-z0-9]+/g,'-') %>">
+      <h3 class="archive-group-title">
+        <%= L === 'zh' ? (g.group_zh || g.group_en) : g.group_en %>
+        <span class="archive-group-count"><%= g.photos.length %></span>
+      </h3>
+      <div class="gallery-grid gallery-grid-archive">
+        <% g.photos.forEach(function(p) { %>
+        <a class="gallery-item" data-lightbox="archive"
+           href="<%= p.path %>"
+           data-full="<%= p.path %>"
+           data-alt="<%= L === 'zh' ? (p.caption_zh || p.caption_en) : (p.caption_en || p.caption_zh) %>"
+           data-caption="<%= L === 'zh' ? (p.caption_zh || p.caption_en) : (p.caption_en || p.caption_zh) %>"
+           aria-label="<%= L === 'zh' ? (p.caption_zh || p.caption_en || 'SDCA photo') : (p.caption_en || p.caption_zh || 'SDCA photo') %>">
+          <img src="<%= p.thumb %>"
+               alt="<%= L === 'zh' ? (p.caption_zh || p.caption_en) : (p.caption_en || p.caption_zh) %>"
+               loading="lazy"
+               width="480" height="320"
+               decoding="async">
+        </a>
+        <% }) %>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+</section>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="<%= L === 'zh' ? '照片檔案' : 'Photo archive' %>" hidden>
+  <button class="lb-close" aria-label="<%= t('button.close') %>" data-lb-close>&times;</button>
+  <button class="lb-prev" aria-label="Previous" data-lb-prev>‹</button>
+  <img class="lb-img" src="" alt="">
+  <div class="lb-caption"></div>
+  <button class="lb-next" aria-label="Next" data-lb-next>›</button>
+</div>
+<script type="module" src="/js/lightbox.js"></script>

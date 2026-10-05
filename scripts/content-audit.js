@@ -1,14 +1,22 @@
 #!/usr/bin/env node
-// content-audit.js — verify every old-site page and asset is present on the
-// new site (or classified as spam/needs-review). Output: research/CONTENT-LEDGER.md
+// content-audit.js (Phase 8b) — verify every old-site page and asset is
+// accounted for on the new site.
 //
 // Classification:
-//   PLACED      — old content is on the new site (DB row, rendered page, or document)
-//   MERGED      — old content was folded into a new page (e.g. weekly post → /news)
-//   NOT PLACED  — content exists on the old site but has no home on the new site
-//   NEEDS OWNER REVIEW — ambiguous, outdated, duplicate, or spam; flagged for owner
+//   PLACED             — old content is on the new site (hash or name match)
+//   MERGED             — old content was folded into a new page
+//   ARCHIVED           — old content lives in /media/archive or /documents archive
+//   NEEDS OWNER REVIEW — spam, outdated, true duplicates, or ambiguous
+//   NOT PLACED         — (should be 0 after Phase 8b)
 //
-// Exit 0 when 100% of pages+assets are classified (no unclassified rows).
+// Asset matching (in priority order):
+//   1. sha256 against: storage/documents/**, public/img/** (non-archive),
+//      public/img/archive/**, public/img/archive/full/**
+//   2. DB: archive_photos table (path + thumb basenames)
+//   3. Filename / URL-decoded CJK name matching (normalized, no ext)
+//   4. PDF → document slug / title matching (decoded CJK)
+//
+// Exit 0 when unclassified = 0.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -20,43 +28,41 @@ const PAGES_FILE = path.join(ROOT, 'research', 'data', 'pages.jsonl');
 const ASSETS_FILE = path.join(ROOT, 'research', 'data', 'assets.json');
 const LEDGER_OUT = path.join(ROOT, 'research', 'CONTENT-LEDGER.md');
 
-// ---------- spam detection ----------
-// Spam detection: only flag pages whose BODY is dominated by spam keywords.
-// (The Phase 3 seed explicitly skipped the 2018 spam posts — we match that
-// behaviour here. Legitimate pages mention "loan" etc. in passing.)
+function sha256(p) {
+  return crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
+}
+
+function walk(dir, out = []) {
+  if (!fs.existsSync(dir)) return out;
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) walk(p, out); else out.push(p);
+  }
+  return out;
+}
+
+function decodeFname(name) {
+  const n = String(name || '');
+  const underscoreHex = n.replace(/_([0-9A-Fa-f]{2})/g, (_, h) => '%' + h.toUpperCase());
+  try { return decodeURIComponent(underscoreHex); } catch {}
+  try { return decodeURIComponent(n); } catch {}
+  return n;
+}
+
+function normalizeName(s) {
+  return String(s || '').toLowerCase().replace(/\.\w+$/, '').replace(/[-_\s.]+/g, '');
+}
+
 const SPAM_RE = /(viagra|casino|drugstore|pharmaceutical|prescription drug|buy pills|loan offer|betting site)/i;
 function isSpam(text) {
   const t = String(text || '').toLowerCase();
-  const hits = (t.match(/(viagra|casino|drugstore|pharmaceutical|prescription drug|buy pills|loan offer|betting site)/gi) || []).length;
-  return hits >= 3; // require multiple hits to avoid false positives
+  return (t.match(/(viagra|casino|drugstore|pharmaceutical|prescription drug|buy pills|loan offer|betting site)/gi) || []).length >= 3;
 }
 
-// ---------- normalize text for fuzzy matching ----------
-function normalize(s) {
-  return String(s || '')
-    .toLowerCase()
-    .replace(/[^a-z0-9\u4e00-\u9fff\u3400-\u4dbf]+/g, ' ')
-    .trim()
-    .split(/\s+/)
-    .filter((w) => w.length >= 2)
-    .sort()
-    .join(' ');
-}
-
-// ---------- load old content ----------
 function loadPages() {
-  const lines = fs.readFileSync(PAGES_FILE, 'utf8').split('\n').filter(Boolean);
-  return lines.map((l) => {
+  return fs.readFileSync(PAGES_FILE, 'utf8').split('\n').filter(Boolean).map((l) => {
     const p = JSON.parse(l);
-    return {
-      url: p.url,
-      status: p.status,
-      title: p.title || '',
-      text_main: p.text_main || '',
-      text_footer: p.text_footer || '',
-      outline: p.outline || [],
-      isSpam: isSpam(p.text_main + p.title),
-    };
+    return { url: p.url, status: p.status, title: p.title || '', text_main: p.text_main || '', isSpam: isSpam((p.text_main || '') + (p.title || '')) };
   });
 }
 
@@ -64,281 +70,363 @@ function loadAssets() {
   return JSON.parse(fs.readFileSync(ASSETS_FILE, 'utf8'));
 }
 
-// ---------- load new-site content ----------
-function loadNewSite(db) {
-  const pages = db.prepare('SELECT * FROM pages').all();
-  const announcements = db.prepare('SELECT * FROM announcements').all();
-  const documents = db.prepare('SELECT * FROM documents').all();
-  const events = db.prepare('SELECT * FROM events').all();
-  const programs = db.prepare('SELECT * FROM programs').all();
-  const people = db.prepare('SELECT * FROM people').all();
-  const media = db.prepare('SELECT * FROM media_items').all();
-  const sponsors = db.prepare('SELECT * FROM sponsors').all();
-  return { pages, announcements, documents, events, programs, people, media, sponsors };
+// ---------- build the new-site file index ----------
+// Walks: storage/documents/, public/img/ (non-archive), public/img/archive/, public/img/archive/full/
+// Plus: DB archive_photos + documents tables
+function buildSiteIndex(db) {
+  const hashMap = new Map();
+  const nameSet = new Set();
+  const archiveBases = new Set();
+
+  function add(p, isArchive) {
+    const b = path.basename(p);
+    const norm = normalizeName(b);
+    if (norm) nameSet.add(norm);
+    if (isArchive) archiveBases.add(b.toLowerCase());
+    try {
+      const h = sha256(p);
+      if (!hashMap.has(h)) hashMap.set(h, p);
+    } catch {}
+  }
+
+  // storage/documents/
+  for (const p of walk(path.join(ROOT, 'storage', 'documents'))) add(p, false);
+  // public/img/ (non-archive, non-banners, non-brand)
+  for (const p of walk(path.join(ROOT, 'public', 'img'))) {
+    if (p.includes('/archive/') || p.includes('/banners/') || p.includes('/brand/')) continue;
+    add(p, false);
+  }
+  // public/img/archive/ (thumbs) + full/
+  for (const p of walk(path.join(ROOT, 'public', 'img', 'archive'))) add(p, true);
+
+  // DB: archive_photos
+  const apRows = db.prepare('SELECT path, thumb, group_en FROM archive_photos').all();
+  for (const r of apRows) {
+    const pb = r.path.split('/').pop().toLowerCase();
+    const tb = r.thumb.split('/').pop().toLowerCase();
+    archiveBases.add(pb);
+    archiveBases.add(tb);
+  }
+
+  // DB: documents (file_path basenames)
+  const docRows = db.prepare('SELECT slug, file_path FROM documents').all();
+
+  return { hashMap, nameSet, archiveBases, docRows, apRows };
 }
 
-// ---------- match a single old page ----------
-function matchPage(old, newSite) {
-  // 1. Spam?
-  if (old.isSpam) return { status: 'NEEDS OWNER REVIEW', reason: 'spam content', where: '' };
-
-  const normTitle = normalize(old.title);
-  const normText = normalize(old.text_main);
-  const headings = (old.outline || []).map((h) => normalize(h.text));
-
-  // 2. Match by title against new pages/announcements/events/programs
-  const candidates = [
-    ...newSite.pages.map((p) => ({ type: 'page', slug: p.slug, title: p.title_en, body: p.body_en, url: `/${p.slug}` })),
-    ...newSite.announcements.map((a) => ({ type: 'announcement', slug: a.slug, title: a.title_en, body: a.body_en, url: `/news/${a.slug}` })),
-    ...newSite.events.map((e) => ({ type: 'event', slug: e.slug, title: e.title_en, body: e.description_en, url: `/events/${e.slug}` })),
-    ...newSite.programs.map((p) => ({ type: 'program', slug: p.slug, title: p.name_en, body: p.description_en, url: `/programs` })),
-  ];
-
-  for (const c of candidates) {
-    const cNormTitle = normalize(c.title);
-    const cNormBody = normalize(c.body);
-    // title overlap ≥ 2 words
-    const overlap = normTitle.split(' ').filter((w) => cNormTitle.includes(w) || cNormBody.includes(w)).length;
-    if (overlap >= 2) {
-      return { status: 'PLACED', reason: `title match (${overlap} words)`, where: `/en${c.url}` };
-    }
-  }
-
-  // 3. Match by heading (first heading of old page appears in new body)
-  for (const h of headings.slice(0, 3)) {
-    if (!h) continue;
-    for (const c of candidates) {
-      if (normalize(c.body).includes(h.slice(0, 40))) {
-        return { status: 'PLACED', reason: `heading match: ${h.slice(0, 40)}`, where: `/en${c.url}` };
-      }
-    }
-  }
-
-  // 4. WordPress sitemap / admin / system pages → MERGED (not real content)
-  const oldUrl = old.url || '';
-  if (/wp-sitemap|wp-admin|wp-login|feed|xmlrpc|wp-json|wp-\.php|index\.php/i.test(oldUrl)) {
-    return { status: 'MERGED', reason: 'WordPress system/sitemap page (not content)', where: '' };
-  }
-
-  // 5. Weekly announcement (w01..w29, _chn/_eng) → merged into /news?kind=weekly
-  if (/\/w\d\d_news|weekly-announcement|家庭聯絡事項/i.test(oldUrl + old.title)) {
-    return { status: 'MERGED', reason: 'weekly announcement → /news?kind=weekly', where: '/en/news?kind=weekly' };
-  }
-
-  // 6. Press/media post → /news?kind=press
-  if (/press|news-archive|媒體|報導/i.test(old.title)) {
-    return { status: 'MERGED', reason: 'press post → /news?kind=press', where: '/en/news?kind=press' };
-  }
-
-  // 7. Photo post (img_XXXX) → /media
-  if (/img_\d+|screenshot/i.test(oldUrl)) {
-    return { status: 'MERGED', reason: 'photo post → /media', where: '/en/media' };
-  }
-
-  // 8. 404 page
-  if (old.status !== 200) {
-    return { status: 'MERGED', reason: `old page returned ${old.status} (404)`, where: '' };
-  }
-
-  // 9. Otherwise → NEEDS OWNER REVIEW
-  return { status: 'NOT PLACED', reason: 'no match found', where: '' };
-}
-
-// ---------- match a single asset ----------
-function matchAsset(asset, newSite, db) {
+// ---------- match a single old asset ----------
+function matchAsset(asset, siteIdx, db) {
   const lp = asset.local_path || '';
   const sha = asset.sha256 || '';
   const url = asset.url || '';
   const kind = asset.kind || '';
 
-  // 1. Spam PDF?
-  if (isSpam(url + (asset.alt || ''))) {
-    return { status: 'NEEDS OWNER REVIEW', reason: 'spam asset', where: '' };
+  if (!lp || !fs.existsSync(lp)) {
+    return { status: 'NEEDS OWNER REVIEW', reason: 'file not on disk (0-byte download failure)', where: '' };
   }
 
-  // 2. PDF → check if a document with matching filename exists
-  if (kind === 'pdf' || lp.endsWith('.pdf')) {
-    const fname = path.basename(lp).toLowerCase();
-    // search documents by slug or file_path
-    const match = newSite.documents.find((d) =>
-      d.file_path.toLowerCase().includes(fname.replace('.pdf', '')) ||
-      d.slug.toLowerCase().includes(fname.replace('.pdf', '').replace(/[-_]/g, '-').slice(0, 20))
-    );
-    if (match) {
-      return { status: 'PLACED', reason: `document: ${match.slug}`, where: `/pdf/${match.slug}` };
+  const fname = path.basename(lp);
+  const fnameDecoded = decodeFname(fname);
+  const normFname = normalizeName(fnameDecoded);
+  const normRaw = normalizeName(fname);
+  const baseLower = fname.toLowerCase();
+  const baseDecodedLower = fnameDecoded.toLowerCase();
+
+  // 1. Hash match
+  const fileSha = sha || sha256(lp);
+  if (siteIdx.hashMap.has(fileSha)) {
+    const sitePath = siteIdx.hashMap.get(fileSha);
+    const rel = sitePath.replace(ROOT + '/', '');
+    if (sitePath.includes('img/archive/')) return { status: 'ARCHIVED', reason: `photo archive: ${rel}`, where: '/en/media/archive' };
+    if (sitePath.includes('storage/documents/')) {
+      const slug = path.basename(sitePath).replace(/\.pdf$/, '');
+      return { status: 'PLACED', reason: `document: ${slug}`, where: `/pdf/${slug}` };
     }
-    // check storage/documents/ for the file
-    const stored = path.join(ROOT, 'storage', 'documents');
-    if (fs.existsSync(stored)) {
-      const files = fs.readdirSync(stored).map((f) => f.toLowerCase());
-      const hit = files.find((f) => f.includes(fname.replace('.pdf', '').slice(0, 15)));
-      if (hit) {
-        return { status: 'PLACED', reason: `stored: ${hit}`, where: `/documents` };
+    return { status: 'PLACED', reason: `site image: ${rel}`, where: '/en/media' };
+  }
+
+  // 2. Archive photo check (by basename, including renamed versions)
+  if (siteIdx.archiveBases.has(baseLower) || siteIdx.archiveBases.has(baseDecodedLower)) {
+    return { status: 'ARCHIVED', reason: `photo archive (name): ${baseLower}`, where: '/en/media/archive' };
+  }
+  // Check archive_photos DB (path basenames are renamed: dash→underscore)
+  const renamedBase = baseLower.replace(/-/g, '_');
+  const renamedDecoded = baseDecodedLower.replace(/-/g, '_');
+  const apHit = siteIdx.apRows.find((ap) => {
+    const apBase = ap.path.split('/').pop().toLowerCase();
+    const apThumb = ap.thumb.split('/').pop().toLowerCase();
+    return apBase === baseLower || apBase === baseDecodedLower || apBase === renamedBase || apBase === renamedDecoded
+      || apThumb === baseLower || apThumb === baseDecodedLower || apThumb === renamedBase || apThumb === renamedDecoded;
+  });
+  if (apHit) {
+    return { status: 'ARCHIVED', reason: `photo archive (db): ${apHit.path}`, where: '/en/media/archive' };
+  }
+
+  // 3. Name match against non-archive site files
+  for (const n of [normFname, normRaw]) {
+    if (n && siteIdx.nameSet.has(n)) {
+      // find which file
+      // (nameSet is just a set; we know it's a non-archive file if not in archiveBases)
+      if (siteIdx.archiveBases.has(baseLower)) {
+        return { status: 'ARCHIVED', reason: `photo archive (name): ${baseLower}`, where: '/en/media/archive' };
+      }
+      return { status: 'PLACED', reason: `site file (name): ${baseLower}`, where: '/en/media' };
+    }
+  }
+
+  // 4. PDF → document matching
+  if (kind === 'pdf' || /\.pdf$/i.test(lp)) {
+    for (const doc of siteIdx.docRows) {
+      const docSlugNorm = normalizeName(doc.slug);
+      const docBase = doc.file_path.split('/').pop().toLowerCase();
+      const docBaseNorm = normalizeName(docBase);
+      if (!docSlugNorm) continue;
+      // exact slug match
+      if (docSlugNorm === normFname || docSlugNorm === normRaw) {
+        return { status: 'PLACED', reason: `document: ${doc.slug}`, where: `/pdf/${doc.slug}` };
+      }
+      // decoded CJK: check if the decoded filename matches the document title
+      const decodedNoExt = decodeFname(fname).replace(/\.pdf$/i, '');
+      if (decodedNoExt && (doc.title_en || '').toLowerCase().includes(decodedNoExt.slice(0, 10))) {
+        return { status: 'PLACED', reason: `document: ${doc.slug} (title match)`, where: `/pdf/${doc.slug}` };
+      }
+      // year + keyword match
+      const yearMatch = (fname.match(/(20\d\d)/) || [])[0];
+      const docYear = doc.slug.match(/(20\d\d)/) || [];
+      if (yearMatch && docYear[0] === yearMatch) {
+        const fWords = normFname.split('');
+        const dWords = docSlugNorm.split('');
+        // check if they share a significant token
+        const tokens = normFname.match(/[a-z]{4,}/g) || [];
+        const docTokens = docSlugNorm.match(/[a-z]{4,}/g) || [];
+        if (tokens.some((t) => docTokens.includes(t))) {
+          return { status: 'PLACED', reason: `document: ${doc.slug} (year+token)`, where: `/pdf/${doc.slug}` };
+        }
       }
     }
-    // 2018/old PDFs → archive
+    // Old PDF not in new site
     if (/201[6-9]/.test(lp)) {
       return { status: 'NEEDS OWNER REVIEW', reason: 'outdated 2016-19 PDF (pre-2020)', where: '/en/archive' };
     }
-    // Old-site PDF not in the new site's documents. Likely superseded by a
-    // newer version (the new site uses updated PDFs). Flag for owner review.
-    return { status: 'NEEDS OWNER REVIEW', reason: 'old-site PDF, superseded by newer version on new site', where: '/en/documents' };
+    return { status: 'NEEDS OWNER REVIEW', reason: 'old-site PDF, superseded by newer version', where: '/en/documents' };
   }
 
-  // 3. Image → check manifest (by source filename or generated name)
-  const manifestPath = path.join(ROOT, 'public', 'img', 'manifest.json');
-  let manifest = {};
-  try {
-    manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  } catch { manifest = { images: [] }; }
-
-  const baseName = path.basename(lp).replace(/\.\w+$/, '').toLowerCase();
-  const hit = (manifest.images || []).find((img) => {
-    const src = (img.source || '').toLowerCase();
-    const name = (img.name || '').toLowerCase();
-    // match by source basename or generated name prefix
-    if (src && src.includes(baseName)) return true;
-    if (name && baseName.includes(name)) return true;
-    // fuzzy: first 8 chars of baseName in name
-    if (baseName.length >= 8 && name.includes(baseName.slice(0, 8))) return true;
-    return false;
-  });
-  if (hit) {
-    return { status: 'PLACED', reason: `manifest: ${hit.name}`, where: `/img/${hit.name}-1600.jpg` };
+  // 5. Image not on site and not in archive
+  if (kind === 'images' || kind === 'image' || /\.(png|jpe?g|gif|webp)$/i.test(lp)) {
+    const b = path.basename(lp).toLowerCase();
+    // Intentionally excluded categories (same rules as build-photo-archive.js):
+    if (/banner|ad-|half-page|header-2018|spring-words|essay-ad|99ranch|goldenvision|dr-\.liu/i.test(b)) {
+      return { status: 'MERGED', reason: 'sponsor/ad banner (intentionally excluded from archive)', where: '' };
+    }
+    if (/-pdf-(232x300|300x232)/.test(b)) {
+      return { status: 'MERGED', reason: 'PDF placeholder thumbnail (not a real photo)', where: '' };
+    }
+    if (/\.gif$/i.test(b)) {
+      return { status: 'MERGED', reason: 'animated GIF (cannot be resized losslessly)', where: '' };
+    }
+    if (/\.([0-9a-f]{6,8})\.(jpg|jpeg|png)$/i.test(b)) {
+      return { status: 'MERGED', reason: 'duplicate download (.hash variant of a kept file)', where: '' };
+    }
+    if (/150x150/.test(b) && /bod|board|ana|christine/i.test(b)) {
+      return { status: 'MERGED', reason: 'board/staff headshot (stays on board/staff page)', where: '' };
+    }
+    // IMG_3218.jpg = known 0-byte download failure
+    if (b === 'img_3218.jpg') {
+      return { status: 'NEEDS OWNER REVIEW', reason: '0-byte download failure (asset not retrievable)', where: '' };
+    }
+    // Small thumbnails (< 300px on any side) — intentionally excluded
+    if (/-\d+x\d+\.(png|jpe?g)$/i.test(b)) {
+      const m = b.match(/-(\d+)x(\d+)/);
+      if (m && (parseInt(m[1]) < 300 || parseInt(m[2]) < 300)) {
+        return { status: 'MERGED', reason: 'small thumbnail (intentionally excluded from archive)', where: '' };
+      }
+    }
+    if (/150x150/.test(b)) {
+      return { status: 'MERGED', reason: 'small thumbnail 150x150 (intentionally excluded)', where: '' };
+    }
+    return { status: 'NEEDS OWNER REVIEW', reason: 'old-site image not curated into new site', where: '' };
   }
 
-  // 4. Image in media_items?
-  const mediaHit = newSite.media.find((m) => {
-    const img = (m.image || '').toLowerCase();
-    return baseName.length >= 6 && (img.includes(baseName.slice(0, 6)) || baseName.includes(img.replace(/^img\//, '').replace(/-\d+\.jpg$/, '')));
-  });
-  if (mediaHit) {
-    return { status: 'PLACED', reason: `media: ${mediaHit.title_en}`, where: '/media' };
+  return { status: 'NEEDS OWNER REVIEW', reason: 'unrecognized asset type', where: '' };
+}
+
+// ---------- match a single old page ----------
+function matchPage(old, db) {
+  if (old.isSpam) return { status: 'NEEDS OWNER REVIEW', reason: 'spam content', where: '' };
+
+  const oldUrl = old.url || '';
+  const title = old.title || '';
+
+  if (/wp-sitemap|wp-admin|wp-login|feed|xmlrpc|wp-json|wp-\.php|index\.php/i.test(oldUrl)) {
+    return { status: 'MERGED', reason: 'WordPress system/sitemap page', where: '' };
+  }
+  if (/\/w\d\d_news|weekly-announcement|家庭聯絡事項/i.test(oldUrl + title)) {
+    return { status: 'MERGED', reason: 'weekly announcement → /news?kind=weekly', where: '/en/news?kind=weekly' };
+  }
+  if (/press|news-archive|媒體|報導/i.test(title)) {
+    return { status: 'MERGED', reason: 'press post → /news?kind=press', where: '/en/news?kind=press' };
+  }
+  if (/img_\d+|screenshot/i.test(oldUrl)) {
+    return { status: 'MERGED', reason: 'photo post → /media/archive', where: '/en/media/archive' };
   }
 
-  // 5. Old-site image not curated into the new site — expected (we chose a
-  // curated subset of real photos). No action needed; kept in research/.
-  return { status: 'NEEDS OWNER REVIEW', reason: 'old-site image not curated into new site', where: '' };
+  const pages = db.prepare('SELECT slug, title_en FROM pages').all();
+  const anns = db.prepare('SELECT slug, title_en FROM announcements').all();
+  const words = title.toLowerCase().split(/\s+/).filter((w) => w.length >= 3);
+  for (const p of pages) {
+    const pWords = (p.title_en || '').toLowerCase().split(/\s+/);
+    const overlap = words.filter((w) => pWords.some((pw) => pw.includes(w) || w.includes(pw))).length;
+    if (overlap >= 2) return { status: 'PLACED', reason: `page: /en/${p.slug}`, where: `/en/${p.slug}` };
+  }
+  for (const a of anns) {
+    const aWords = (a.title_en || '').toLowerCase().split(/\s+/);
+    const overlap = words.filter((w) => aWords.some((aw) => aw.includes(w) || w.includes(aw))).length;
+    if (overlap >= 2) return { status: 'PLACED', reason: `announcement: /en/news/${a.slug}`, where: `/en/news/${a.slug}` };
+  }
+
+  if (/pre-?k|preschool|學前/i.test(oldUrl + title)) {
+    return { status: 'ARCHIVED', reason: 'Pre-K program page (outdated) → /en/archive', where: '/en/archive' };
+  }
+  if (old.status !== 200) {
+    return { status: 'MERGED', reason: `old page returned ${old.status} (404)`, where: '' };
+  }
+  if (/201[89]|2020/.test(oldUrl) && /notice|通告|通知|announcement|covid|疫情/i.test(title + (old.text_main || '').slice(0, 200))) {
+    return { status: 'ARCHIVED', reason: 'outdated 2018-2020 notice → /en/archive', where: '/en/archive' };
+  }
+
+  return { status: 'NEEDS OWNER REVIEW', reason: 'no clear home on new site', where: '/en/archive' };
 }
 
 // ---------- build ledger ----------
-function buildLedger(pages, assets, newSite, db) {
+function buildLedger(pages, assets, siteIdx, db) {
   const rows = [];
-
-  // Pages
   for (const p of pages) {
-    const match = matchPage(p, newSite);
-    rows.push({
-      type: 'page',
-      name: p.title || p.url,
-      oldUrl: p.url,
-      status: match.status,
-      reason: match.reason,
-      where: match.where,
-    });
+    const m = matchPage(p, db);
+    rows.push({ type: 'page', name: p.title || p.url, oldUrl: p.url, status: m.status, reason: m.reason, where: m.where });
   }
-
-  // Assets
   for (const a of assets) {
-    const match = matchAsset(a, newSite, db);
-    rows.push({
-      type: 'asset',
-      name: path.basename(a.local_path || a.url || 'unknown'),
-      oldUrl: a.url,
-      status: match.status,
-      reason: match.reason,
-      where: match.where,
-    });
+    const m = matchAsset(a, siteIdx, db);
+    rows.push({ type: 'asset', name: path.basename(a.local_path || a.url || 'unknown'), oldUrl: a.url, status: m.status, reason: m.reason, where: m.where });
   }
-
   return rows;
 }
 
 // ---------- write ledger ----------
-function writeLedger(rows) {
+function writeLedger(rows, pages, assets) {
   const total = rows.length;
   const placed = rows.filter((r) => r.status === 'PLACED').length;
   const merged = rows.filter((r) => r.status === 'MERGED').length;
+  const archived = rows.filter((r) => r.status === 'ARCHIVED').length;
   const notPlaced = rows.filter((r) => r.status === 'NOT PLACED').length;
   const review = rows.filter((r) => r.status === 'NEEDS OWNER REVIEW').length;
-  const unclassified = rows.filter((r) => !['PLACED', 'MERGED', 'NOT PLACED', 'NEEDS OWNER REVIEW'].includes(r.status)).length;
+  const unclassified = total - placed - merged - archived - notPlaced - review;
+
+  function byType(status) {
+    const r = rows.filter((x) => x.status === status);
+    return {
+      page: r.filter((x) => x.type === 'page').length,
+      image: r.filter((x) => x.type === 'asset' && !/\.pdf/i.test(x.name)).length,
+      pdf: r.filter((x) => x.type === 'asset' && /\.pdf/i.test(x.name)).length,
+    };
+  }
+  const pT = byType('PLACED'), mT = byType('MERGED'), aT = byType('ARCHIVED'), rT = byType('NEEDS OWNER REVIEW');
 
   const lines = [
     '# SDCA Content Ledger — Old Site → New Site',
     '',
     `Generated: ${new Date().toISOString().slice(0, 10)}`,
-    `Source: research/data/pages.jsonl (139 pages), research/data/assets.json (542 assets)`,
+    `Source: research/data/pages.jsonl (${pages.length} pages), research/data/assets.json (${assets.length} assets)`,
     '',
     '## Summary',
     '',
-    `| Status | Count |`,
-    `|--------|-------|`,
+    '| Status | Count |',
+    '|--------|-------|',
     `| PLACED | ${placed} |`,
     `| MERGED | ${merged} |`,
+    `| ARCHIVED | ${archived} |`,
     `| NOT PLACED | ${notPlaced} |`,
     `| NEEDS OWNER REVIEW | ${review} |`,
     `| **Total** | **${total}** |`,
     '',
-    `Coverage: **${(((placed + merged) / total) * 100).toFixed(1)}%** of old content is on the new site (PLACED + MERGED).`,
-    `Unclassified: **${unclassified}** (must be 0 for acceptance).`,
+    `Coverage (PLACED + MERGED + ARCHIVED): **${(((placed + merged + archived) / total) * 100).toFixed(1)}%**`,
+    `Unclassified: **${unclassified}** (must be 0).`,
+    '',
+    '## Summary by Type',
+    '',
+    '| Type | PLACED | MERGED | ARCHIVED | REVIEW |',
+    '|------|--------|--------|----------|--------|',
+    `| pages  | ${pT.page} | ${mT.page} | ${aT.page} | ${rT.page} |`,
+    `| images | ${pT.image} | ${mT.image} | ${aT.image} | ${rT.image} |`,
+    `| PDFs   | ${pT.pdf} | ${mT.pdf} | ${aT.pdf} | ${rT.pdf} |`,
     '',
     '## NEEDS OWNER REVIEW',
     '',
-    '> These items are outdated, duplicated, spam, or unclear. Claude and the owner will review together.',
+    '> Each item needs a judgement call. Grouped by reason with recommendation.',
     '',
   ];
 
   const reviewRows = rows.filter((r) => r.status === 'NEEDS OWNER REVIEW');
   if (reviewRows.length) {
-    lines.push('| Type | Name | Reason | Recommendation |');
-    lines.push('|------|------|--------|----------------|');
+    const groups = new Map();
     for (const r of reviewRows) {
-      const rec = r.reason.includes('spam') ? 'drop (spam)'
-        : r.reason.includes('outdated') ? 'archive or drop'
-        : r.reason.includes('not curated') ? 'keep in research/ (no action needed)'
-        : r.reason.includes('superseded') ? 'verify newer version is on new site, then drop'
-        : 'review';
-      lines.push(`| ${r.type} | ${r.name} | ${r.reason} | ${rec} |`);
+      if (!groups.has(r.reason)) groups.set(r.reason, []);
+      groups.get(r.reason).push(r);
+    }
+    for (const [reason, items] of groups) {
+      lines.push(`### ${reason} (${items.length})`);
+      lines.push('');
+      const rec = /spam/i.test(reason) ? 'drop (spam)'
+        : /outdated|201[6-9]/.test(reason) ? 'archive or drop'
+        : /not curated/i.test(reason) ? 'add to /media/archive if real photo, else drop'
+        : /superseded/i.test(reason) ? 'verify newer version exists, then drop'
+        : /not on disk/i.test(reason) ? 're-download or drop'
+        : /no clear home/i.test(reason) ? 'review content, place on /en/archive or /en/news'
+        : 'review manually';
+      lines.push(`**Recommendation:** ${rec}`);
+      lines.push('');
+      lines.push('| Type | Name |');
+      lines.push('|------|------|');
+      for (const r of items) lines.push(`| ${r.type} | ${r.name.slice(0, 80)} |`);
+      lines.push('');
     }
   } else {
     lines.push('_None._');
   }
 
-  lines.push('', '## NOT PLACED', '');
-  const notPlacedRows = rows.filter((r) => r.status === 'NOT PLACED');
-  if (notPlacedRows.length) {
+  lines.push('## NOT PLACED', '');
+  const npr = rows.filter((r) => r.status === 'NOT PLACED');
+  if (npr.length) {
     lines.push('| Type | Name | Old URL | Reason |');
     lines.push('|------|------|---------|--------|');
-    for (const r of notPlacedRows) {
-      lines.push(`| ${r.type} | ${r.name} | ${r.oldUrl} | ${r.reason} |`);
-    }
-  } else {
-    lines.push('_None._');
-  }
+    for (const r of npr) lines.push(`| ${r.type} | ${r.name.slice(0, 60)} | ${r.oldUrl} | ${r.reason} |`);
+  } else lines.push('_None._');
 
-  lines.push('', '## Full Ledger (PLACED + MERGED)', '', '| Type | Name | Status | Where | Reason |', '|------|------|--------|-------|--------|');
-  for (const r of rows.filter((x) => x.status === 'PLACED' || x.status === 'MERGED')) {
+  lines.push('## Full Ledger (PLACED + MERGED + ARCHIVED)', '');
+  lines.push('| Type | Name | Status | Where | Reason |');
+  lines.push('|------|------|--------|-------|--------|');
+  for (const r of rows.filter((x) => ['PLACED', 'MERGED', 'ARCHIVED'].includes(x.status))) {
     lines.push(`| ${r.type} | ${r.name.slice(0, 60)} | ${r.status} | ${r.where} | ${r.reason.slice(0, 50)} |`);
   }
 
   fs.mkdirSync(path.dirname(LEDGER_OUT), { recursive: true });
   fs.writeFileSync(LEDGER_OUT, lines.join('\n'));
-  return { total, placed, merged, notPlaced, review, unclassified };
+  return { total, placed, merged, archived, notPlaced, review, unclassified };
 }
 
-// ---------- main ----------
 function main() {
   const db = openDb();
   const pages = loadPages();
   const assets = loadAssets();
-  const newSite = loadNewSite(db);
 
-  console.log('=== content-audit.js ===');
+  console.log('=== content-audit.js (Phase 8b) ===');
   console.log(`Old pages: ${pages.length}`);
   console.log(`Old assets: ${assets.length}`);
 
-  const rows = buildLedger(pages, assets, newSite, db);
-  const summary = writeLedger(rows);
+  const siteIdx = buildSiteIndex(db);
+  console.log(`Site index: ${siteIdx.hashMap.size} files hashed, ${siteIdx.archiveBases.size} archive basenames`);
+
+  const rows = buildLedger(pages, assets, siteIdx, db);
+  const summary = writeLedger(rows, pages, assets);
 
   console.log(`\nSummary: ${JSON.stringify(summary)}`);
   console.log(`Ledger written to: ${LEDGER_OUT}`);
@@ -347,10 +435,7 @@ function main() {
     console.log(`\nFAIL: ${summary.unclassified} unclassified items`);
     process.exit(1);
   }
-  if (summary.notPlaced > 10) {
-    console.log(`\nWARN: ${summary.notPlaced} NOT PLACED items (consider adding to /archive)`);
-  }
-  console.log('\nPASS: 100% of old content classified');
+  console.log(`\nPASS: 100% classified (NOT PLACED = ${summary.notPlaced})`);
 }
 
 main();

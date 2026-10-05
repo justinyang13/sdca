@@ -55,7 +55,8 @@
       <h2 id="media-gal-h"><%= t('media.gallery') %></h2>
       <p class="section-lead"><%= photosArr.length %> <%= t('media.photos') %></p>
     </div>
-    <div class="gallery-grid">
+    <p class="archive-link"><a class="btn btn-ghost" href="/<%= L %>/media/archive"><%= L === 'zh' ? '檢視完整照片檔案（舊站所有真實照片）' : 'Browse the full photo archive (every real photo from the old site)' %> →</a></p>
+        <div class="gallery-grid">
       <% photosArr.forEach(function(p) {
            const alt = pick(p, 'title');
       %>

@@ -1,0 +1,38 @@
+<%# archive-photo-edit.ejs %>
+<h1>Edit archive photo #<%= item.id %></h1>
+<dl class="kv">
+  <dt>Full path</dt><dd><a href="<%= item.path %>" target="_blank" rel="noopener"><code><%= item.path %></code></a></dd>
+  <dt>Thumbnail</dt><dd><a href="<%= item.thumb %>" target="_blank" rel="noopener"><code><%= item.thumb %></code></a></dd>
+  <dt>Preview</dt><dd><img src="<%= item.thumb %>" alt="" width="160" height="104" style="object-fit:cover;border-radius:6px"></dd>
+</dl>
+<form method="POST" action="/admin/archive-photos" class="form">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <input type="hidden" name="id" value="<%= item.id %>">
+
+  <label>Group (English) — e.g. "Cultural Day", "Class of 2020", "2019"
+    <input name="group_en" required value="<%= item.group_en %>" placeholder="Cultural Day">
+  </label>
+  <label>Group (中文)
+    <input name="group_zh" value="<%= item.group_zh %>" placeholder="文化日">
+  </label>
+  <label>Caption (English)
+    <input name="caption_en" value="<%= item.caption_en %>" placeholder="Cultural Day — students making tangyuan">
+  </label>
+  <label>Caption (中文)
+    <input name="caption_zh" value="<%= item.caption_zh %>" placeholder="文化日 — 學生做湯圓">
+  </label>
+  <label>Taken year (0 = unknown)
+    <input name="taken_year" type="number" min="0" max="2100" step="1" value="<%= item.taken_year %>">
+  </label>
+  <label>Sort (lower first within group)
+    <input name="sort" type="number" min="0" step="1" value="<%= item.sort %>">
+  </label>
+  <label class="check">
+    <input type="checkbox" name="published" <%= item.published ? 'checked' : '' %>>
+    Published
+  </label>
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a class="btn btn-ghost" href="/admin/archive-photos">Cancel</a>
+  </div>
+</form>

@@ -23,7 +23,7 @@ test('migration applies once and is idempotent', () => {
   try {
     const db = newDb(file);
     const first = applyMigrations(db);
-    assert.equal(first.length, 2, 'first run applies 001_schema.sql + 002_slides.sql');
+    assert.equal(first.length, 3, 'first run applies 001 + 002 + 003 migrations');
     const second = applyMigrations(db);
     assert.equal(second.length, 0, 'second run applies nothing');
     db.close();
