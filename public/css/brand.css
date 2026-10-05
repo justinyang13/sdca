@@ -1,0 +1,6 @@
+/* Responsive logo: part 3 (full) wide, part 2 (badge + Chinese name) medium, part 1 (badge) small. Loaded after layout.css. */
+.brand img.brand-lockup { height: 50px; width: auto; max-width: none; }
+.brand .brand-compact, .brand .brand-badge { display: none; }
+@media (max-width: 1279px) { .brand .brand-full { display: none; } .brand .brand-compact { display: block; } }
+@media (max-width: 599px)  { .brand .brand-compact { display: none; } .brand .brand-badge { display: block; height: 40px; } }
+.footer-brand img.footer-lockup { height: 52px; width: auto; max-width: 100%; }
