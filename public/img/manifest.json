@@ -1,0 +1,629 @@
+{
+  "generated": "2026-10-05T12:07:41.041Z",
+  "images": [
+    {
+      "name": "classroom-bilingual",
+      "source": "research/assets/images/SDCA-Bilingual-Class-1-1.jpeg",
+      "role": "home-hero",
+      "alt_en": "SDCA bilingual class: students in a bright classroom with their teacher",
+      "alt_zh": "聖地牙哥中華學苑雙語班：明亮的教室內，學生與老師一起上課",
+      "sw": 2300,
+      "sh": 1188,
+      "files": [
+        {
+          "file": "img/classroom-bilingual-480.jpg",
+          "w": 480,
+          "h": 248
+        },
+        {
+          "file": "img/classroom-bilingual-960.jpg",
+          "w": 960,
+          "h": 496
+        },
+        {
+          "file": "img/classroom-bilingual-1600.jpg",
+          "w": 1600,
+          "h": 826
+        }
+      ]
+    },
+    {
+      "name": "teachers-2018",
+      "source": "research/assets/images/2018-2019-Teachers.jpg",
+      "role": "staff-group",
+      "alt_en": "The SDCA teaching team together on campus",
+      "alt_zh": "聖地牙哥中華學苑師資團隊合影",
+      "sw": 4664,
+      "sh": 1988,
+      "files": [
+        {
+          "file": "img/teachers-2018-480.jpg",
+          "w": 480,
+          "h": 205
+        },
+        {
+          "file": "img/teachers-2018-960.jpg",
+          "w": 960,
+          "h": 409
+        },
+        {
+          "file": "img/teachers-2018-1600.jpg",
+          "w": 1600,
+          "h": 682
+        }
+      ]
+    },
+    {
+      "name": "preschool-class",
+      "source": "research/assets/images/Pre-K-Program-5.jpeg",
+      "role": "programs-preschool",
+      "alt_en": "Preschool students doing group activities with teachers",
+      "alt_zh": "幼稚園小朋友在老師帶領下進行團體活動",
+      "sw": 1859,
+      "sh": 1186,
+      "files": [
+        {
+          "file": "img/preschool-class-480.jpg",
+          "w": 480,
+          "h": 306
+        },
+        {
+          "file": "img/preschool-class-960.jpg",
+          "w": 960,
+          "h": 612
+        },
+        {
+          "file": "img/preschool-class-1600.jpg",
+          "w": 1600,
+          "h": 1021
+        }
+      ]
+    },
+    {
+      "name": "beginner-class",
+      "source": "research/assets/images/SDCA-Beginner-Class-1.jpeg",
+      "role": "programs-beginner",
+      "alt_en": "Beginner class students proudly showing their lesson work",
+      "alt_zh": "初級班學生展示課堂作品",
+      "sw": 1866,
+      "sh": 1181,
+      "files": [
+        {
+          "file": "img/beginner-class-480.jpg",
+          "w": 480,
+          "h": 304
+        },
+        {
+          "file": "img/beginner-class-960.jpg",
+          "w": 960,
+          "h": 608
+        },
+        {
+          "file": "img/beginner-class-1600.jpg",
+          "w": 1600,
+          "h": 1013
+        }
+      ]
+    },
+    {
+      "name": "regular-class",
+      "source": "research/assets/images/SDCA-Regular-Class-Original.jpeg",
+      "role": "programs-regular",
+      "alt_en": "Regular class students focused on writing at their desks",
+      "alt_zh": "普通班學生在座位上認真書寫",
+      "sw": 2092,
+      "sh": 1188,
+      "files": [
+        {
+          "file": "img/regular-class-480.jpg",
+          "w": 480,
+          "h": 273
+        },
+        {
+          "file": "img/regular-class-960.jpg",
+          "w": 960,
+          "h": 545
+        },
+        {
+          "file": "img/regular-class-1600.jpg",
+          "w": 1600,
+          "h": 909
+        }
+      ]
+    },
+    {
+      "name": "graduation-2023",
+      "source": "research/assets/images/IMG_3544.jpg",
+      "role": "events-graduation",
+      "alt_en": "SDCA graduates in blue gowns with faculty at the graduation ceremony",
+      "alt_zh": "畢業典禮上，穿藍色學士袍的畢業生與師長合影",
+      "sw": 1170,
+      "sh": 1079,
+      "files": [
+        {
+          "file": "img/graduation-2023-480.jpg",
+          "w": 480,
+          "h": 443
+        },
+        {
+          "file": "img/graduation-2023-960.jpg",
+          "w": 960,
+          "h": 885
+        },
+        {
+          "file": "img/graduation-2023-1170.jpg",
+          "w": 1170,
+          "h": 1079
+        }
+      ]
+    },
+    {
+      "name": "cultural-day",
+      "source": "research/assets/images/Cultural-Day-WJ-2.jpg",
+      "role": "events-cultural",
+      "alt_en": "Students making tangyuan and the poetry recitation contest at Cultural Day",
+      "alt_zh": "文化日：學生搓湯圓，以及中文詩詞朗誦比賽頒獎",
+      "sw": 1851,
+      "sh": 869,
+      "files": [
+        {
+          "file": "img/cultural-day-480.jpg",
+          "w": 480,
+          "h": 225
+        },
+        {
+          "file": "img/cultural-day-960.jpg",
+          "w": 960,
+          "h": 451
+        },
+        {
+          "file": "img/cultural-day-1600.jpg",
+          "w": 1600,
+          "h": 751
+        }
+      ]
+    },
+    {
+      "name": "lantern-performance",
+      "source": "research/assets/images/IMG_4189.jpg",
+      "role": "events-lantern",
+      "alt_en": "Students performing with red lanterns on the outdoor stage",
+      "alt_zh": "學生在露天舞台上手持紅燈籠表演",
+      "sw": 996,
+      "sh": 563,
+      "files": [
+        {
+          "file": "img/lantern-performance-480.jpg",
+          "w": 480,
+          "h": 271
+        },
+        {
+          "file": "img/lantern-performance-960.jpg",
+          "w": 960,
+          "h": 543
+        },
+        {
+          "file": "img/lantern-performance-996.jpg",
+          "w": 996,
+          "h": 563
+        }
+      ]
+    },
+    {
+      "name": "yoga-class",
+      "source": "research/assets/images/Yoga-Class-1024x683.jpg",
+      "role": "programs-yoga",
+      "alt_en": "Adults doing yoga together in a bright studio",
+      "alt_zh": "成人在明亮的教室裡一起練習瑜伽",
+      "sw": 1024,
+      "sh": 683,
+      "files": [
+        {
+          "file": "img/yoga-class-480.jpg",
+          "w": 480,
+          "h": 320
+        },
+        {
+          "file": "img/yoga-class-960.jpg",
+          "w": 960,
+          "h": 640
+        },
+        {
+          "file": "img/yoga-class-1024.jpg",
+          "w": 1024,
+          "h": 683
+        }
+      ]
+    },
+    {
+      "name": "teacher-meeting",
+      "source": "research/assets/images/SDCA-Teacher-Meeting-2-1024x648.jpg",
+      "role": "staff-meeting",
+      "alt_en": "Teachers meeting in the classroom",
+      "alt_zh": "老師們在教室裡開會",
+      "sw": 1024,
+      "sh": 648,
+      "files": [
+        {
+          "file": "img/teacher-meeting-480.jpg",
+          "w": 480,
+          "h": 304
+        },
+        {
+          "file": "img/teacher-meeting-960.jpg",
+          "w": 960,
+          "h": 608
+        },
+        {
+          "file": "img/teacher-meeting-1024.jpg",
+          "w": 1024,
+          "h": 648
+        }
+      ]
+    },
+    {
+      "name": "field-trip",
+      "source": "research/assets/images/IMG_5351-scaled.jpeg",
+      "role": "gallery-field-trip",
+      "alt_en": "Students and families on an outdoor field trip",
+      "alt_zh": "學生與家長戶外參觀活動",
+      "sw": 2560,
+      "sh": 2018,
+      "files": [
+        {
+          "file": "img/field-trip-480.jpg",
+          "w": 480,
+          "h": 378
+        },
+        {
+          "file": "img/field-trip-960.jpg",
+          "w": 960,
+          "h": 757
+        },
+        {
+          "file": "img/field-trip-1600.jpg",
+          "w": 1600,
+          "h": 1261
+        }
+      ]
+    },
+    {
+      "name": "community-gathering",
+      "source": "research/assets/images/IMG_2885-scaled.jpg",
+      "role": "gallery-community",
+      "alt_en": "Families and volunteers preparing food together",
+      "alt_zh": "家長與志工一起準備點心",
+      "sw": 2560,
+      "sh": 1422,
+      "files": [
+        {
+          "file": "img/community-gathering-480.jpg",
+          "w": 480,
+          "h": 267
+        },
+        {
+          "file": "img/community-gathering-960.jpg",
+          "w": 960,
+          "h": 533
+        },
+        {
+          "file": "img/community-gathering-1600.jpg",
+          "w": 1600,
+          "h": 889
+        }
+      ]
+    },
+    {
+      "name": "poetry-award",
+      "source": "research/assets/images/Credit-Class-Poetry-Recitation.jpeg",
+      "role": "gallery-poetry",
+      "alt_en": "Students receiving awards at the poetry recitation contest",
+      "alt_zh": "學生在詩詞朗誦比賽中獲獎",
+      "sw": 1530,
+      "sh": 2048,
+      "files": [
+        {
+          "file": "img/poetry-award-480.jpg",
+          "w": 480,
+          "h": 643
+        },
+        {
+          "file": "img/poetry-award-960.jpg",
+          "w": 960,
+          "h": 1285
+        },
+        {
+          "file": "img/poetry-award-1530.jpg",
+          "w": 1530,
+          "h": 2048
+        }
+      ]
+    },
+    {
+      "name": "contest-trophies",
+      "source": "research/assets/images/IMG_4215-scaled.jpeg",
+      "role": "gallery-contest",
+      "alt_en": "Contest finalists with trophies and the judging panel",
+      "alt_zh": "比賽得獎學生與評委合影",
+      "sw": 2560,
+      "sh": 1520,
+      "files": [
+        {
+          "file": "img/contest-trophies-480.jpg",
+          "w": 480,
+          "h": 285
+        },
+        {
+          "file": "img/contest-trophies-960.jpg",
+          "w": 960,
+          "h": 570
+        },
+        {
+          "file": "img/contest-trophies-1600.jpg",
+          "w": 1600,
+          "h": 950
+        }
+      ]
+    },
+    {
+      "name": "cultural-food",
+      "source": "research/assets/images/Credit-Class-Food-Activity.jpeg",
+      "role": "gallery-food",
+      "alt_en": "Adult class exploring Chinese cooking aromatics",
+      "alt_zh": "成人班探索中式料理香辛料",
+      "sw": 2250,
+      "sh": 3000,
+      "files": [
+        {
+          "file": "img/cultural-food-480.jpg",
+          "w": 480,
+          "h": 640
+        },
+        {
+          "file": "img/cultural-food-960.jpg",
+          "w": 960,
+          "h": 1280
+        },
+        {
+          "file": "img/cultural-food-1600.jpg",
+          "w": 1600,
+          "h": 2133
+        }
+      ]
+    },
+    {
+      "name": "teacher-dinner",
+      "source": "research/assets/images/SDCA-Teacher-Appreciation-Dinner.jpg",
+      "role": "gallery-dinner",
+      "alt_en": "Teachers at the appreciation dinner 謝師宴",
+      "alt_zh": "老師們在謝師宴上歡聚",
+      "sw": 400,
+      "sh": 535,
+      "files": [
+        {
+          "file": "img/teacher-dinner-400.jpg",
+          "w": 400,
+          "h": 535
+        },
+        {
+          "file": "img/teacher-dinner-400.jpg",
+          "w": 400,
+          "h": 535
+        },
+        {
+          "file": "img/teacher-dinner-400.jpg",
+          "w": 400,
+          "h": 535
+        }
+      ]
+    },
+    {
+      "name": "karaoke-contest",
+      "source": "research/assets/images/SDCA-Karaoke-Contest.jpg",
+      "role": "gallery-karaoke",
+      "alt_en": "Students singing in the Chinese karaoke contest",
+      "alt_zh": "學生參加卡拉OK歌唱比賽",
+      "sw": 1475,
+      "sh": 898,
+      "files": [
+        {
+          "file": "img/karaoke-contest-480.jpg",
+          "w": 480,
+          "h": 292
+        },
+        {
+          "file": "img/karaoke-contest-960.jpg",
+          "w": 960,
+          "h": 584
+        },
+        {
+          "file": "img/karaoke-contest-1475.jpg",
+          "w": 1475,
+          "h": 898
+        }
+      ]
+    },
+    {
+      "name": "tai-chi",
+      "source": "research/assets/images/IMG_4686-225x300.jpg",
+      "role": "gallery-taichi",
+      "alt_en": "A student practicing Tai Chi in a studio",
+      "alt_zh": "學生在教室裡練習太極",
+      "sw": 225,
+      "sh": 300,
+      "files": [
+        {
+          "file": "img/tai-chi-225.jpg",
+          "w": 225,
+          "h": 300
+        },
+        {
+          "file": "img/tai-chi-225.jpg",
+          "w": 225,
+          "h": 300
+        },
+        {
+          "file": "img/tai-chi-225.jpg",
+          "w": 225,
+          "h": 300
+        }
+      ]
+    },
+    {
+      "name": "students-perform",
+      "source": "research/assets/images/IMG_4188.jpg",
+      "role": "gallery-perform",
+      "alt_en": "Young students in red on stage at a school event",
+      "alt_zh": "身穿紅衣的學生在學校活動舞台上表演",
+      "sw": 1040,
+      "sh": 553,
+      "files": [
+        {
+          "file": "img/students-perform-480.jpg",
+          "w": 480,
+          "h": 255
+        },
+        {
+          "file": "img/students-perform-960.jpg",
+          "w": 960,
+          "h": 510
+        },
+        {
+          "file": "img/students-perform-1040.jpg",
+          "w": 1040,
+          "h": 553
+        }
+      ]
+    },
+    {
+      "name": "gallery-community-outdoor",
+      "source": "research/assets/images/IMG_2892-scaled.jpg",
+      "role": "gallery-community",
+      "alt_en": "Students and families gathered outdoors on a sunny school day",
+      "alt_zh": "晴朗的校日，學生與家長在校園戶外聚會",
+      "sw": 2560,
+      "sh": 1920,
+      "files": [
+        {
+          "file": "img/gallery-community-outdoor-480.jpg",
+          "w": 480,
+          "h": 360
+        },
+        {
+          "file": "img/gallery-community-outdoor-960.jpg",
+          "w": 960,
+          "h": 720
+        },
+        {
+          "file": "img/gallery-community-outdoor-1600.jpg",
+          "w": 1600,
+          "h": 1200
+        }
+      ]
+    },
+    {
+      "name": "anniversary-30th",
+      "source": "research/assets/images/SDCA-30th-Anniversary-5.jpg",
+      "role": "events-anniversary",
+      "alt_en": "SDCA community celebrating the 30th anniversary",
+      "alt_zh": "聖地牙哥中華學苑三十週年慶祝活動",
+      "sw": 2000,
+      "sh": 1333,
+      "files": [
+        {
+          "file": "img/anniversary-30th-480.jpg",
+          "w": 480,
+          "h": 320
+        },
+        {
+          "file": "img/anniversary-30th-960.jpg",
+          "w": 960,
+          "h": 640
+        },
+        {
+          "file": "img/anniversary-30th-1600.jpg",
+          "w": 1600,
+          "h": 1066
+        }
+      ]
+    },
+    {
+      "name": "spring-ceremony",
+      "source": "research/assets/images/IMG_5827.jpg",
+      "role": "events-spring",
+      "alt_en": "Students in red celebrating together at a spring ceremony",
+      "alt_zh": "學生在春季典禮上一起慶祝",
+      "sw": 2359,
+      "sh": 1558,
+      "files": [
+        {
+          "file": "img/spring-ceremony-480.jpg",
+          "w": 480,
+          "h": 317
+        },
+        {
+          "file": "img/spring-ceremony-960.jpg",
+          "w": 960,
+          "h": 634
+        },
+        {
+          "file": "img/spring-ceremony-1600.jpg",
+          "w": 1600,
+          "h": 1057
+        }
+      ]
+    },
+    {
+      "name": "stage-performance",
+      "source": "research/assets/images/IMG_5817-scaled.jpeg",
+      "role": "events-stage",
+      "alt_en": "Students performing on stage at a school event",
+      "alt_zh": "學生在學校活動舞台上表演",
+      "sw": 2560,
+      "sh": 1920,
+      "files": [
+        {
+          "file": "img/stage-performance-480.jpg",
+          "w": 480,
+          "h": 360
+        },
+        {
+          "file": "img/stage-performance-960.jpg",
+          "w": 960,
+          "h": 720
+        },
+        {
+          "file": "img/stage-performance-1600.jpg",
+          "w": 1600,
+          "h": 1200
+        }
+      ]
+    },
+    {
+      "name": "food-fair",
+      "source": "research/assets/images/IMG_4190.jpg",
+      "role": "gallery-fair",
+      "alt_en": "Families browsing a school food fair",
+      "alt_zh": "家長與學生在校園美食市集逛攤位",
+      "sw": 985,
+      "sh": 669,
+      "files": [
+        {
+          "file": "img/food-fair-480.jpg",
+          "w": 480,
+          "h": 326
+        },
+        {
+          "file": "img/food-fair-960.jpg",
+          "w": 960,
+          "h": 652
+        },
+        {
+          "file": "img/food-fair-985.jpg",
+          "w": 985,
+          "h": 669
+        }
+      ]
+    }
+  ]
+}

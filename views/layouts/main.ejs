@@ -11,12 +11,16 @@
   <link rel="alternate" hreflang="en" href="<%= typeof enUrl !== 'undefined' ? enUrl : '/en/' %>">
   <link rel="alternate" hreflang="zh-Hant" href="<%= typeof zhUrl !== 'undefined' ? zhUrl : '/zh/' %>">
   <link rel="alternate" hreflang="x-default" href="<%= typeof enUrl !== 'undefined' ? enUrl : '/en/' %>">
-  <link rel="icon" href="/img/logo.png" type="image/png">
+  <link rel="icon" href="/favicon/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="icon" href="/favicon/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon-180.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/favicon/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/favicon/icon-512.png">
   <meta property="og:site_name" content="San Diego Chinese Academy">
   <meta property="og:title" content="<%= typeof title !== 'undefined' ? title : 'SDCA' %>">
   <meta property="og:description" content="<%= typeof description !== 'undefined' ? description : 'Non-profit Chinese language school in San Diego since 1988.' %>">
   <meta property="og:type" content="website">
-  <% if (typeof ogImage !== 'undefined' && ogImage) { %><meta property="og:image" content="<%= ogImage %>"><% } %>
+  <meta property="og:image" content="<%= typeof ogImage !== 'undefined' && ogImage ? ogImage : '/brand/og-image.png' %>">
   <link rel="stylesheet" href="/css/tokens.css">
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/layout.css">
