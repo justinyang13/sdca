@@ -1,0 +1,76 @@
+<%
+  // documents.ejs — document library with category filter + search.
+  // ctx: { docs, cat, q, cats }
+  const L = lang;
+  const docsArr = (typeof docs !== 'undefined' && docs) ? docs : [];
+  const activeCat = (typeof cat !== 'undefined' && cat) ? cat : 'all';
+  const qv = (typeof q !== 'undefined' && q) ? q : '';
+  const catsArr = (typeof cats !== 'undefined' && cats) ? cats : [];
+  const title = (r) => L === 'zh' ? (r.title_zh || r.title_en || r.slug) : (r.title_en || r.title_zh || r.slug);
+  const size = (b) => b >= 1048576 ? `${(b / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(b / 1024))} KB`;
+  const href = (d) => `/${L}/documents/${d.slug}`;
+  const filterUrl = (overCat, overQ) => {
+    const p = new URLSearchParams();
+    if (overCat && overCat !== 'all') p.set('cat', overCat);
+    if (overQ) p.set('q', overQ);
+    const s = p.toString();
+    return `/${L}/documents${s ? '?' + s : ''}`;
+  };
+%>
+<%- renderPart('partials/hero.ejs', {
+  heroTitle: L === 'zh' ? '文件與表單' : 'Documents & Forms',
+  heroSub: L === 'zh' ? '學年行事曆、手冊、比賽規則、每週 PDF 等。'
+                        : 'School calendars, handbooks, contest rules, weekly PDFs and more.',
+  heroImage: '/img/banners/banner-books-ink.png',
+  heroVariant: 'photo',
+}) %>
+
+<section class="section" aria-labelledby="docs-h">
+  <div class="container">
+    <h2 id="docs-h" class="sr-only"><%= L === 'zh' ? '文件庫' : 'Document library' %></h2>
+
+    <form class="docs-filter" method="get" action="/<%= L %>/documents" role="search">
+      <div class="docs-filter-cats" role="tablist" aria-label="<%= t('documents.cats') %>">
+        <a class="<%= activeCat === 'all' ? 'is-active' : '' %>" role="tab" aria-selected="<%= String(activeCat === 'all') %>"
+           href="<%= filterUrl('all', qv) %>"><%= t('documents.cat.all') %></a>
+        <% catsArr.forEach(function(c) { %>
+        <a class="<%= activeCat === c.id ? 'is-active' : '' %>" role="tab" aria-selected="<%= String(activeCat === c.id) %>"
+           href="<%= filterUrl(c.id, qv) %>"><%= t('documents.cat.' + c.id) || c.id %> <span class="count">(<%= c.count %>)</span></a>
+        <% }) %>
+      </div>
+      <div class="docs-filter-search">
+        <label class="sr-only" for="q"><%= t('documents.search_ph') %></label>
+        <input type="search" id="q" name="q" value="<%= qv %>" placeholder="<%= t('documents.search_ph') %>"
+               <%= activeCat !== 'all' ? `formaction="/${L}/documents?cat=${activeCat}"` : '' %>>
+        <button type="submit" class="btn btn-navy"><%= t('button.search') %></button>
+        <% if (activeCat !== 'all' || qv) { %><a class="btn btn-ghost" href="/<%= L %>/documents"><%= t('button.clear') %></a><% } %>
+      </div>
+    </form>
+
+    <p class="docs-count"><%= docsArr.length %> <%= t('documents.count') %></p>
+
+    <ul class="doc-list doc-list-full">
+      <% if (!docsArr.length) { %><li class="ann-empty"><%= t('documents.zero') %></li><% } %>
+      <% docsArr.forEach(function(d) { %>
+      <li class="doc-item">
+        <span class="doc-icon" aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+            <path d="M3 1h8l4 4v10H3z"/><path d="M11 1v4h4"/><path d="M6 9h6M6 12h6M6 15h4"/>
+          </svg>
+        </span>
+        <div>
+          <h3 class="doc-title"><a href="<%= href(d) %>"><%= title(d) %></a></h3>
+          <div class="doc-meta">
+            <% if (d.school_year) { %><%= d.school_year %> · <% } %>
+            <%= t('documents.cat.' + d.category) || d.category %> · <%= size(d.bytes) %>
+          </div>
+        </div>
+        <a class="btn btn-ghost btn-sm" href="<%= href(d) %>" rel="noopener">
+          <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 2v8M4 7l4 4 4-4M2 14h12"/></svg>
+          <%= t('button.download') %>
+        </a>
+      </li>
+      <% }) %>
+    </ul>
+  </div>
+</section>

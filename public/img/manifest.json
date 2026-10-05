@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-05T12:07:41.041Z",
+  "generated": "2026-10-05T18:55:20.003Z",
   "images": [
     {
       "name": "classroom-bilingual",
@@ -151,9 +151,9 @@
           "h": 885
         },
         {
-          "file": "img/graduation-2023-1170.jpg",
-          "w": 1170,
-          "h": 1079
+          "file": "img/graduation-2023-1600.jpg",
+          "w": 1600,
+          "h": 1476
         }
       ]
     },
@@ -203,9 +203,9 @@
           "h": 543
         },
         {
-          "file": "img/lantern-performance-996.jpg",
-          "w": 996,
-          "h": 563
+          "file": "img/lantern-performance-1600.jpg",
+          "w": 1600,
+          "h": 904
         }
       ]
     },
@@ -229,9 +229,9 @@
           "h": 640
         },
         {
-          "file": "img/yoga-class-1024.jpg",
-          "w": 1024,
-          "h": 683
+          "file": "img/yoga-class-1600.jpg",
+          "w": 1600,
+          "h": 1067
         }
       ]
     },
@@ -255,9 +255,9 @@
           "h": 608
         },
         {
-          "file": "img/teacher-meeting-1024.jpg",
-          "w": 1024,
-          "h": 648
+          "file": "img/teacher-meeting-1600.jpg",
+          "w": 1600,
+          "h": 1013
         }
       ]
     },
@@ -333,9 +333,9 @@
           "h": 1285
         },
         {
-          "file": "img/poetry-award-1530.jpg",
-          "w": 1530,
-          "h": 2048
+          "file": "img/poetry-award-1600.jpg",
+          "w": 1600,
+          "h": 2142
         }
       ]
     },
@@ -401,19 +401,19 @@
       "sh": 535,
       "files": [
         {
-          "file": "img/teacher-dinner-400.jpg",
-          "w": 400,
-          "h": 535
+          "file": "img/teacher-dinner-480.jpg",
+          "w": 480,
+          "h": 642
         },
         {
-          "file": "img/teacher-dinner-400.jpg",
-          "w": 400,
-          "h": 535
+          "file": "img/teacher-dinner-960.jpg",
+          "w": 960,
+          "h": 1284
         },
         {
-          "file": "img/teacher-dinner-400.jpg",
-          "w": 400,
-          "h": 535
+          "file": "img/teacher-dinner-1600.jpg",
+          "w": 1600,
+          "h": 2140
         }
       ]
     },
@@ -437,9 +437,9 @@
           "h": 584
         },
         {
-          "file": "img/karaoke-contest-1475.jpg",
-          "w": 1475,
-          "h": 898
+          "file": "img/karaoke-contest-1600.jpg",
+          "w": 1600,
+          "h": 974
         }
       ]
     },
@@ -453,19 +453,19 @@
       "sh": 300,
       "files": [
         {
-          "file": "img/tai-chi-225.jpg",
-          "w": 225,
-          "h": 300
+          "file": "img/tai-chi-480.jpg",
+          "w": 480,
+          "h": 640
         },
         {
-          "file": "img/tai-chi-225.jpg",
-          "w": 225,
-          "h": 300
+          "file": "img/tai-chi-960.jpg",
+          "w": 960,
+          "h": 1280
         },
         {
-          "file": "img/tai-chi-225.jpg",
-          "w": 225,
-          "h": 300
+          "file": "img/tai-chi-1600.jpg",
+          "w": 1600,
+          "h": 2133
         }
       ]
     },
@@ -489,9 +489,9 @@
           "h": 510
         },
         {
-          "file": "img/students-perform-1040.jpg",
-          "w": 1040,
-          "h": 553
+          "file": "img/students-perform-1600.jpg",
+          "w": 1600,
+          "h": 851
         }
       ]
     },
@@ -619,9 +619,9 @@
           "h": 652
         },
         {
-          "file": "img/food-fair-985.jpg",
-          "w": 985,
-          "h": 669
+          "file": "img/food-fair-1600.jpg",
+          "w": 1600,
+          "h": 1087
         }
       ]
     }

@@ -10,6 +10,9 @@ import { openDb } from './db/open.js';
 import * as H from './helpers.js';
 import { imageManifest } from './helpers.js';
 import { registerPublicRoutes } from './routes-public.js';
+import { registerPhase5Routes } from './routes-phase5.js';
+import { lookupRedirect } from './redirects.js';
+import { buildSitemap } from './sitemap.js';
 import { marked } from 'marked';
 import sanitizeHtml from 'sanitize-html';
 
@@ -123,8 +126,30 @@ export function createApp({ db = openDb() } = {}) {
     }
   }
 
+  // ---------- 301 redirects (from research/wiki/url-map.md) ----------
+  app.use(function redirectsMiddleware(req, res, next) {
+    if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+    const url = new URL(req.originalUrl, 'http://localhost');
+    const pathname = url.pathname;
+    if (!pathname || pathname === '/' || pathname.startsWith('/en/') || pathname.startsWith('/zh/')) return next();
+    const hit = lookupRedirect(pathname);
+    if (!hit) return next();
+    res.redirect(301, hit[1]);
+  });
+
+  // ---------- /sitemap.xml (mounted early so it is not swallowed by /:lang) ----------
+  app.get('/sitemap.xml', (req, res) => {
+    const base = `${req.protocol}://${req.get('host') || 'localhost:3000'}`;
+    const xml = buildSitemap({ base });
+    res.type('application/xml; charset=utf-8').send(xml);
+  });
+
+
   // ---------- Phase 4 public pages ----------
   registerPublicRoutes(app, { makeRenderPart, renderShell, pageView, renderMarkdown, t, db, SUPPORTED });
+
+  // ---------- Phase 5 public pages + platform features ----------
+  registerPhase5Routes(app, { makeRenderPart, renderShell, pageView, renderMarkdown, t, db, SUPPORTED });
 
   // 404
   app.use((req, res) => renderError(app, res, 404, req.lang || 'en', {

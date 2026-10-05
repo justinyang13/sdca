@@ -6,3 +6,4 @@ Phase 1 research DONE (research/wiki). ARCHITECTURE.md + BUILD-PLAN.md written. 
 Phase 1 DONE+reviewed 3:20AM. Phase 2 (assets/logo/banners) started.
 Phase 2 DONE+reviewed 7:06AM (logo traced by Claude scripts/build-logo.py, kit by Qwen). Phase 3 (seed) started.
 Phase 3 DONE+reviewed 8:05AM (22 pages, 57 announcements, 81 docs, 13 people, 10 programs, 51 settings; no spam). Phase 4 started.
+Phase 4 DONE+reviewed 9:55AM (56 tests). Phase 5 started.

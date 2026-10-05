@@ -1,0 +1,65 @@
+<%
+  // calendar.ejs — school-year PDFs + current-year event list.
+  // ctx: { docs, events }
+  const L = lang;
+  const docsArr = (typeof docs !== 'undefined' && docs) ? docs : [];
+  const eventsArr = (typeof events !== 'undefined' && events) ? events : [];
+  const title = (r) => L === 'zh' ? (r.title_zh || r.title_en || '') : (r.title_en || r.title_zh || '');
+%>
+<%- renderPart('partials/hero.ejs', {
+  heroTitle: L === 'zh' ? '行事曆' : 'Calendar',
+  heroSub: L === 'zh' ? '學年行事曆、教室地圖與重要日期。'
+                        : 'School-year calendars, the classroom map and key dates.',
+  heroImage: '/img/banners/banner-books-ink.png',
+  heroVariant: 'photo',
+}) %>
+
+<section class="section" aria-labelledby="cal-years-h">
+  <div class="container">
+    <div class="section-head">
+      <h2 id="cal-years-h"><%= t('calendar.years') %></h2>
+      <p class="section-lead"><%= L === 'zh' ? '下載學年行事曆、教材清單與教室地圖。'
+                                              : 'Download the school-year calendar, textbook lists and classroom map.' %></p>
+    </div>
+    <ul class="doc-list">
+      <% docsArr.forEach(function(d) { %>
+      <li class="doc-item">
+        <span class="doc-icon" aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+            <path d="M3 1h8l4 4v10H3z"/><path d="M11 1v4h4"/><path d="M6 9h6M6 12h6M6 15h4"/>
+          </svg>
+        </span>
+        <div>
+          <h3 class="doc-title"><a href="/<%= L %>/documents/<%= d.slug %>"><%= title(d) %></a></h3>
+          <div class="doc-meta"><%= d.school_year || '' %> · <%= Math.max(1, Math.round(d.bytes / 1024)) %> KB</div>
+        </div>
+        <a class="btn btn-ghost btn-sm" href="/<%= L %>/documents/<%= d.slug %>"><%= t('calendar.download_all') %></a>
+      </li>
+      <% }) %>
+    </ul>
+  </div>
+</section>
+
+<section class="section section-alt" aria-labelledby="cal-ev-h">
+  <div class="container">
+    <div class="section-head">
+      <h2 id="cal-ev-h"><%= t('calendar.this_year') %></h2>
+      <p class="section-lead"><%= L === 'zh' ? '本學年的重要日期與活動。'
+                                              : 'Key dates and events for the current school year.' %></p>
+    </div>
+    <div class="events-list">
+      <% eventsArr.forEach(function(e) { %>
+      <%- renderPart('partials/event-row.ejs', {
+        evDate: new Date(e.starts_at),
+        evTitle: title(e),
+        evHref: `/${L}/events/${e.slug}`,
+        evLocation: e.location || '',
+        evTime: e.all_day ? t('events.all_day') : '',
+      }) %>
+      <% }) %>
+    </div>
+    <div class="section-cta">
+      <a class="btn btn-ghost" href="/<%= L %>/events"><%= L === 'zh' ? '查看全部活動' : 'View All Events' %> →</a>
+    </div>
+  </div>
+</section>

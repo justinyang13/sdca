@@ -1,0 +1,55 @@
+<%
+  // search.ejs — search results page.
+  // ctx: { q, rows, engine }
+  const L = lang;
+  const qv = (typeof q !== 'undefined' && q) ? q : '';
+  const rowsArr = (typeof rows !== 'undefined' && rows) ? rows : [];
+  const kindLabel = (k) => {
+    const key = `search.kind.${k}`;
+    const label = t(key);
+    return label === key ? k : label;
+  };
+%>
+<%- renderPart('partials/hero.ejs', {
+  heroTitle: L === 'zh' ? '搜尋' : 'Search',
+  heroVariant: 'slim',
+}) %>
+
+<section class="section" aria-labelledby="search-h">
+  <div class="container container-narrow">
+    <h2 id="search-h" class="sr-only"><%= t('search.results') %></h2>
+
+    <form class="search-form" method="get" action="/<%= L %>/search" role="search">
+      <label class="sr-only" for="q"><%= t('search.placeholder') %></label>
+      <input type="search" id="q" name="q" value="<%= qv %>" placeholder="<%= t('search.placeholder') %>"
+             autocomplete="off" required>
+      <button type="submit" class="btn btn-primary btn-lg"><%= t('button.search') %></button>
+    </form>
+
+    <% if (!qv) { %>
+      <p class="search-empty"><%= t('search.no_query') %></p>
+    <% } else if (!rowsArr.length) { %>
+      <p class="search-empty">
+        <%= t('search.zero') %>
+        <%= L === 'zh' ? `「${qv}」` : `for "${qv}"` %>.
+        <%= t('search.try') %>
+        <a href="/<%= L %>/news"><%= t('search.announcements_link') %></a>
+        <%= L === 'zh' ? '或' : 'or' %>
+        <a href="/<%= L %>/documents"><%= t('search.documents_link') %></a>.
+      </p>
+    <% } else { %>
+      <p class="search-count"><%= rowsArr.length %> <%= t('search.findings') %> — "<%= qv %>"</p>
+      <ul class="search-results">
+        <% rowsArr.forEach(function(r) {
+           const url = r.url.replace(/^\/en/, '/' + L);
+        %>
+        <li class="search-item">
+          <span class="chip search-kind search-kind-<%= r.kind %>"><%= kindLabel(r.kind) %></span>
+          <h3><a href="<%= url %>"><%= r.title %></a></h3>
+          <% if (r.snippet) { %><p class="search-snippet"><%= r.snippet %></p><% } %>
+        </li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </div>
+</section>

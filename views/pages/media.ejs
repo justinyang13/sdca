@@ -1,0 +1,97 @@
+<%
+  // media.ejs — gallery grid with lightbox + video + albums.
+  // ctx: { photos, videos, albums }
+  const L = lang;
+  const photosArr = (typeof photos !== 'undefined' && photos) ? photos : [];
+  const videosArr = (typeof videos !== 'undefined' && videos) ? videos : [];
+  const albumsArr = (typeof albums !== 'undefined' && albums) ? albums : [];
+  const pick = (r, f) => L === 'zh' ? (r[`${f}_zh`] || r[`${f}_en`] || '') : (r[`${f}_en`] || r[`${f}_zh`] || '');
+  const fileOf = (img, w) => {
+    const s = String(img || '').replace(/^\/+/, '');
+    if (!s) return '';
+    if (/-\d+\.\w+$/.test(s)) {
+      return s.replace(/-\d+\.\w+$/, `-${w}.jpg`);
+    }
+    return s.replace(/\.\w+$/, '') + `-${w}.jpg`;
+  };
+%>
+<%- renderPart('partials/hero.ejs', {
+  heroTitle: L === 'zh' ? '照片與影片' : 'Photos & Videos',
+  heroSub: L === 'zh' ? 'SDCA 課堂、節慶與活動的精彩瞬間。'
+                        : 'Moments from SDCA classrooms, festivals and events.',
+  heroImage: '/img/banners/banner-paper-cut.png',
+  heroVariant: 'photo',
+}) %>
+
+<section class="section" aria-labelledby="media-gal-h">
+  <div class="container">
+    <div class="section-head">
+      <h2 id="media-gal-h"><%= t('media.gallery') %></h2>
+      <p class="section-lead"><%= photosArr.length %> <%= t('media.photos') %></p>
+    </div>
+    <div class="gallery-grid">
+      <% photosArr.forEach(function(p) {
+           const alt = pick(p, 'title');
+      %>
+      <a class="gallery-item" data-lightbox="gallery"
+         href="<%= fileOf(p.image, 1600) %>"
+         data-full="<%= fileOf(p.image, 1600) %>"
+         data-alt="<%= alt %>"
+         aria-label="<%= alt %>">
+        <img src="<%= fileOf(p.image, 480) %>"
+             srcset="<%= fileOf(p.image, 480) %> 480w, <%= fileOf(p.image, 960) %> 960w, <%= fileOf(p.image, 1600) %> 1600w"
+             sizes="(max-width: 600px) 50vw, (max-width: 1024px) 33vw, 25vw"
+             alt="<%= alt %>"
+             loading="lazy"
+             width="480" height="320">
+      </a>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt" aria-labelledby="media-video-h">
+  <div class="container grid-2-col">
+    <div>
+      <h2 id="media-video-h" class="section-h2"><%= t('media.videos') %></h2>
+      <div class="video-card">
+        <% videosArr.forEach(function(v) { %>
+        <a class="video-card-link" href="<%= v.url %>" target="_blank" rel="noopener">
+          <div class="video-card-thumb" aria-hidden="true">
+            <svg viewBox="0 0 64 64" width="64" height="64" fill="none" stroke="currentColor" stroke-width="3"><circle cx="32" cy="32" r="28"/><path d="M26 20l20 12-20 12z" fill="currentColor" stroke="none"/></svg>
+          </div>
+          <div class="video-card-body">
+            <h3><%= pick(v, 'title') %></h3>
+            <span class="video-card-cta"><%= t('media.watch') %> →</span>
+          </div>
+        </a>
+        <% }) %>
+      </div>
+    </div>
+    <div>
+      <h2 class="section-h2"><%= t('media.albums') %></h2>
+      <div class="album-card">
+        <% albumsArr.forEach(function(a) { %>
+        <a class="album-card-link" href="<%= a.url %>" target="_blank" rel="noopener">
+          <div class="album-card-thumb" aria-hidden="true">
+            <svg viewBox="0 0 64 64" width="48" height="48" fill="none" stroke="currentColor" stroke-width="3"><rect x="8" y="14" width="48" height="36" rx="4"/><circle cx="24" cy="30" r="5"/><path d="M8 44l14-12 10 8 12-10 12 12"/></svg>
+          </div>
+          <div class="album-card-body">
+            <h3><%= pick(a, 'title') %></h3>
+            <span class="album-card-cta"><%= t('media.open_album') %> →</span>
+          </div>
+        </a>
+        <% }) %>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="<%= t('media.gallery') %>" hidden>
+  <button class="lb-close" aria-label="<%= t('button.close') %>" data-lb-close>&times;</button>
+  <button class="lb-prev" aria-label="Previous" data-lb-prev>‹</button>
+  <img class="lb-img" src="" alt="">
+  <div class="lb-caption"></div>
+  <button class="lb-next" aria-label="Next" data-lb-next>›</button>
+</div>
+<script type="module" src="/js/lightbox.js"></script>

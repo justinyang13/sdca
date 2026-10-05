@@ -1,0 +1,93 @@
+<%
+  // news.ejs — news/announcements index with tabs, pagination, optional kind filter.
+  // ctx: { kind, page, perPage, total, anns }
+  // NOTE: ctx keys are passed via the `news` object to avoid EJS TDZ (const shadowing).
+  const n = typeof news !== 'undefined' ? news : { kind: 'all', page: 1, perPage: 12, total: 0, anns: [] };
+  const activeKind = n.kind || 'all';
+  const p = Math.max(1, parseInt(n.page || '1', 10) || 1);
+  const per = parseInt(n.perPage || '12', 10) || 12;
+  const total = parseInt(n.total || '0', 10) || 0;
+  const pageCount = Math.max(1, Math.ceil(total / per));
+  const items = n.anns || [];
+  const L = lang;
+  const dateFmt = (iso) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    const months = L === 'zh' ? ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+                              : ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+  };
+  const title = (r) => L === 'zh' ? (r.title_zh || r.title_en || '') : (r.title_en || r.title_zh || '');
+  const note  = (r) => {
+    const en = r.title_en || ''; const zh = r.title_zh || '';
+    if (L === 'zh') return zh ? null : (en ? 'meta.lang_note_zh' : null);
+    return en ? null : (zh ? 'meta.lang_note_en' : null);
+  };
+  const tabs = [
+    { id: 'all',    label: t('tabs.all') },
+    { id: 'weekly', label: t('tabs.weekly') },
+    { id: 'news',   label: t('tabs.news') },
+    { id: 'press',  label: t('tabs.press') },
+    { id: 'notice', label: t('tabs.notice') },
+  ];
+%>
+<%- renderPart('partials/hero.ejs', {
+  heroTitle: L === 'zh' ? '新聞與通告' : 'News & Announcements',
+  heroSub: L === 'zh' ? '每週通告、新聞、媒體剪報與通知。'
+                       : 'Weekly announcements, news, press archive and notices.',
+  heroImage: '/img/banners/banner-temple.png',
+  heroVariant: 'photo',
+}) %>
+
+<section class="section" aria-labelledby="news-h">
+  <div class="container">
+    <h2 id="news-h" class="sr-only"><%= L === 'zh' ? '通告清單' : 'Announcement list' %></h2>
+
+    <div class="filter-tabs" role="tablist" aria-label="<%= t('tabs.announcements') %>">
+      <% tabs.forEach(function(tb) {
+           const selected = tb.id === activeKind;
+           const qs = tb.id === 'all' ? '' : `?kind=${tb.id}`;
+      %>
+        <a class="<%= selected ? 'is-active' : '' %>"
+           href="/<%= L %>/news<%= qs %>"
+           role="tab"
+           aria-selected="<%= String(selected) %>"><%= tb.label %></a>
+      <% }) %>
+    </div>
+
+    <ul class="announcement-list news-list">
+      <% if (!items.length) { %>
+      <li class="ann-empty"><%= t('tabs.no_results') %></li>
+      <% } %>
+      <% items.forEach(function(a) { %>
+      <li class="announcement-item">
+        <div>
+          <span class="chip <%= { weekly: 'chip-weekly', news: 'chip-news', press: 'chip-press', notice: 'chip-notice' }[a.kind] || '' %>">
+            <%= t('tabs.' + a.kind) %>
+          </span>
+          <h3 class="ann-title"><a href="/<%= L %>/news/<%= a.slug %>"><%= title(a) %></a></h3>
+          <% const nn = note(a); if (nn) { %><span class="lang-note">(<%= t(nn) %>)</span><% } %>
+          <% if (a.summary_en || a.summary_zh) { %>
+            <p class="ann-body"><%= L === 'zh' ? (a.summary_zh || a.summary_en || '') : (a.summary_en || a.summary_zh || '') %></p>
+          <% } %>
+          <div class="ann-meta"><time datetime="<%= a.published_at %>"><%= dateFmt(a.published_at) %></time></div>
+        </div>
+        <div class="ann-cta">
+          <a class="btn btn-ghost btn-sm" href="/<%= L %>/news/<%= a.slug %>"><%= t('button.read_more') %></a>
+        </div>
+      </li>
+      <% }) %>
+    </ul>
+
+    <% if (pageCount > 1) { %>
+    <nav class="pagination" aria-label="Pagination">
+      <% if (p > 1) { %><a href="/<%= L %>/news?kind=<%= activeKind %>&page=<%= p - 1 %>"><%= t('button.prev_page') %></a><% } %>
+      <% for (let i = 1; i <= pageCount; i++) { %>
+        <% if (i === p) { %><span class="current" aria-current="page"><%= i %></span>
+        <% } else { %><a href="/<%= L %>/news?kind=<%= activeKind %>&page=<%= i %>"><%= i %></a><% } %>
+      <% } %>
+      <% if (p < pageCount) { %><a href="/<%= L %>/news?kind=<%= activeKind %>&page=<%= p + 1 %>"><%= t('button.next_page') %></a><% } %>
+    </nav>
+    <% } %>
+  </div>
+</section>

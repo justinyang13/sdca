@@ -1,0 +1,59 @@
+<%
+  // parents.ejs — shared layout for /parents/handbook|volunteer|scrip.
+  // ctx: { page, relatedDocs, subLinks, mdBody, bodyNote }
+  const L = lang;
+  const pg = (typeof page !== 'undefined' && page) ? page : { title_en: '', title_zh: '' };
+  const title = L === 'zh' ? (pg.title_zh || pg.title_en || '') : (pg.title_en || pg.title_zh || '');
+  const docsArr = (typeof relatedDocs !== 'undefined' && relatedDocs) ? relatedDocs : [];
+  const linksArr = (typeof subLinks !== 'undefined' && subLinks) ? subLinks : [];
+%>
+<%- renderPart('partials/hero.ejs', {
+  heroTitle: title,
+  heroSub: L === 'zh' ? 'SDCA 家長專區：手冊、志工、書券與表單。'
+                        : 'SDCA parent resources: handbook, volunteer, scrip and forms.',
+  heroImage: '/img/banners/banner-calligraphy.png',
+  heroVariant: 'photo',
+}) %>
+
+<section class="section" aria-labelledby="parents-h">
+  <div class="container grid-2-col">
+    <div class="detail-body markdown">
+      <%- mdBody %><% if (!mdBody) { %><p><%= L === 'zh' ? '（內容略）' : '(Content omitted.)' %></p><% } %>
+      <% if (bodyNote) { %><p class="lang-note"><%= t(bodyNote) %></p><% } %>
+    </div>
+
+    <aside>
+      <% if (linksArr.length) { %>
+      <div class="sidebar-card">
+        <h3 class="sidebar-title"><%= L === 'zh' ? '相關頁面' : 'Related pages' %></h3>
+        <ul class="sidebar-list">
+          <% linksArr.forEach(function(l) { %>
+          <li><a href="<%= l.href %>"><%= l.label %></a></li>
+          <% }) %>
+        </ul>
+      </div>
+      <% } %>
+
+      <% if (docsArr.length) { %>
+      <div class="sidebar-card">
+        <h3 class="sidebar-title"><%= t('parents.related_forms') %></h3>
+        <ul class="doc-list doc-list-compact">
+          <% docsArr.forEach(function(d) { %>
+          <li class="doc-item">
+            <span class="doc-icon" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+                <path d="M3 1h8l4 4v10H3z"/><path d="M11 1v4h4"/><path d="M6 9h6M6 12h6M6 15h4"/>
+              </svg>
+            </span>
+            <div>
+              <h4 class="doc-title"><a href="/<%= L %>/documents/<%= d.slug %>"><%= L === 'zh' ? (d.title_zh || d.title_en) : (d.title_en || d.title_zh) %></a></h4>
+              <div class="doc-meta"><%= Math.max(1, Math.round(d.bytes / 1024)) %> KB</div>
+            </div>
+          </li>
+          <% }) %>
+        </ul>
+      </div>
+      <% } %>
+    </aside>
+  </div>
+</section>

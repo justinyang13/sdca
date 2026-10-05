@@ -1,0 +1,52 @@
+<%
+  // event-detail.ejs — single event with iCal export + location.
+  // ctx: { ev, related, bodyHtml }
+  const L = lang;
+  const e = ev;
+  const title = L === 'zh' ? (e.title_zh || e.title_en || '') : (e.title_en || e.title_zh || '');
+  const desc = L === 'zh' ? (e.description_zh || e.description_en || '') : (e.description_en || e.description_zh || '');
+  const start = new Date(e.starts_at);
+  const months = L === 'zh' ? ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+                            : ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const relatedArr = (typeof related !== 'undefined' && related) ? related : [];
+%>
+<%- renderPart('partials/hero.ejs', {
+  heroTitle: title,
+  heroSub: desc,
+  heroVariant: 'slim',
+}) %>
+
+<section class="section" aria-labelledby="ev-h">
+  <div class="container container-narrow">
+    <div class="detail-meta">
+      <time datetime="<%= e.starts_at %>"><%= months[start.getMonth()] %> <%= start.getDate() %>, <%= start.getFullYear() %></time>
+      <% if (e.all_day) { %><span class="chip chip-notice"><%= t('events.all_day') %></span><% } %>
+      <% if (e.location) { %><span><%= t('events.location') %>: <%= e.location %></span><% } %>
+    </div>
+
+    <div class="detail-body markdown">
+      <%- bodyHtml %><% if (!bodyHtml) { %><p><%= desc %></p><% } %>
+    </div>
+
+    <a class="btn btn-primary" href="/<%= L %>/events/<%= e.slug %>.ics">
+      <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 4h12v10H2zM2 4V2M14 4V2M5 1v3M11 1v3M5 9h2M9 9h2M5 12h2M9 12h2"/></svg>
+      <%= t('button.add_to_calendar') %>
+    </a>
+
+    <hr>
+    <% if (relatedArr.length) { %>
+    <h2 class="section-h2"><%= L === 'zh' ? '其他活動' : 'Other events' %></h2>
+    <div class="events-list">
+      <% relatedArr.forEach(function(r) { %>
+      <%- renderPart('partials/event-row.ejs', {
+        evDate: new Date(r.starts_at),
+        evTitle: L === 'zh' ? (r.title_zh || r.title_en) : (r.title_en || r.title_zh),
+        evHref: `/${L}/events/${r.slug}`,
+        evLocation: r.location || '',
+        evTime: r.all_day ? t('events.all_day') : '',
+      }) %>
+      <% }) %>
+    </div>
+    <% } %>
+  </div>
+</section>

@@ -1,0 +1,21 @@
+<%
+  // static-page.ejs — renders any `pages` row (privacy, disclaimer, education-resource…).
+  // ctx: { pg, mdBody, bodyNote }
+  const L = lang;
+  const pgv = (typeof pg !== 'undefined' && pg) ? pg : { title_en: '', title_zh: '' };
+  const title = L === 'zh' ? (pgv.title_zh || pgv.title_en || '') : (pgv.title_en || pgv.title_zh || '');
+%>
+<%- renderPart('partials/hero.ejs', {
+  heroTitle: title,
+  heroVariant: 'slim',
+}) %>
+
+<section class="section" aria-labelledby="static-h">
+  <div class="container container-narrow">
+    <h2 id="static-h" class="sr-only"><%= title %></h2>
+    <div class="detail-body markdown">
+      <%- mdBody %><% if (!mdBody) { %><p><%= L === 'zh' ? '（內容略）' : '(Content omitted.)' %></p><% } %>
+      <% if (bodyNote) { %><p class="lang-note"><%= t(bodyNote) %></p><% } %>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,88 @@
+<%
+  // events.ejs — events list + month calendar view (no JS dependencies).
+  // ctx: { events, month (Date), view ('list'|'month') }
+  const L = lang;
+  const evts = (typeof events !== 'undefined' && events) ? events : [];
+  const mv = (typeof view !== 'undefined' && view) ? view : 'list';
+  const calMonth = (typeof month !== 'undefined' && month) ? new Date(month) : new Date();
+  const byDate = new Map();
+  evts.forEach(function(e) {
+    const d = new Date(e.starts_at);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    if (!byDate.has(key)) byDate.set(key, []);
+    byDate.get(key).push(e);
+  });
+  const monthLabel = L === 'zh'
+    ? `${calMonth.getFullYear()} 年 ${calMonth.getMonth() + 1} 月`
+    : `${calMonth.getFullYear()} - ${['January','February','March','April','May','June','July','August','September','October','November','December'][calMonth.getMonth()]}`;
+  const prevM = new Date(calMonth.getFullYear(), calMonth.getMonth() - 1, 1);
+  const nextM = new Date(calMonth.getFullYear(), calMonth.getMonth() + 1, 1);
+  const monthQs = (d) => `?month=${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  const title = (r) => L === 'zh' ? (r.title_zh || r.title_en || '') : (r.title_en || r.title_zh || '');
+  const weekday = L === 'zh'
+    ? [t('sun'), t('mon'), t('tue'), t('wed'), t('thu'), t('fri'), t('sat')]
+    : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const firstDay = new Date(calMonth.getFullYear(), calMonth.getMonth(), 1).getDay();
+  const daysInMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + 1, 0).getDate();
+%>
+<%- renderPart('partials/hero.ejs', {
+  heroTitle: L === 'zh' ? '活動' : 'Events',
+  heroSub: L === 'zh' ? '即將舉行的活動與學年行事曆。'
+                        : 'Upcoming events and the school-year calendar.',
+  heroImage: '/img/banners/banner-coastline.png',
+  heroVariant: 'photo',
+}) %>
+
+<section class="section" aria-labelledby="events-h">
+  <div class="container">
+    <div class="view-toggle" role="tablist" aria-label="<%= L === 'zh' ? '檢視方式' : 'View' %>">
+      <a class="<%= mv === 'list' ? 'is-active' : '' %>" role="tab" aria-selected="<%= String(mv === 'list') %>" href="/<%= L %>/events"><%= t('events.list_view') %></a>
+      <a class="<%= mv === 'month' ? 'is-active' : '' %>" role="tab" aria-selected="<%= String(mv === 'month') %>" href="/<%= L %>/events/view/month"><%= t('events.calendar_view') %></a>
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="events-h">
+  <div class="container">
+    <% if (mv === 'month') { %>
+      <div class="cal-head">
+        <a href="/<%= L %>/events/view/month<%= monthQs(prevM) %>"><%= t('button.prev_page') %> ‹</a>
+        <h2 id="events-h" class="cal-month-label"><%= monthLabel %></h2>
+        <a href="/<%= L %>/events/view/month<%= monthQs(nextM) %>">› <%= t('button.next_page') %></a>
+      </div>
+      <div class="cal-grid" role="grid" aria-label="<%= monthLabel %>">
+        <% for (let i = 0; i < 7; i++) { %>
+        <div class="cal-head-cell" role="columnheader"><%= weekday[i] %></div>
+        <% } %>
+        <% for (let i = 0; i < firstDay; i++) { %><div class="cal-cell cal-cell-empty"></div><% } %>
+        <% for (let day = 1; day <= daysInMonth; day++) { %>
+          <% const key = `${calMonth.getFullYear()}-${String(calMonth.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; %>
+          <% const dayEvents = byDate.get(key) || []; %>
+          <div class="cal-cell <%= dayEvents.length ? 'has-events' : '' %>" role="gridcell" aria-label="<%= day %>">
+            <span class="cal-day"><%= day %></span>
+            <% if (dayEvents.length) { %>
+              <% dayEvents.slice(0, 2).forEach(function(e) { %>
+              <a class="cal-event" href="/<%= L %>/events/<%= e.slug %>"><%= title(e) %></a>
+              <% }) %>
+              <% if (dayEvents.length > 2) { %><span class="cal-more">+<%= dayEvents.length - 2 %></span><% } %>
+            <% } %>
+          </div>
+        <% } %>
+      </div>
+    <% } else { %>
+      <h2 id="events-h" class="section-h2 sr-only"><%= L === 'zh' ? '活動清單' : 'Events list' %></h2>
+      <% if (!evts.length) { %><p class="ann-empty"><%= t('events.no_events') %></p><% } %>
+      <div class="events-list">
+        <% evts.forEach(function(e) { %>
+        <%- renderPart('partials/event-row.ejs', {
+          evDate: new Date(e.starts_at),
+          evTitle: title(e),
+          evHref: `/${L}/events/${e.slug}`,
+          evLocation: e.location || '',
+          evTime: e.all_day ? t('events.all_day') : '',
+        }) %>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</section>

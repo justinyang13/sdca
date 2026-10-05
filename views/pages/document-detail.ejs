@@ -1,0 +1,59 @@
+<%
+  // document-detail.ejs — single document with download + meta.
+  // ctx: { doc, relatedDocs }
+  const L = lang;
+  const d = doc;
+  const title = L === 'zh' ? (d.title_zh || d.title_en || d.slug) : (d.title_en || d.title_zh || d.slug);
+  const size = (b) => b >= 1048576 ? `${(b / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(b / 1024))} KB`;
+  const relatedArr = (typeof relatedDocs !== 'undefined' && relatedDocs) ? relatedDocs : [];
+%>
+<%- renderPart('partials/hero.ejs', {
+  heroTitle: title,
+  heroSub: d.school_year ? `${d.school_year} · ${t('documents.cat.' + d.category) || d.category}` : (t('documents.cat.' + d.category) || d.category),
+  heroVariant: 'slim',
+}) %>
+
+<section class="section" aria-labelledby="doc-h">
+  <div class="container container-narrow">
+    <h2 id="doc-h" class="sr-only"><%= L === 'zh' ? '文件詳情' : 'Document details' %></h2>
+
+    <div class="doc-card" aria-label="<%= L === 'zh' ? '下載文件' : 'Download' %>">
+      <div class="doc-card-icon" aria-hidden="true">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+          <path d="M3 1h8l4 4v10H3z"/><path d="M11 1v4h4"/><path d="M6 9h6M6 12h6M6 15h4"/>
+        </svg>
+      </div>
+      <div class="doc-card-body">
+        <div class="doc-card-title"><%= title %></div>
+        <div class="doc-card-meta">
+          <% if (d.school_year) { %><%= d.school_year %> · <% } %>
+          <%= t('documents.cat.' + d.category) || d.category %> · <%= size(d.bytes) %>
+        </div>
+      </div>
+      <a class="btn btn-primary" href="/<%= L %>/documents/<%= d.slug %>" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 2v8M4 7l4 4 4-4M2 14h12"/></svg>
+        <%= t('button.download') %>
+      </a>
+    </div>
+
+    <% if (relatedArr.length) { %>
+    <hr>
+    <h2 class="section-h2"><%= L === 'zh' ? '同類別文件' : 'Related documents' %></h2>
+    <ul class="doc-list">
+      <% relatedArr.forEach(function(r) { %>
+      <li class="doc-item">
+        <span class="doc-icon" aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+            <path d="M3 1h8l4 4v10H3z"/><path d="M11 1v4h4"/><path d="M6 9h6M6 12h6M6 15h4"/>
+          </svg>
+        </span>
+        <div>
+          <h3 class="doc-title"><a href="/<%= L %>/documents/<%= r.slug %>"><%= L === 'zh' ? (r.title_zh || r.title_en) : (r.title_en || r.title_zh) %></a></h3>
+          <div class="doc-meta"><%= r.school_year || '' %> · <%= size(r.bytes) %></div>
+        </div>
+      </li>
+      <% }) %>
+    </ul>
+    <% } %>
+  </div>
+</section>

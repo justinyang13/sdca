@@ -1,0 +1,71 @@
+<%
+  // news-detail.ejs — single announcement with attached PDF.
+  // ctx: { ann, doc, related, bodyHtml }
+  const L = lang;
+  const a = ann;
+  const title = L === 'zh' ? (a.title_zh || a.title_en || '') : (a.title_en || a.title_zh || '');
+  const summary = L === 'zh' ? (a.summary_zh || a.summary_en || '') : (a.summary_en || a.summary_zh || '');
+  const relatedArr = (typeof related !== 'undefined' && related) ? related : [];
+  const dateFmt = (iso) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    const months = L === 'zh' ? ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+                              : ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+  };
+%>
+<%- renderPart('partials/hero.ejs', {
+  heroTitle: title,
+  heroSub: summary,
+  heroVariant: 'slim',
+}) %>
+
+<section class="section" aria-labelledby="ann-h">
+  <div class="container container-narrow">
+    <div class="detail-meta">
+      <span class="chip <%= { weekly: 'chip-weekly', news: 'chip-news', press: 'chip-press', notice: 'chip-notice' }[a.kind] || '' %>">
+        <%= t('tabs.' + a.kind) %>
+      </span>
+      <time datetime="<%= a.published_at %>"><%= dateFmt(a.published_at) %></time>
+    </div>
+
+    <div class="detail-body markdown">
+      <%- bodyHtml %><% if (!bodyHtml) { %><p><%= L === 'zh' ? '（無內容）' : '(No content.)' %></p><% } %>
+    </div>
+
+    <% if (doc) { %>
+    <aside class="doc-card" aria-label="<%= t('news.pdf') %>">
+      <div class="doc-card-icon" aria-hidden="true">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+          <path d="M3 1h8l4 4v10H3z"/><path d="M11 1v4h4"/><path d="M6 9h6M6 12h6M6 15h4"/>
+        </svg>
+      </div>
+      <div class="doc-card-body">
+        <div class="doc-card-title"><%= L === 'zh' ? (doc.title_zh || doc.title_en) : (doc.title_en || doc.title_zh) %></div>
+        <div class="doc-card-meta">PDF · <%= Math.max(1, Math.round(doc.bytes / 1024)) %> KB</div>
+      </div>
+      <a class="btn btn-primary" href="/<%= L %>/documents/<%= doc.slug %>" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 2v8M4 7l4 4 4-4M2 14h12"/></svg>
+        <%= t('news.pdf') %>
+      </a>
+    </aside>
+    <% } else if (a.external_url) { %>
+    <a class="btn btn-primary" href="<%= a.external_url %>" target="_blank" rel="noopener"><%= t('button.learn_more') %></a>
+    <% } else { %>
+    <p class="doc-missing"><%= t('news.no_doc') %></p>
+    <% } %>
+
+    <hr>
+    <h2 class="section-h2"><%= t('news.other_announcements') %></h2>
+    <ul class="announcement-list related-list">
+      <% relatedArr.forEach(function(r) { %>
+      <li class="announcement-item related-item">
+        <div>
+          <h3><a href="/<%= L %>/news/<%= r.slug %>"><%= L === 'zh' ? (r.title_zh || r.title_en) : (r.title_en || r.title_zh) %></a></h3>
+          <time datetime="<%= r.published_at %>"><%= dateFmt(r.published_at) %></time>
+        </div>
+      </li>
+      <% }) %>
+    </ul>
+  </div>
+</section>
