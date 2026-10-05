@@ -1,0 +1,6 @@
+<% const body = '<section class="page-error">' +
+  '<h1>' + (title || t('errors.not_found_title')) + '</h1>' +
+  '<p>' + (message || t('errors.not_found_body')) + '</p>' +
+  '<p><a class="btn" href="/' + lang + '/">' + t('errors.back_home') + '</a></p>' +
+  '</section>'; %>
+<%- include('../layouts/main.ejs', { lang, title: title || t('errors.not_found_title'), t, body }) %>

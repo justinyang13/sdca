@@ -1,0 +1,13 @@
+node_modules/
+work/
+logs/
+data/
+backups/
+*.db
+*.db-*
+.env
+.DS_Store
+research/raw/
+research/assets/
+research/logs/
+research/__pycache__/

@@ -1,0 +1,6 @@
+<% const body = '<section class="page-error">' +
+  '<h1>403</h1>' +
+  '<p>' + (message || 'Access denied.') + '</p>' +
+  '<p><a class="btn" href="/' + lang + '/">' + t('errors.back_home') + '</a></p>' +
+  '</section>'; %>
+<%- include('../layouts/main.ejs', { lang, title: '403', t, body }) %>

@@ -1,0 +1,20 @@
+<header class="site-header" role="banner">
+  <div class="header-inner">
+    <a class="brand" href="/<%= lang %>/">
+      <img src="/img/logo.png" alt="SDCA" width="40" height="40">
+      <span class="brand-name"><%= lang === 'zh' ? '聖地牙哥中華學苑' : 'San Diego Chinese Academy' %></span>
+    </a>
+    <nav class="site-nav" aria-label="Main">
+      <ul>
+        <li><a href="/<%= lang %>/"><%= t('nav.home') %></a></li>
+        <li><a href="/<%= lang %>/about"><%= t('nav.about') %></a></li>
+        <li><a href="/<%= lang %>/programs"><%= t('nav.programs') %></a></li>
+        <li><a href="/<%= lang %>/news"><%= t('nav.news') %></a></li>
+        <li><a href="/<%= lang %>/contact" class="cta"><%= t('nav.donate') %></a></li>
+      </ul>
+    </nav>
+    <a href="/<%= lang === 'zh' ? 'en' : 'zh' %><%= langPath === '/' ? '' : langPath %>" class="lang-switch" aria-label="<%= t('nav.switch_lang') %>">
+      <%= t('nav.switch_lang') %>
+    </a>
+  </div>
+</header>

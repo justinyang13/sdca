@@ -1,0 +1,33 @@
+<footer class="site-footer" role="contentinfo">
+  <div class="footer-grid">
+    <div class="footer-col">
+      <h2><%= t('footer.school') %></h2>
+      <p><%= t('footer.tagline') %></p>
+    </div>
+    <div class="footer-col">
+      <h2><%= t('footer.links') %></h2>
+      <ul>
+        <li><a href="/<%= lang %>/about"><%= t('nav.about') %></a></li>
+        <li><a href="/<%= lang %>/programs"><%= t('nav.programs') %></a></li>
+        <li><a href="/<%= lang %>/news"><%= t('nav.news') %></a></li>
+        <li><a href="/<%= lang %>/privacy"><%= t('footer.privacy') %></a></li>
+        <li><a href="/<%= lang %>/disclaimer"><%= t('footer.disclaimer') %></a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h2><%= t('footer.contact') %></h2>
+      <p>(858) 205-7322</p>
+      <p>Office.SDCA@gmail.com</p>
+    </div>
+    <div class="footer-col">
+      <h2><%= t('footer.follow') %></h2>
+      <ul class="social">
+        <li><a href="https://www.facebook.com/SanDiegoChineseAcademy/" rel="noopener" target="_blank">Facebook</a></li>
+        <li><a href="https://www.youtube.com/channel/UCbURJMa8pWixTD51QEnWMdA" rel="noopener" target="_blank">YouTube</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-legal">
+    <p>© <%= new Date().getFullYear() %> SDCA. <%= t('footer.rights') %></p>
+  </div>
+</footer>
