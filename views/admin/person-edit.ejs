@@ -1,0 +1,24 @@
+<%# person-edit.ejs %>
+<h1><%= item ? 'Edit person' : 'New person' %></h1>
+<form method="POST" action="/admin/people" class="form-grid">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <div class="field"><label>Group
+    <select name="group">
+      <% for (const g of ['board','staff','teacher','volunteer']) { %>
+      <option value="<%= g %>" <%= (item && item.group === g) ? 'selected' : '' %><%= (!item && g === 'staff') ? 'selected' : '' %>><%= g %></option>
+      <% } %>
+    </select>
+  </label></div>
+  <div class="field"><label>Sort <input type="number" name="sort" value="<%= item ? item.sort : 0 %>"></label></div>
+  <div class="field"><label>Photo (manifest name or /img/… path) <input type="text" name="photo" value="<%= item ? item.photo : '' %>"></label></div>
+  <div class="field full"><label>Name (EN) <input type="text" name="name_en" value="<%= item ? item.name_en : '' %>"></label></div>
+  <div class="field full"><label>Name (ZH) <input type="text" name="name_zh" value="<%= item ? item.name_zh : '' %>"></label></div>
+  <div class="field"><label>Role (EN) <input type="text" name="role_en" value="<%= item ? item.role_en : '' %>"></label></div>
+  <div class="field"><label>Role (ZH) <input type="text" name="role_zh" value="<%= item ? item.role_zh : '' %>"></label></div>
+  <div class="field full"><label>Bio (EN) <textarea name="bio_en" rows="4" class="mono"><%= item ? item.bio_en : '' %></textarea></label></div>
+  <div class="field full"><label>Bio (ZH) <textarea name="bio_zh" rows="4" class="mono"><%= item ? item.bio_zh : '' %></textarea></label></div>
+  <div class="actions">
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a class="btn" href="/admin/people">Cancel</a>
+  </div>
+</form>

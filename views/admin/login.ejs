@@ -1,0 +1,17 @@
+<%# login.ejs — login form (rendered inside layout by renderAdmin, but also usable standalone) %>
+<section class="login-box">
+  <h1>Sign in</h1>
+  <% if (error) { %><div class="admin-error"><%= error %></div><% } %>
+  <form method="POST" action="/admin/login" class="login-form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" name="next" value="<%= nextPath %>">
+    <label>Username
+      <input type="text" name="username" autocomplete="username" required autofocus>
+    </label>
+    <label>Password
+      <input type="password" name="password" autocomplete="current-password" required>
+    </label>
+    <button type="submit" class="btn btn-primary">Sign in</button>
+  </form>
+  <p class="login-back"><a href="/en/">← Back to site</a></p>
+</section>

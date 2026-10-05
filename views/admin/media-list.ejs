@@ -1,0 +1,25 @@
+<%# media-list.ejs %>
+<div class="list-head">
+  <h1>Media items</h1>
+  <a class="btn btn-primary" href="/admin/media/new">+ New media item</a>
+</div>
+<table class="table">
+  <thead><tr><th>Title (EN)</th><th>Kind</th><th>URL</th><th>Image</th><th>Taken</th><th>Actions</th></tr></thead>
+  <tbody>
+    <% for (const r of rows) { %>
+    <tr>
+      <td><a href="/admin/media/<%= r.id %>"><%= r.title_en || r.title_zh || '—' %></a></td>
+      <td><span class="chip chip-<%= r.kind %>"><%= r.kind %></span></td>
+      <td><%= r.url ? `<a href="${r.url}" target="_blank" rel="noopener noreferrer">link</a>` : '—' %></td>
+      <td><%= r.image || '—' %></td>
+      <td><%= r.taken_at || '—' %></td>
+      <td>
+        <form method="POST" action="/admin/media/<%= r.id %>/delete" class="inline-form" onsubmit="return confirm('Delete?')">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>

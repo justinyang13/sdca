@@ -1,0 +1,84 @@
+<%# announcement-edit.ejs %>
+<h1><%= item ? 'Edit announcement' : 'New announcement' %></h1>
+<% if (error) { %><div class="admin-error"><%= error %></div><% } %>
+<form method="POST" action="/admin/announcements" class="form-grid">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <div class="field">
+    <label>Slug <small>(unique; leave blank to auto-generate)</small>
+      <input type="text" name="slug" value="<%= item ? item.slug : '' %>" placeholder="weekly-w01">
+    </label>
+  </div>
+  <div class="field">
+    <label>Kind
+      <select name="kind">
+        <% for (const k of ['weekly','news','press','notice']) { %>
+        <option value="<%= k %>" <%= (item && item.kind === k) ? 'selected' : '' %><%= (!item && k === 'weekly') ? 'selected' : '' %>><%= k %></option>
+        <% } %>
+      </select>
+    </label>
+  </div>
+  <div class="field">
+    <label>School year <input type="text" name="school_year" value="<%= item ? item.school_year : '' %>" placeholder="2026-27"></label>
+  </div>
+  <div class="field">
+    <label>Week no <input type="number" name="week_no" value="<%= item && item.week_no != null ? item.week_no : '' %>"></label>
+  </div>
+  <div class="field">
+    <label>Published at <input type="text" name="published_at" value="<%= item ? (item.published_at || '') : '' %>" placeholder="YYYY-MM-DD"></label>
+  </div>
+  <div class="field">
+    <label>Pinned
+      <select name="pinned">
+        <option value="0" <%= (item && !item.pinned) || !item ? 'selected' : '' %>>no</option>
+        <option value="1" <%= item && item.pinned ? 'selected' : '' %>>yes</option>
+      </select>
+    </label>
+  </div>
+  <div class="field">
+    <label>External URL <input type="url" name="external_url" value="<%= item ? item.external_url : '' %>"></label>
+  </div>
+  <div class="field">
+    <label>Attached document
+      <select name="document_id">
+        <option value="">— none —</option>
+        <% for (const d of docs) { %>
+        <option value="<%= d.id %>" <%= item && item.document_id === d.id ? 'selected' : '' %>><%= d.title_en || d.slug %></option>
+        <% } %>
+      </select>
+    </label>
+  </div>
+  <div class="field full">
+    <label>Title (EN) <input type="text" name="title_en" value="<%= item ? item.title_en : '' %>"></label>
+  </div>
+  <div class="field full">
+    <label>Title (ZH) <input type="text" name="title_zh" value="<%= item ? item.title_zh : '' %>" dir="ltr"></label>
+  </div>
+  <div class="field full">
+    <label>Summary (EN) <textarea name="summary_en" rows="2"><%= item ? item.summary_en : '' %></textarea></label>
+  </div>
+  <div class="field full">
+    <label>Summary (ZH) <textarea name="summary_zh" rows="2"><%= item ? item.summary_zh : '' %></textarea></label>
+  </div>
+  <div class="field full">
+    <label>Body (EN) <small>markdown</small>
+      <textarea name="body_en" rows="10" class="mono"><%= item ? item.body_en : '' %></textarea>
+    </label>
+  </div>
+  <div class="field full">
+    <label>Body (ZH) <small>markdown</small>
+      <textarea name="body_zh" rows="10" class="mono"><%= item ? item.body_zh : '' %></textarea>
+    </label>
+  </div>
+  <div class="field full">
+    <label>Published
+      <select name="published">
+        <option value="1" <%= (item && item.published) || !item ? 'selected' : '' %>>yes</option>
+        <option value="0" <%= item && !item.published ? 'selected' : '' %>>no</option>
+      </select>
+    </label>
+  </div>
+  <div class="actions">
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a class="btn" href="/admin/announcements">Cancel</a>
+  </div>
+</form>

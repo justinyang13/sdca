@@ -11,6 +11,7 @@ import * as H from './helpers.js';
 import { imageManifest } from './helpers.js';
 import { registerPublicRoutes } from './routes-public.js';
 import { registerPhase5Routes } from './routes-phase5.js';
+import { registerAdminRoutes } from './admin/routes.js';
 import { lookupRedirect } from './redirects.js';
 import { buildSitemap } from './sitemap.js';
 import { marked } from 'marked';
@@ -81,6 +82,9 @@ export function createApp({ db = openDb() } = {}) {
   applyBaseMiddleware(app);
 
   app.use(express.static(config.publicDir, { maxAge: '1h', etag: true }));
+
+  // ---------- Admin (mounted before /:lang routing) ----------
+  registerAdminRoutes(app, { db });
 
   // /healthz
   app.get('/healthz', (req, res) => {

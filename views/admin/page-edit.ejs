@@ -1,0 +1,23 @@
+<%# page-edit.ejs %>
+<h1><%= item ? 'Edit page' : 'New page' %></h1>
+<form method="POST" action="/admin/pages" class="form-grid">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <div class="field"><label>Slug <input type="text" name="slug" value="<%= item ? item.slug : '' %>" placeholder="about-board"></label></div>
+  <div class="field"><label>Nav section <input type="text" name="nav_section" value="<%= item ? item.nav_section : '' %>" placeholder="about"></label></div>
+  <div class="field"><label>Nav order <input type="number" name="nav_order" value="<%= item ? item.nav_order : 0 %>"></label></div>
+  <div class="field"><label>Hero image (manifest name or /img/… path) <input type="text" name="hero_image" value="<%= item ? item.hero_image : '' %>"></label></div>
+  <div class="field full"><label>Title (EN) <input type="text" name="title_en" value="<%= item ? item.title_en : '' %>"></label></div>
+  <div class="field full"><label>Title (ZH) <input type="text" name="title_zh" value="<%= item ? item.title_zh : '' %>"></label></div>
+  <div class="field full"><label>Body (EN) <small>markdown</small>
+    <textarea name="body_en" rows="12" class="mono"><%= item ? item.body_en : '' %></textarea></label></div>
+  <div class="field full"><label>Body (ZH) <small>markdown</small>
+    <textarea name="body_zh" rows="12" class="mono"><%= item ? item.body_zh : '' %></textarea></label></div>
+  <div class="field"><label>Published <select name="published">
+    <option value="1" <%= (item && item.published) || !item ? 'selected' : '' %>>yes</option>
+    <option value="0" <%= item && !item.published ? 'selected' : '' %>>no</option>
+  </select></label></div>
+  <div class="actions">
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a class="btn" href="/admin/pages">Cancel</a>
+  </div>
+</form>

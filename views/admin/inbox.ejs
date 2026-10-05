@@ -1,0 +1,43 @@
+<%# inbox.ejs %>
+<div class="list-head">
+  <h1>Inbox</h1>
+  <a class="btn" href="/admin/inbox/export.csv">Export CSV</a>
+</div>
+<% if (rows.length === 0) { %><p class="muted">No messages yet.</p><% } %>
+<% for (const r of rows) { %>
+<section class="msg msg-<%= r.status %>">
+  <header>
+    <strong><%= r.name || '(no name)' %></strong>
+    <span class="chip chip-<%= r.status %>"><%= r.status %></span>
+    <span class="muted"><%= r.created_at %></span>
+    <span class="muted">·</span>
+    <span><a href="mailto:<%= r.email %>"><%= r.email %></a></span>
+    <% if (r.phone) { %><span class="muted">·</span><span><%= r.phone %></span><% } %>
+  </header>
+  <p class="topic"><strong>Topic:</strong> <%= r.topic || '—' %></p>
+  <div class="msg-body"><%- r.message %></div>
+  <div class="actions">
+    <% if (r.status !== 'read') { %>
+    <form method="POST" action="/admin/inbox/<%= r.id %>/status" class="inline-form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="status" value="read">
+      <button type="submit" class="btn btn-sm">Mark read</button>
+    </form>
+    <% } %>
+    <% if (r.status !== 'archived') { %>
+    <form method="POST" action="/admin/inbox/<%= r.id %>/status" class="inline-form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="status" value="archived">
+      <button type="submit" class="btn btn-sm">Archive</button>
+    </form>
+    <% } %>
+    <% if (r.status !== 'new') { %>
+    <form method="POST" action="/admin/inbox/<%= r.id %>/status" class="inline-form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="status" value="new">
+      <button type="submit" class="btn btn-sm">Mark new</button>
+    </form>
+    <% } %>
+  </div>
+</section>
+<% } %>

@@ -1,0 +1,22 @@
+<%# settings.ejs %>
+<h1>Settings</h1>
+<p class="muted">School facts and other key-value pairs used across the site. Edit values and submit to save all changes.</p>
+<form method="POST" action="/admin/settings" class="settings-form">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <table class="table">
+    <thead><tr><th>Key</th><th>Value (EN)</th><th>Value (ZH)</th><th>Updated</th></tr></thead>
+    <tbody>
+      <% for (const r of rows) { %>
+      <tr>
+        <td><code><%= r.key %></code></td>
+        <td><input type="text" name="<%= r.key %>|en" value="<%= r.value_en %>" size="40"></td>
+        <td><input type="text" name="<%= r.key %>|zh" value="<%= r.value_zh %>" size="40"></td>
+        <td class="muted"><%= r.updated_at %></td>
+      </tr>
+      <% } %>
+    </tbody>
+  </table>
+  <div class="actions">
+    <button type="submit" class="btn btn-primary">Save all</button>
+  </div>
+</form>

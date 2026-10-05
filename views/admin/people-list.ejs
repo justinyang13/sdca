@@ -1,0 +1,24 @@
+<%# people-list.ejs %>
+<div class="list-head">
+  <h1>People</h1>
+  <a class="btn btn-primary" href="/admin/people/new">+ New person</a>
+</div>
+<table class="table">
+  <thead><tr><th>Name (EN)</th><th>Role (EN)</th><th>Group</th><th>Sort</th><th>Actions</th></tr></thead>
+  <tbody>
+    <% for (const r of rows) { %>
+    <tr>
+      <td><a href="/admin/people/<%= r.id %>"><%= r.name_en || r.name_zh || '—' %></a></td>
+      <td><%= r.role_en || '—' %></td>
+      <td><span class="chip chip-<%= r.group %>"><%= r.group %></span></td>
+      <td><%= r.sort %></td>
+      <td>
+        <form method="POST" action="/admin/people/<%= r.id %>/delete" class="inline-form" onsubmit="return confirm('Delete?')">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>

@@ -1,0 +1,26 @@
+<%# events-list.ejs %>
+<div class="list-head">
+  <h1>Events</h1>
+  <a class="btn btn-primary" href="/admin/events/new">+ New event</a>
+</div>
+<table class="table">
+  <thead><tr><th>Title (EN)</th><th>Starts</th><th>Ends</th><th>Location</th><th>Published</th><th>Actions</th></tr></thead>
+  <tbody>
+    <% for (const r of rows) { %>
+    <tr>
+      <td><a href="/admin/events/<%= r.id %>"><%= r.title_en || r.title_zh || '—' %></a></td>
+      <td><%= r.starts_at %></td>
+      <td><%= r.ends_at || '—' %></td>
+      <td><%= r.location || '—' %></td>
+      <td><%= r.published ? 'yes' : 'no' %></td>
+      <td>
+        <a href="/en/events/<%= r.slug %>">view</a>
+        <form method="POST" action="/admin/events/<%= r.id %>/delete" class="inline-form" onsubmit="return confirm('Delete?')">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>

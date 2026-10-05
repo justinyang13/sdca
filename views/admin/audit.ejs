@@ -1,0 +1,16 @@
+<%# audit.ejs %>
+<h1>Audit log <span class="muted">(<%= rows.length %> most recent)</span></h1>
+<table class="table">
+  <thead><tr><th>When</th><th>User</th><th>Action</th><th>Entity</th><th>ID</th></tr></thead>
+  <tbody>
+    <% for (const r of rows) { %>
+    <tr>
+      <td><%= r.at %></td>
+      <td><%= r.user %></td>
+      <td><%= r.action %></td>
+      <td><%= r.entity %></td>
+      <td><%= r.entity_id || '—' %></td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>

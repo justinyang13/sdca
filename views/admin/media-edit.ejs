@@ -1,0 +1,21 @@
+<%# media-edit.ejs %>
+<h1><%= item ? 'Edit media item' : 'New media item' %></h1>
+<form method="POST" action="/admin/media" class="form-grid">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <div class="field"><label>Kind
+    <select name="kind">
+      <% for (const k of ['photo','video','album']) { %>
+      <option value="<%= k %>" <%= (item && item.kind === k) ? 'selected' : '' %><%= (!item && k === 'photo') ? 'selected' : '' %>><%= k %></option>
+      <% } %>
+    </select>
+  </label></div>
+  <div class="field"><label>Taken at <input type="text" name="taken_at" value="<%= item ? (item.taken_at || '') : '' %>" placeholder="YYYY-MM-DD"></label></div>
+  <div class="field full"><label>Title (EN) <input type="text" name="title_en" value="<%= item ? item.title_en : '' %>"></label></div>
+  <div class="field full"><label>Title (ZH) <input type="text" name="title_zh" value="<%= item ? item.title_zh : '' %>"></label></div>
+  <div class="field full"><label>URL <input type="url" name="url" value="<%= item ? item.url : '' %>" placeholder="https://…"></label></div>
+  <div class="field full"><label>Image (manifest name or /img/… path) <input type="text" name="image" value="<%= item ? item.image : '' %>"></label></div>
+  <div class="actions">
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a class="btn" href="/admin/media">Cancel</a>
+  </div>
+</form>

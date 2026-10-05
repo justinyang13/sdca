@@ -1,0 +1,29 @@
+<%# dashboard.ejs %>
+<h1>Dashboard</h1>
+<section class="card-grid">
+  <div class="stat"><a href="/admin/announcements"><b><%= counts.announcements %></b><span>Announcements</span></a></div>
+  <div class="stat"><a href="/admin/events"><b><%= counts.events %></b><span>Events</span></a></div>
+  <div class="stat"><a href="/admin/pages"><b><%= counts.pages %></b><span>Pages</span></a></div>
+  <div class="stat"><a href="/admin/programs"><b><%= counts.programs %></b><span>Programs</span></a></div>
+  <div class="stat"><a href="/admin/people"><b><%= counts.people %></b><span>People</span></a></div>
+  <div class="stat"><a href="/admin/sponsors"><b><%= counts.sponsors %></b><span>Sponsors</span></a></div>
+  <div class="stat"><a href="/admin/documents"><b><%= counts.documents %></b><span>Documents</span></a></div>
+  <div class="stat"><a href="/admin/media"><b><%= counts.media %></b><span>Media</span></a></div>
+  <div class="stat"><a href="/admin/inbox"><b><%= counts.newMessages %></b><span>New messages</span></a></div>
+  <div class="stat"><a href="/admin/subscribers"><b><%= counts.subscribers %></b><span>Subscribers</span></a></div>
+</section>
+<h2>Recent activity</h2>
+<table class="table">
+  <thead><tr><th>When</th><th>User</th><th>Action</th><th>Entity</th><th>ID</th></tr></thead>
+  <tbody>
+    <% for (const r of recentAudit) { %>
+    <tr>
+      <td><%= r.at %></td>
+      <td><%= r.user %></td>
+      <td><%= r.action %></td>
+      <td><%= r.entity %></td>
+      <td><%= r.entity_id || '—' %></td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>

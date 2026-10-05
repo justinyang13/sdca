@@ -1,0 +1,14 @@
+<%# sponsor-edit.ejs %>
+<h1><%= item ? 'Edit sponsor' : 'New sponsor' %></h1>
+<form method="POST" action="/admin/sponsors" class="form-grid">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <div class="field"><label>Name <input type="text" name="name" value="<%= item ? item.name : '' %>"></label></div>
+  <div class="field"><label>Tier <input type="text" name="tier" value="<%= item ? item.tier : '' %>" placeholder="business|community|media"></label></div>
+  <div class="field"><label>Logo (manifest name or /img/… path) <input type="text" name="logo" value="<%= item ? item.logo : '' %>"></label></div>
+  <div class="field"><label>URL <input type="url" name="url" value="<%= item ? item.url : '' %>"></label></div>
+  <div class="field"><label>Sort <input type="number" name="sort" value="<%= item ? item.sort : 0 %>"></label></div>
+  <div class="actions">
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a class="btn" href="/admin/sponsors">Cancel</a>
+  </div>
+</form>

@@ -1,0 +1,27 @@
+<%# event-edit.ejs %>
+<h1><%= item ? 'Edit event' : 'New event' %></h1>
+<form method="POST" action="/admin/events" class="form-grid">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <div class="field"><label>Slug <input type="text" name="slug" value="<%= item ? item.slug : '' %>"></label></div>
+  <div class="field"><label>Category <input type="text" name="category" value="<%= item ? item.category : '' %>"></label></div>
+  <div class="field"><label>Starts (date) <input type="text" name="starts_at" value="<%= item ? item.starts_at : '' %>" placeholder="YYYY-MM-DD"></label></div>
+  <div class="field"><label>Ends <input type="text" name="ends_at" value="<%= item ? (item.ends_at || '') : '' %>"></label></div>
+  <div class="field"><label>All day <select name="all_day">
+    <option value="0" <%= (item && !item.all_day) || !item ? 'selected' : '' %>>no</option>
+    <option value="1" <%= item && item.all_day ? 'selected' : '' %>>yes</option>
+  </select></label></div>
+  <div class="field"><label>Location <input type="text" name="location" value="<%= item ? item.location : '' %>"></label></div>
+  <div class="field"><label>Image (manifest name or path) <input type="text" name="image" value="<%= item ? item.image : '' %>"></label></div>
+  <div class="field full"><label>Title (EN) <input type="text" name="title_en" value="<%= item ? item.title_en : '' %>"></label></div>
+  <div class="field full"><label>Title (ZH) <input type="text" name="title_zh" value="<%= item ? item.title_zh : '' %>"></label></div>
+  <div class="field full"><label>Description (EN) <textarea name="description_en" rows="6" class="mono"><%= item ? item.description_en : '' %></textarea></label></div>
+  <div class="field full"><label>Description (ZH) <textarea name="description_zh" rows="6" class="mono"><%= item ? item.description_zh : '' %></textarea></label></div>
+  <div class="field"><label>Published <select name="published">
+    <option value="1" <%= (item && item.published) || !item ? 'selected' : '' %>>yes</option>
+    <option value="0" <%= item && !item.published ? 'selected' : '' %>>no</option>
+  </select></label></div>
+  <div class="actions">
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a class="btn" href="/admin/events">Cancel</a>
+  </div>
+</form>

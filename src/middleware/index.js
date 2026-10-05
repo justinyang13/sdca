@@ -4,6 +4,8 @@ import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import session from 'express-session';
 import { config } from '../config.js';
+import { openDb } from '../db/open.js';
+import { createSessionStore } from '../db/session-store.js';
 import { langMiddleware } from './lang.js';
 import { csrfMiddleware } from './csrf.js';
 
@@ -21,6 +23,19 @@ export function createLimiter({ windowMs, max, message } = {}) {
 export const generalLimiter = createLimiter({ max: 300 });
 /** Contact form / login limiter (strict). */
 export const strictLimiter = createLimiter({ max: 10 });
+/** Admin login limiter (very strict). */
+// Login rate limiter. Reads LOGIN_RATE_LIMIT at call time (not module load)
+// so tests can override it via process.env after import.
+export function loginLimiter(req, res, next) {
+  const max = Number(process.env.LOGIN_RATE_LIMIT || 5);
+  // Lazily create the limiter (cached per max value)
+  if (!loginLimiter._cache) loginLimiter._cache = {};
+  if (!loginLimiter._cache[max]) {
+    loginLimiter._cache[max] = createLimiter({ max, message: { error: 'Too many login attempts. Try again in a few minutes.' } });
+  }
+  return loginLimiter._cache[max](req, res, next);
+}
+
 
 function buildCsp() {
   const directives = {
@@ -77,8 +92,10 @@ export function applyBaseMiddleware(app) {
     next();
   });
 
-  // session (SQLite-backed store is added in Phase 6; in-memory for now)
+  // session — SQLite-backed (survives restarts; Phase 6 adds the admin).
+  const db = openDb();
   app.use(session({
+    store: createSessionStore(db),
     secret: process.env.SESSION_SECRET || 'sdca-dev-secret',
     resave: false,
     saveUninitialized: false,

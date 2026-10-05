@@ -1,0 +1,24 @@
+<%# programs-list.ejs %>
+<div class="list-head">
+  <h1>Programs</h1>
+  <a class="btn btn-primary" href="/admin/programs/new">+ New program</a>
+</div>
+<table class="table">
+  <thead><tr><th>Name (EN)</th><th>Grades (EN)</th><th>Sort</th><th>Image</th><th>Actions</th></tr></thead>
+  <tbody>
+    <% for (const r of rows) { %>
+    <tr>
+      <td><a href="/admin/programs/<%= r.id %>"><%= r.name_en || r.name_zh || '—' %></a></td>
+      <td><%= r.grades_en || '—' %></td>
+      <td><%= r.sort %></td>
+      <td><%= r.image || '—' %></td>
+      <td>
+        <form method="POST" action="/admin/programs/<%= r.id %>/delete" class="inline-form" onsubmit="return confirm('Delete?')">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>

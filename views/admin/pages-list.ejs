@@ -1,0 +1,26 @@
+<%# pages-list.ejs %>
+<div class="list-head">
+  <h1>Pages</h1>
+  <a class="btn btn-primary" href="/admin/pages/new">+ New page</a>
+</div>
+<table class="table">
+  <thead><tr><th>Slug</th><th>Title (EN)</th><th>Nav section</th><th>Order</th><th>Published</th><th>Actions</th></tr></thead>
+  <tbody>
+    <% for (const r of rows) { %>
+    <tr>
+      <td><code><%= r.slug %></code></td>
+      <td><a href="/admin/pages/<%= r.id %>"><%= r.title_en || '—' %></a></td>
+      <td><%= r.nav_section || '—' %></td>
+      <td><%= r.nav_order %></td>
+      <td><%= r.published ? 'yes' : 'no' %></td>
+      <td>
+        <a href="/en/<%= r.slug.replace(/^about-/,'about/').replace(/^programs-/,'programs/') %>">view</a>
+        <form method="POST" action="/admin/pages/<%= r.id %>/delete" class="inline-form" onsubmit="return confirm('Delete?')">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>
