@@ -1,0 +1,14 @@
+<%
+  const L = lang;
+  const spam = (_spam !== undefined && _spam);
+%>
+
+<section class="section">
+  <div class="container container-narrow">
+    <div class="alert <%= spam ? 'alert-success' : 'alert-success' %>" role="alert">
+      <h2><%= L === 'zh' ? '感謝您的訊息！' : 'Thank you!' %></h2>
+      <p><%= t('form.success') %></p>
+      <p><a href="/<%= L %>/"><%= L === 'zh' ? '返回首頁' : 'Back to home' %> →</a></p>
+    </div>
+  </div>
+</section>

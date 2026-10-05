@@ -1,5 +1,149 @@
-<section class="home-hero">
-  <h1><%= lang === 'zh' ? '聖地牙哥中華學苑' : 'San Diego Chinese Academy' %></h1>
-  <p class="tagline"><%= lang === 'zh' ? '非營利語言學校 · 自 1988 年起教授中文與中華文化' : 'Non-profit language school teaching Mandarin and Chinese culture since 1988' %></p>
-  <p class="phase0-note">This is a Phase 0 scaffold. Site content arrives in Phase 3.</p>
+<%
+  // home.ejs — SDCA home page. All content from DB via ctx.
+  const L = lang;
+  const settings = (_settings !== undefined && _settings) || {};
+  const schoolName = L === 'zh'
+    ? (settings.school_name_zh || '聖地牙哥中華學苑')
+    : (settings.school_name_en || 'San Diego Chinese Academy');
+  const pick = (r, f) => L === 'zh'
+    ? (r[`${f}_zh`] || r[`${f}_en`] || '')
+    : (r[`${f}_en`] || r[`${f}_zh`] || '');
+  const pickNote = (r, f) => {
+    const en = r[`${f}_en`] || '';
+    const zh = r[`${f}_zh`] || '';
+    if (L === 'zh') return zh ? null : (en ? 'meta.lang_note_zh' : null);
+    return en ? null : (zh ? 'meta.lang_note_en' : null);
+  };
+  const dateFmt = (iso) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    const months = L === 'zh' ? ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+                              : ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+  };
+%>
+
+<section class="home-hero" role="region" aria-label="<%= L === 'zh' ? '歡迎' : 'Welcome' %>">
+  <div class="home-hero-media" aria-hidden="true">
+    <%- renderPart('partials/hero-media.ejs', {
+      heroImage: heroImg,
+      altEn: heroAltEn,
+      altZh: heroAltZh,
+    }) %>
+  </div>
+  <div class="home-hero-inner">
+    <h1><%= schoolName %></h1>
+    <p class="tagline"><%= tagline %></p>
+    <div class="home-hero-cta">
+      <a class="btn btn-primary btn-lg" href="/<%= L %>/programs"><%= L === 'zh' ? '探索課程' : 'Explore Programs' %> →</a>
+      <a class="btn btn-light btn-lg" href="<%= portalUrl %>" target="_blank" rel="noopener"><%= L === 'zh' ? '立即報名' : 'Enroll Now' %></a>
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="home-tiles-h">
+  <div class="container">
+    <h2 id="home-tiles-h" class="sr-only"><%= L === 'zh' ? '為什麼選擇 SDCA' : 'Why Choose SDCA' %></h2>
+    <div class="grid grid-4 value-tiles">
+      <% tiles.forEach(function(tl) { %>
+      <%- renderPart('partials/icon-tile.ejs', {
+        tileIcon: tl.icon,
+        tileTitle: L === 'zh' ? tl.titleZh : tl.titleEn,
+        tileDesc: L === 'zh' ? tl.descZh : tl.descEn,
+      }) %>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt" aria-labelledby="home-programs-h">
+  <div class="container">
+    <div class="section-head">
+      <h2 id="home-programs-h"><%= L === 'zh' ? '我們的課程' : 'Our Programs' %></h2>
+      <p class="section-lead"><%= L === 'zh' ? '從學前班到 12 年級，加上成人與休閒課程。'
+                                              : 'From Pre-K through Grade 12, plus adult and recreational programs.' %></p>
+    </div>
+    <div class="grid grid-3 programs-strip">
+      <% programs.forEach(function(p) { %>
+      <article class="program-card card">
+        <% if (p.image) { %>
+        <div class="card-media"><img src="<%= imgUrl(p.image) %>" alt="<%= pick(p, 'name') %>" loading="lazy" width="480" height="320"></div>
+        <% } %>
+        <div class="card-body">
+          <h3 class="card-title"><a href="/<%= L %>/programs"><%= pick(p, 'name') %></a></h3>
+          <% const grades = L === 'zh' ? (p.grades_zh || p.grades_en) : (p.grades_en || p.grades_zh); %>
+          <% if (grades) { %><p class="card-desc"><%= grades %></p><% } %>
+        </div>
+      </article>
+      <% }) %>
+    </div>
+    <div class="section-cta">
+      <a class="btn btn-navy" href="/<%= L %>/programs"><%= L === 'zh' ? '查看全部課程' : 'View All Programs' %> →</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="home-news-h">
+  <div class="container grid-2-col">
+    <div>
+      <h2 id="home-news-h" class="section-h2"><%= L === 'zh' ? '最新公告' : 'Latest Announcements' %></h2>
+      <div class="announcement-list">
+        <% announcements.forEach(function(a) { %>
+        <div class="ann-row">
+          <div class="ann-date"><%= dateFmt(a.published_at) %></div>
+          <div class="ann-body">
+            <h3><%= pick(a, 'title') %></h3>
+            <% const note = pickNote(a, 'title'); if (note) { %><span class="lang-note">(<%= t(note) %>)</span><% } %>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+      <a class="btn btn-ghost" href="/<%= L %>/news"><%= L === 'zh' ? '查看全部公告' : 'View All Announcements' %> →</a>
+    </div>
+    <div>
+      <h2 class="section-h2"><%= L === 'zh' ? '即將舉行的活動' : 'Upcoming Events' %></h2>
+      <div class="events-list">
+        <% events.forEach(function(ev) { %>
+        <%- renderPart('partials/event-row.ejs', {
+          evDate: new Date(ev.starts_at),
+          evTitle: pick(ev, 'title'),
+          evHref: `/${L}/events/${ev.slug}`,
+          evLocation: ev.location || '',
+        }) %>
+        <% }) %>
+      </div>
+      <a class="btn btn-ghost" href="/<%= L %>/events"><%= L === 'zh' ? '查看全部活動' : 'View All Events' %> →</a>
+    </div>
+  </div>
+</section>
+
+<section class="support-band" role="region" aria-labelledby="support-band-h">
+  <div class="container">
+    <h2 id="support-band-h" class="sr-only"><%= L === 'zh' ? '支持中華學苑' : 'Support SDCA' %></h2>
+    <div class="support-band-inner">
+      <div>
+        <h3><%= L === 'zh' ? '支持我們的使命' : 'Support Our Mission' %></h3>
+        <p><%= L === 'zh'
+             ? '聖地牙哥中華學苑是一家非營利機構，依靠家長、贊助商和禮券收入運作。您的捐款可以報稅。'
+             : 'SDCA is a non-profit, funded by families, sponsors and Scrip sales. Your donation is tax-deductible.' %></p>
+      </div>
+      <a class="btn btn-primary btn-lg" href="/<%= L %>/support"><%= L === 'zh' ? '立即捐款' : 'Donate Now' %></a>
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="sponsors-h">
+  <div class="container">
+    <h2 id="sponsors-h" class="section-h2 section-h2-center"><%= L === 'zh' ? '感謝我們的贊助商' : 'Our Sponsors' %></h2>
+    <div class="sponsor-grid" role="list">
+      <% sponsors.forEach(function(s) { %>
+      <div class="sponsor-card" role="listitem">
+        <img src="<%= s.logo %>" alt="<%= s.name %>" loading="lazy">
+      </div>
+      <% }) %>
+    </div>
+    <div class="section-cta">
+      <a class="btn btn-outline" href="/<%= L %>/support/sponsors"><%= L === 'zh' ? '成為贊助商' : 'Become a Sponsor' %> →</a>
+    </div>
+  </div>
 </section>

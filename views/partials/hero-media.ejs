@@ -1,0 +1,23 @@
+<%
+  // hero-media.ejs — responsive background image with manifest srcset.
+  // Read from L: heroImage (manifest base name OR full /img/... path), altEn, altZh
+  const img = (L && L.heroImage) || '';
+  const alt = (typeof lang !== 'undefined' && lang === 'zh')
+    ? (L.altZh || L.altEn || '')
+    : (L.altEn || L.altZh || '');
+  const manifest = (typeof imageManifest === 'function') ? imageManifest() : {};
+  const entry = img ? (manifest[img] || null) : null;
+  const escapeAttr = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+%>
+<% if (entry && entry.files && entry.files.length) { %>
+  <img class="hero-bg"
+       src="<%= entry.files[entry.files.length - 1].file.startsWith('/') ? entry.files[entry.files.length - 1].file : '/' + entry.files[entry.files.length - 1].file %>"
+       srcset="<%= entry.files.map(f => (f.file.startsWith('/') ? f.file : '/' + f.file) + ' ' + f.w + 'w').join(', ') %>"
+       sizes="(max-width: 768px) 100vw, 1600px"
+       width="<%= entry.files[entry.files.length - 1].w %>" height="<%= entry.files[entry.files.length - 1].h %>"
+       alt="<%= escapeAttr(alt) %>" fetchpriority="high">
+<% } else if (img) { %>
+  <img class="hero-bg" src="<%= img.startsWith('/') ? img : '/' + img %>" alt="<%= escapeAttr(alt) %>" fetchpriority="high">
+<% } else { %>
+  <div class="hero-bg hero-bg-fallback"></div>
+<% } %>

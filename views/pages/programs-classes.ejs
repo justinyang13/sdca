@@ -1,0 +1,61 @@
+<%
+  const L = lang;
+  const pg = (_pg !== undefined && _pg) || { title_en: 'Class Descriptions & Placement', title_zh: '課程安排與分班', body_en: '', body_zh: '' };
+  const bodyEn = pg.body_en || '';
+  const bodyZh = pg.body_zh || '';
+  const useZh = (L === 'zh');
+  const body = useZh ? (bodyZh || bodyEn) : (bodyEn || bodyZh);
+  const noteKey = (useZh)
+    ? (bodyZh ? null : (bodyEn ? 'meta.lang_note_zh' : null))
+    : (bodyEn ? null : (bodyZh ? 'meta.lang_note_en' : null));
+  const title = useZh ? (pg.title_zh || pg.title_en) : (pg.title_en || pg.title_zh);
+  const html = (typeof renderMarkdown === 'function') ? renderMarkdown(body) : '';
+  const settings = (_settings !== undefined && _settings) || {};
+%>
+
+<section class="hero hero--slim">
+  <div class="hero-inner">
+    <div class="section-kicker"><%= L === 'zh' ? '課程' : 'Programs' %></div>
+    <h1><%= title %></h1>
+    <p class="hero-sub"><%= L === 'zh'
+      ? '了解各班級的課程內容與分班方式。'
+      : 'Class descriptions and how placement works at SDCA.' %></p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container container-narrow">
+    <% if (noteKey) { %><p class="lang-note"><%= t(noteKey) %></p><% } %>
+    <div class="prose">
+      <%- html %>
+    </div>
+  </div>
+</section>
+
+<% if (settings.class_days || settings.bell_times) { %>
+<section class="section section-alt">
+  <div class="container">
+    <h2 class="section-title"><%= L === 'zh' ? '上課時間' : 'Class Schedule' %></h2>
+    <div class="grid grid-2">
+      <% if (settings.class_days) { %>
+      <div class="icon-tile">
+        <span class="icon-badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.2v4.8l3.4 2"/></svg>
+        </span>
+        <h3><%= L === 'zh' ? '上課日' : 'Class Days' %></h3>
+        <p><%= settings.class_days %></p>
+      </div>
+      <% } %>
+      <% if (settings.bell_times) { %>
+      <div class="icon-tile">
+        <span class="icon-badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2c-3.4 0-5.8 2.4-5.8 5.6v3.6L4.4 14.8h15.2l-1.8-2.4V8.8c0-3.2-2.4-5.6-5.8-5.6Z"/><path d="M9.8 17.6a2.2 2.2 0 0 0 4.4 0"/></svg>
+        </span>
+        <h3><%= L === 'zh' ? '上課時間' : 'Bell Times' %></h3>
+        <p><%= settings.bell_times %></p>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</section>
+<% } %>

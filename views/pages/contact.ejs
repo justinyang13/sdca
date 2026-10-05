@@ -1,0 +1,103 @@
+<%
+  const L = lang;
+  const settings = (_settings !== undefined && _settings) || {};
+  const errors = (_errors !== undefined && _errors) || {};
+  const form = (_form !== undefined && _form) || {};
+  const submitted = (_submitted !== undefined && _submitted);
+%>
+
+<section class="hero hero--slim">
+  <div class="hero-inner">
+    <div class="section-kicker"><%= L === 'zh' ? '聯絡' : 'Contact' %></div>
+    <h1><%= L === 'zh' ? '聯絡我們' : 'Contact Us' %></h1>
+    <p class="hero-sub"><%= L === 'zh'
+      ? '詢問報名、課程或活動相關問題。'
+      : 'Send us a question about enrollment, programs or events.' %></p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container container-narrow">
+    <div class="grid grid-2 contact-grid">
+      <div>
+        <h2 class="section-title"><%= L === 'zh' ? '直接聯絡' : 'Direct Contact' %></h2>
+        <ul class="contact-list">
+          <% if (settings.phone) { %>
+          <li><a href="tel:+18582057322"><%= settings.phone %></a></li>
+          <% } %>
+          <% if (settings.email_office) { %>
+          <li><a href="mailto:<%= settings.email_office %>"><%= settings.email_office %></a></li>
+          <% } %>
+          <% if (settings.email_pta) { %>
+          <li><a href="mailto:<%= settings.email_pta %>"><%= L === 'zh' ? 'PTA：' : 'PTA: ' %><%= settings.email_pta %></a></li>
+          <% } %>
+          <% if (settings.sms_number && settings.sms_keyword) { %>
+          <li><%= L === 'zh' ? '短信：' : 'Text: ' %><strong><%= settings.sms_keyword %></strong> <%= L === 'zh' ? '發送到' : 'to' %> <strong><%= settings.sms_number %></strong></li>
+          <% } %>
+          <% if (settings.mailing_address) { %>
+          <li><%= settings.mailing_address %></li>
+          <% } %>
+          <% if (settings.campus_name) { %>
+          <li><%= L === 'zh' ? '上課地點：' : 'Campus: ' %><%= settings.campus_name %></li>
+          <% } %>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="section-title"><%= L === 'zh' ? '發送訊息' : 'Send a Message' %></h2>
+        <form method="post" action="/<%= L %>/contact" data-enhance novalidate>
+          <input type="hidden" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+          <div class="form-field">
+            <label for="c-name"><%= t('form.name') %><span class="req" aria-hidden="true">*</span></label>
+            <input type="text" id="c-name" name="name" required
+                   value="<%= form.name || '' %>"
+                   placeholder="<%= t('form.name_placeholder') %>"
+                   <%= errors.name ? 'aria-invalid="true" aria-describedby="err-name"' : '' %>>
+            <% if (errors.name) { %><p class="form-error" id="err-name" data-error-for="name"><%= errors.name %></p><% } %>
+          </div>
+
+          <div class="form-field">
+            <label for="c-email"><%= t('form.email') %><span class="req" aria-hidden="true">*</span></label>
+            <input type="email" id="c-email" name="email" required
+                   value="<%= form.email || '' %>"
+                   placeholder="<%= t('form.email_placeholder') %>"
+                   <%= errors.email ? 'aria-invalid="true" aria-describedby="err-email"' : '' %>>
+            <% if (errors.email) { %><p class="form-error" id="err-email" data-error-for="email"><%= errors.email %></p><% } %>
+          </div>
+
+          <div class="form-field">
+            <label for="c-phone"><%= t('form.phone') %></label>
+            <input type="tel" id="c-phone" name="phone"
+                   value="<%= form.phone || '' %>"
+                   placeholder="<%= t('form.phone_placeholder') %>">
+          </div>
+
+          <div class="form-field">
+            <label for="c-topic"><%= t('form.topic') %><span class="req" aria-hidden="true">*</span></label>
+            <select id="c-topic" name="topic" required
+                    <%= errors.topic ? 'aria-invalid="true" aria-describedby="err-topic"' : '' %>>
+              <option value="" <%= !form.topic ? 'selected' : '' %>><%= t('form.topic_choose') %></option>
+              <option value="enrollment" <%= form.topic === 'enrollment' ? 'selected' : '' %>><%= L === 'zh' ? '報名' : 'Enrollment' %></option>
+              <option value="programs" <%= form.topic === 'programs' ? 'selected' : '' %>><%= L === 'zh' ? '課程' : 'Programs' %></option>
+              <option value="events" <%= form.topic === 'events' ? 'selected' : '' %>><%= L === 'zh' ? '活動' : 'Events' %></option>
+              <option value="support" <%= form.topic === 'support' ? 'selected' : '' %>><%= L === 'zh' ? '捐款與贊助' : 'Support & Sponsors' %></option>
+              <option value="other" <%= form.topic === 'other' ? 'selected' : '' %>><%= L === 'zh' ? '其他' : 'Other' %></option>
+            </select>
+            <% if (errors.topic) { %><p class="form-error" id="err-topic" data-error-for="topic"><%= errors.topic %></p><% } %>
+          </div>
+
+          <div class="form-field">
+            <label for="c-message"><%= t('form.message') %><span class="req" aria-hidden="true">*</span></label>
+            <textarea id="c-message" name="message" rows="5" required
+                      placeholder="<%= t('form.message_placeholder') %>"
+                      <%= errors.message ? 'aria-invalid="true" aria-describedby="err-message"' : '' %>><%= form.message || '' %></textarea>
+            <% if (errors.message) { %><p class="form-error" id="err-message" data-error-for="message"><%= errors.message %></p><% } %>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg"><%= t('button.send') %></button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

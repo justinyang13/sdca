@@ -1,13 +1,31 @@
 <%
   // icon-tile.ejs — feature icon tile. Read from L: tileIcon, tileTitle, tileDesc, tileHref
-  const icon = (typeof L !== 'undefined' && L.tileIcon) || '<circle cx="8" cy="8" r="6"/>';
+  // tileIcon: a named icon key (book-open, lantern, people, shield-heart, ...) or
+  //           raw SVG inner markup for a 16x16 viewBox (legacy).
+  const named = {
+    'book-open': '<path d="M12 6.2C10.8 5.4 9 5 7.5 5c-1.6 0-3.1.4-4.2 1v12.2C4.4 17.6 5.9 17.2 7.5 17.2c1.5 0 3.3.4 4.5 1.2 1.2-.8 3-1.2 4.5-1.2 1.6 0 3.1.4 4.2 1.2V6c-1.1-.6-2.6-1-4.2-1-1.5 0-3.3.4-4.5 1.2Z"/><path d="M12 6.2v12.2"/>',
+    'lantern': '<path d="M9.2 3.2h5.6M12 3.2v1.4"/><path d="M7.4 4.6h9.2C16.9 5.6 17.6 7.3 17.6 9.2c0 3-2 5.4-5.6 5.4s-5.6-2.4-5.6-5.4c0-1.9.7-3.6 1-4.6Z"/><path d="M8.6 14.6h6.8M9.2 17h5.6M12 14.6v2.4"/>',
+    'people': '<circle cx="8.6" cy="7.4" r="3.1"/><path d="M2.8 19.4c0-3.3 2.6-5.4 5.8-5.4s5.8 2.1 5.8 5.4"/><circle cx="16.2" cy="8.4" r="2.4"/><path d="M17.4 13.9c1.9.6 3.4 2.2 3.4 4.5"/>',
+    'shield-heart': '<path d="M12 2.8 4.8 5.5v5.4c0 4.4 2.8 7.6 7.2 9.3 4.4-1.7 7.2-4.9 7.2-9.3V5.5L12 2.8Z"/><path d="M12 12.9c-2.3-1.6-3.6-2.8-3.6-4.2 0-1 .8-1.8 1.8-1.8.6 0 1.3.3 1.8 1 .5-.7 1.2-1 1.8-1 1 0 1.8.8 1.8 1.8 0 1.4-1.3 2.6-3.6 4.2Z"/>',
+    'clock': '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.2v4.8l3.4 2"/>',
+    'bell': '<path d="M12 3.2c-3.4 0-5.8 2.4-5.8 5.6v3.6L4.4 14.8h15.2l-1.8-2.4V8.8c0-3.2-2.4-5.6-5.8-5.6Z"/><path d="M9.8 17.6a2.2 2.2 0 0 0 4.4 0"/>',
+    'user': '<circle cx="12" cy="8" r="3.6"/><path d="M4.6 20.4c0-3.8 3.2-6 7.4-6s7.4 2.2 7.4 6"/>',
+    'calendar': '<rect x="3.6" y="5" width="16.8" height="15" rx="1.8"/><path d="M3.6 10h16.8M8 2.8v4M16 2.8v4"/>',
+    'check': '<path d="M4.4 12.8 9.6 18 19.6 6.8"/>',
+    'arrow-right': '<path d="M4 12h15M13.5 5.5 20 12l-6.5 6.5"/>',
+  };
+  const icon = (typeof L !== 'undefined' && L.tileIcon) || 'book-open';
+  const isNamed = Object.prototype.hasOwnProperty.call(named, icon);
+  const inner = isNamed ? named[icon] : icon;
+  const viewBox = isNamed ? '0 0 24 24' : '0 0 16 16';
+  const sw = isNamed ? '1.75' : '1.5';
   const title = (typeof L !== 'undefined' && L.tileTitle) || '';
   const desc = (typeof L !== 'undefined' && L.tileDesc) || '';
   const href = (typeof L !== 'undefined' && L.tileHref) || null;
 %>
 <div class="icon-tile">
   <span class="icon-badge" aria-hidden="true">
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><%= icon %></svg>
+    <svg viewBox="<%= viewBox %>" width="24" height="24" fill="none" stroke="currentColor" stroke-width="<%= sw %>" stroke-linecap="round" stroke-linejoin="round"><%- inner %></svg>
   </span>
   <h3><%= title %></h3>
   <p><%= desc %></p>

@@ -1,0 +1,32 @@
+<%
+  const L = lang;
+  const pg = (_pg !== undefined && _pg) || { title_en: 'About SDCA', title_zh: '關於聖地牙哥中華學苑', body_en: '', body_zh: '' };
+  const bodyEn = pg.body_en || '';
+  const bodyZh = pg.body_zh || '';
+  const useZh = (L === 'zh');
+  const body = useZh ? (bodyZh || bodyEn) : (bodyEn || bodyZh);
+  const noteKey = (useZh)
+    ? (bodyZh ? null : (bodyEn ? 'meta.lang_note_zh' : null))
+    : (bodyEn ? null : (bodyZh ? 'meta.lang_note_en' : null));
+  const title = useZh ? (pg.title_zh || pg.title_en) : (pg.title_en || pg.title_zh);
+  const html = (typeof renderMarkdown === 'function') ? renderMarkdown(body) : '';
+%>
+
+<section class="hero hero--slim">
+  <div class="hero-inner">
+    <div class="section-kicker"><%= L === 'zh' ? '關於我們' : 'About' %></div>
+    <h1><%= title %></h1>
+    <p class="hero-sub"><%= L === 'zh'
+      ? '聖地牙哥中華學苑是一家於 1988 年成立的加州非營利機構。'
+      : 'San Diego Chinese Academy is a California non-profit founded in 1988.' %></p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container container-narrow">
+    <% if (noteKey) { %><p class="lang-note"><%= t(noteKey) %></p><% } %>
+    <div class="prose">
+      <%- html %>
+    </div>
+  </div>
+</section>

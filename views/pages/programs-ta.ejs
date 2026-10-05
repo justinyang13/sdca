@@ -1,0 +1,49 @@
+<%
+  const L = lang;
+  const pg = (_pg !== undefined && _pg) || { title_en: 'TA Program', title_zh: '教學助理計畫', body_en: '', body_zh: '' };
+  const bodyEn = pg.body_en || '';
+  const bodyZh = pg.body_zh || '';
+  const useZh = (L === 'zh');
+  const body = useZh ? (bodyZh || bodyEn) : (bodyEn || bodyZh);
+  const noteKey = (useZh)
+    ? (bodyZh ? null : (bodyEn ? 'meta.lang_note_zh' : null))
+    : (bodyEn ? null : (bodyZh ? 'meta.lang_note_en' : null));
+  const title = useZh ? (pg.title_zh || pg.title_en) : (pg.title_en || pg.title_zh);
+  const html = (typeof renderMarkdown === 'function') ? renderMarkdown(body) : '';
+  const settings = (_settings !== undefined && _settings) || {};
+%>
+
+<section class="hero hero--slim">
+  <div class="hero-inner">
+    <div class="section-kicker"><%= L === 'zh' ? '課程' : 'Programs' %></div>
+    <h1><%= title %></h1>
+    <p class="hero-sub"><%= L === 'zh'
+      ? '成為 SDCA 教學助理並獲得津貼。'
+      : 'Become a TA at SDCA and earn a stipend.' %></p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container container-narrow">
+    <% if (noteKey) { %><p class="lang-note"><%= t(noteKey) %></p><% } %>
+    <div class="prose">
+      <%- html %>
+    </div>
+  </div>
+</section>
+
+<% if (settings.ta_form) { %>
+<section class="support-band">
+  <div class="container">
+    <div class="support-band-inner">
+      <div>
+        <h3><%= L === 'zh' ? '有興趣成為教學助理？' : 'Interested in becoming a TA?' %></h3>
+        <p><%= L === 'zh'
+           ? '填寫申請表，加入我們的師資團隊。'
+           : 'Fill out the application form and join our faculty.' %></p>
+      </div>
+      <a class="btn btn-primary btn-lg" href="<%= settings.ta_form %>" target="_blank" rel="noopener"><%= L === 'zh' ? '申請 TA' : 'Apply for TA' %> →</a>
+    </div>
+  </div>
+</section>
+<% } %>

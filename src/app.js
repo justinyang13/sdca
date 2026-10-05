@@ -7,6 +7,11 @@ import { config } from './config.js';
 import { t, SUPPORTED } from './i18n/index.js';
 import { applyBaseMiddleware } from './middleware/index.js';
 import { openDb } from './db/open.js';
+import * as H from './helpers.js';
+import { imageManifest } from './helpers.js';
+import { registerPublicRoutes } from './routes-public.js';
+import { marked } from 'marked';
+import sanitizeHtml from 'sanitize-html';
 
 function renderError(app, res, status, lang, opts = {}) {
   const view = ['404', '500', '403', '400'].includes(String(status)) ? String(status) : '500';
@@ -33,7 +38,7 @@ export function createApp({ db = openDb() } = {}) {
     function renderPart(file, locals) {
       const full = path.join(config.viewsDir, file);
       const src = fs.readFileSync(full, 'utf8');
-      return ejs.render(src, { lang, t: tFn, renderPart, L: locals || {} });
+      return ejs.render(src, { lang, t: tFn, renderPart, L: locals || {}, imageManifest });
     }
     return renderPart;
   }
@@ -46,6 +51,24 @@ export function createApp({ db = openDb() } = {}) {
       header: rp('partials/header.ejs', ctx),
       footer: rp('partials/footer.ejs', ctx),
     };
+  }
+
+  // Render markdown to safe HTML (marked + sanitize-html).
+  function renderMarkdown(md) {
+    if (!md) return '';
+    const raw = marked.parse(md, { mangle: false, headerIds: false, breaks: false });
+    return sanitizeHtml(raw, {
+      allowedTags: ['h1','h2','h3','h4','h5','p','ul','ol','li','strong','em','del',
+        'a','code','pre','blockquote','table','thead','tbody','tr','th','td','br','hr','span','img','details','summary'],
+      allowedAttributes: { a: ['href','title','rel','target'], img: ['src','alt','width','height'] },
+      allowedSchemes: ['http','https','mailto','tel'],
+    });
+  }
+
+  // Render a views/pages/*.ejs template with `renderPart` available in scope.
+  function pageView(viewFile, ctx) {
+    const full = path.join(config.viewsDir, 'pages', viewFile);
+    return ejs.render(fs.readFileSync(full, 'utf8'), ctx);
   }
 
   // JSON + form bodies
@@ -100,25 +123,8 @@ export function createApp({ db = openDb() } = {}) {
     }
   }
 
-  // ---------- Locale home pages ----------
-  for (const lang of SUPPORTED) {
-    app.get(`/${lang}`, (req, res) => {
-      const tFn = (k) => t(lang, k);
-      const renderPart = makeRenderPart(lang);
-      const body = ejs.render(fs.readFileSync(path.join(config.viewsDir, 'pages', 'home.ejs'), 'utf8'), {
-        lang, t: tFn, renderPart,
-      });
-      res.render('layouts/main.ejs', {
-        lang,
-        t: tFn,
-        renderPart,
-        title: lang === 'zh' ? 'SDCA — 聖地牙哥中華學苑' : 'SDCA — San Diego Chinese Academy',
-        description: 'Non-profit Chinese language school in San Diego since 1988.',
-        body,
-        ...renderShell(lang, { langPath: '/' }),
-      });
-    });
-  }
+  // ---------- Phase 4 public pages ----------
+  registerPublicRoutes(app, { makeRenderPart, renderShell, pageView, renderMarkdown, t, db, SUPPORTED });
 
   // 404
   app.use((req, res) => renderError(app, res, 404, req.lang || 'en', {
