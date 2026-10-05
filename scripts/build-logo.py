@@ -42,6 +42,22 @@ pad = 4*SCALE
 y0, x0 = max(0, y0-pad), max(0, x0-pad); y1, x1 = min(h-1, y1+pad), min(w-1, x1+pad)
 W, H = x1-x0+1, y1-y0+1
 m = [mask[y][x0:x1+1] for y in range(y0, y1+1)]
+# smooth the staircase edges of the upscaled raster: box-blur the mask (integral image) and re-threshold at 50%
+R = 3
+integ = [[0]*(W+1) for _ in range(H+1)]
+for y in range(H):
+    run = 0; row = integ[y+1]; prev = integ[y]
+    for x in range(W):
+        run += 1 if m[y][x] else 0
+        row[x+1] = prev[x+1] + run
+sm = [[False]*W for _ in range(H)]
+for y in range(H):
+    ya, yb = max(0, y-R), min(H, y+R+1)
+    for x in range(W):
+        xa, xb = max(0, x-R), min(W, x+R+1)
+        tot = integ[yb][xb] - integ[ya][xb] - integ[yb][xa] + integ[ya][xa]
+        sm[y][x] = tot * 2 >= (yb-ya) * (xb-xa)
+m = sm
 # drop specks (< 12 px at 4x) via flood fill
 seen = [[False]*W for _ in range(H)]
 for sy in range(H):
@@ -93,7 +109,7 @@ def rdp(pts, eps):
 def smooth_path(pts):
     far = max(range(len(pts)), key=lambda i: (pts[i][0]-pts[0][0])**2 + (pts[i][1]-pts[0][1])**2)
     a, b = pts[:far+1], pts[far:] + [pts[0]]
-    p = rdp(a, 1.1)[:-1] + rdp(b, 1.1)[:-1]
+    p = rdp(a, 1.6)[:-1] + rdp(b, 1.6)[:-1]
     if len(p) < 4: return ''
     k = 1.0 / SCALE
     f = lambda v: ('%.2f' % (v*k)).rstrip('0').rstrip('.')
