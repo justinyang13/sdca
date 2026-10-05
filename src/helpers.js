@@ -85,7 +85,7 @@ export function pageBySlug(db, slug) {
 export function mdToHtml(md, { title = '' } = {}) {
   if (!md) return '';
   const raw = marked.parse(md, { mangle: false, headerIds: false, breaks: false });
-  return withPdfTargets(sanitizeHtml(raw, {
+  return withAssetUrls(withPdfTargets(sanitizeHtml(raw, {
     allowedTags: [
       'h1', 'h2', 'h3', 'h4', 'h5', 'p', 'ul', 'ol', 'li', 'strong', 'em', 'del',
       'a', 'code', 'pre', 'blockquote', 'table', 'thead', 'tbody', 'tr', 'th', 'td',
@@ -96,7 +96,21 @@ export function mdToHtml(md, { title = '' } = {}) {
       img: ['src', 'alt', 'width', 'height'],
     },
     allowedSchemes: ['http', 'https', 'mailto', 'tel'],
-  }));
+  })));
+}
+
+/**
+ * Normalise img src attributes in rendered HTML through assetUrl() so that
+ * markdown-borne local paths (img/..., storage/...) become root-absolute.
+ */
+export function withAssetUrls(html) {
+  if (!html) return '';
+  return String(html).replace(/<img([^>]*?)src="([^"]*)"/g,
+    (m, attrs, src) => {
+      const fixed = assetUrl(src);
+      if (fixed === src) return m;
+      return `<img${attrs}src="${fixed}"`;
+    });
 }
 
 /**
@@ -173,4 +187,19 @@ export function allSponsors(db) {
 /** People in a group. */
 export function peopleByGroup(db, group) {
   return db.prepare('SELECT * FROM people WHERE "group" = ? ORDER BY sort, name_en').all(group);
+}
+
+/**
+ * assetUrl(v) — Phase 9 single source of truth for asset URLs.
+ * - empty → ''
+ * - http(s)://, data:, mailto:, tel:, # → returned unchanged
+ * - local paths (img/..., /img/..., storage/..., brand/..., css/..., any
+ *   repo-root-relative or already root-absolute path) → root-absolute
+ * Used by EVERY template, route, markdown renderer, admin preview and JSON-LD.
+ */
+export function assetUrl(v) {
+  const s = String(v == null ? '' : v).trim();
+  if (!s) return '';
+  if (/^(https?:|data:|mailto:|tel:|#)/i.test(s)) return s;
+  return '/' + s.replace(/^\/+/, '');
 }

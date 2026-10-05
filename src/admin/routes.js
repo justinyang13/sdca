@@ -6,6 +6,7 @@ import path from 'node:path';
 import ejs from 'ejs';
 import sanitizeHtml from 'sanitize-html';
 import { t, SUPPORTED } from '../i18n/index.js';
+import { assetUrl } from '../helpers.js';
 import { verifyPassword } from './auth.js';
 import crypto from 'node:crypto';
 import { uploader, uploadDir } from './uploads.js';
@@ -81,6 +82,7 @@ export function registerAdminRoutes(app, { db }) {
       csrfToken: csrf,
       user: req.session.user,
       t: (k) => t('en', k),
+      assetUrl,
       ...locals,
     });
     const shell = ejs.render(fs.readFileSync(path.join(views, 'layout.ejs'), 'utf8'), {
@@ -91,6 +93,7 @@ export function registerAdminRoutes(app, { db }) {
       flash: locals.flash,
       error: locals.error,
       t: (k) => t('en', k),
+      assetUrl,
       css: ADMIN_CSS,
     });
     res.status(status).type('html').send(shell);

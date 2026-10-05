@@ -13,3 +13,4 @@
 - 2026-10-05: owner asked for full re-crawl: Phase 8g, output research/v2.
 - 2026-10-05: ROADMAP v2: capture once (crawl v2) -> deterministic import -> strict parity tests -> section-by-section passes vs old screenshots -> menu/hero -> hardening.
 - 2026-10-05: owner: simple 1:1 project. ROADMAP v3 Direct Port replaces capture/section passes: reuse old main-content HTML verbatim in new layout.
+- 2026-10-05: clarified: NOT reuse old HTML; rebuild clean HTML with same content, order, layout arrangement and images (block-tree parser + renderer).

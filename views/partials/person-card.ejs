@@ -8,7 +8,7 @@
 <div class="person-card">
   <% if (photo) { %>
   <div class="person-photo">
-    <img src="<%= photo %>" alt="<%= name %>" width="96" height="96" loading="lazy">
+    <img src="<%= assetUrl(photo) %>" alt="<%= name %>" width="96" height="96" loading="lazy">
   </div>
   <% } %>
   <h3 class="person-name"><%= name %></h3>

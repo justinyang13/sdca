@@ -14,6 +14,7 @@
     }
     return s.replace(/\.\w+$/, '') + `-${w}.jpg`;
   };
+  const urlOf = (img, w) => assetUrl(fileOf(img, w));
 %>
 <%- renderPart('partials/hero.ejs', {
   heroTitle: L === 'zh' ? '照片與影片' : 'Photos & Videos',
@@ -61,12 +62,12 @@
            const alt = pick(p, 'title');
       %>
       <a class="gallery-item" data-lightbox="gallery"
-         href="<%= fileOf(p.image, 1600) %>"
-         data-full="<%= fileOf(p.image, 1600) %>"
+         href="<%= urlOf(p.image, 1600) %>"
+         data-full="<%= urlOf(p.image, 1600) %>"
          data-alt="<%= alt %>"
          aria-label="<%= alt %>">
-        <img src="<%= fileOf(p.image, 480) %>"
-             srcset="<%= fileOf(p.image, 480) %> 480w, <%= fileOf(p.image, 960) %> 960w, <%= fileOf(p.image, 1600) %> 1600w"
+        <img src="<%= urlOf(p.image, 480) %>"
+             srcset="<%= urlOf(p.image, 480) %> 480w, <%= urlOf(p.image, 960) %> 960w, <%= urlOf(p.image, 1600) %> 1600w"
              sizes="(max-width: 600px) 50vw, (max-width: 1024px) 33vw, 25vw"
              alt="<%= alt %>"
              loading="lazy"

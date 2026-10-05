@@ -40,10 +40,10 @@
       <div class="sponsor-card sponsor-tier-<%= s.tier || 'business' %>" role="listitem">
         <% if (s.url) { %>
         <a href="<%= s.url %>" target="_blank" rel="noopener" aria-label="<%= s.name %>">
-          <img src="<%= s.logo %>" alt="<%= s.name %>" loading="lazy">
+          <img src="<%= assetUrl(s.logo) %>" alt="<%= s.name %>" loading="lazy">
         </a>
         <% } else { %>
-        <img src="<%= s.logo %>" alt="<%= s.name %>" loading="lazy">
+        <img src="<%= assetUrl(s.logo) %>" alt="<%= s.name %>" loading="lazy">
         <% } %>
       </div>
       <% }) %>

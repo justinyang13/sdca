@@ -14,4 +14,5 @@ Phase 8b (ledger by sha256, photo archive, document archive) started 3:34PM.
 Phase 8c (page images: relative-path bug, image parity audit, gaps on about/board/staff etc.) queued: auto-starts after 8b ends.
 
 
-ROADMAP v3 DIRECT PORT (2026-10-05): after Phase 9 (running) -> DP (port every old page 1:1 verbatim into new layout) -> 8d menu -> 8e hero -> V visual QA -> 7 hardening -> release. Chain: work/run_chain3.sh. 8g/8f/S1-S4 cancelled.
+
+ROADMAP v3 FAITHFUL REBUILD (2026-10-05): parse old DOM -> verbatim ordered BLOCK TREE -> clean new components; same content/order/layout/images; chain work/run_chain3.sh: Phase 9 (running) -> DP -> 8d -> 8e -> V -> 7 -> release.

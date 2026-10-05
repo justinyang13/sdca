@@ -9,7 +9,7 @@
   const kicker = (typeof L !== 'undefined' && L.heroKicker) || '';
 %>
 <section class="hero <%= variant === 'photo' ? 'hero--photo' : '' %> <%= variant === 'slim' ? 'hero--slim' : '' %>"
-         <%= img ? `style="background-image:url('${img}')"` : '' %>>
+         <%= img ? `style="background-image:url('${assetUrl(img)}')"` : '' %>>
   <div class="hero-inner">
     <% if (kicker) { %><div class="section-kicker"><%= kicker %></div><% } %>
     <h1><%= title %></h1>
