@@ -13,5 +13,5 @@ Phase 6 DONE+tests 112 pass (1:45PM). Admin demo login in data/ADMIN-DEMO-LOGIN.
 Phase 8b (ledger by sha256, photo archive, document archive) started 3:34PM.
 Phase 8c (page images: relative-path bug, image parity audit, gaps on about/board/staff etc.) queued: auto-starts after 8b ends.
 
-ROADMAP v2 (2026-10-05 4:35PM): chain work/run_chain.sh runs 9 -> 8g -> 8f -> S1 -> S2 -> S3 -> S4 -> 8d -> 8e, then Phase 7 hardening + release. Claude gate-reviews each report (screenshots vs old). 8c was cancelled (WIP committed); its items live in Phase 9 and S2.
-After chain: run_chain2.sh runs Phase V (visual/spacing QA of every page) then Phase 7 hardening. Spacing check also added to each section pass (step 5b).
+
+ROADMAP v3 DIRECT PORT (2026-10-05): after Phase 9 (running) -> DP (port every old page 1:1 verbatim into new layout) -> 8d menu -> 8e hero -> V visual QA -> 7 hardening -> release. Chain: work/run_chain3.sh. 8g/8f/S1-S4 cancelled.
