@@ -1,0 +1,18 @@
+<%
+  // breadcrumb.ejs — Read from L: crumbList (array of {label, href?}); last is current.
+  const crumbList = (typeof L !== 'undefined' && L.crumbList) ? L.crumbList : [];
+%>
+<nav class="breadcrumb" aria-label="<%= t('nav.breadcrumb') %>">
+  <ol>
+    <% crumbList.forEach(function(c, i) { %>
+      <li>
+        <% if (c.href && i < crumbList.length - 1) { %>
+          <a href="<%= c.href %>"><%= c.label %></a>
+        <% } else { %>
+          <span aria-current="page"><%= c.label %></span>
+        <% } %>
+        <% if (i < crumbList.length - 1) { %><span class="sep" aria-hidden="true">/</span><% } %>
+      </li>
+    <% }) %>
+  </ol>
+</nav>

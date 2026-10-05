@@ -1,0 +1,17 @@
+<%
+  // sponsor-grid.ejs — sponsor logos. Read from L: sponsors (array of {name, logo, url, tier})
+  const list = (typeof L !== 'undefined' && L.sponsors) ? L.sponsors : [];
+%>
+<div class="sponsor-grid" role="list">
+  <% list.forEach(function(s) { %>
+  <div class="sponsor-card sponsor-tier-<%= s.tier || 'partner' %>" role="listitem">
+    <% if (s.url) { %>
+      <a href="<%= s.url %>" target="_blank" rel="noopener" aria-label="<%= s.name %>">
+        <img src="<%= s.logo %>" alt="<%= s.name %>" loading="lazy">
+      </a>
+    <% } else { %>
+      <img src="<%= s.logo %>" alt="<%= s.name %>" loading="lazy">
+    <% } %>
+  </div>
+  <% }) %>
+</div>

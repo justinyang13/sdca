@@ -25,16 +25,38 @@ export function createApp({ db = openDb() } = {}) {
   app.locals.t = t;
   app.locals.langs = SUPPORTED;
 
+  // Helper for templates: render a partial (views/partials/*.ejs) with locals.
+  // Wraps locals as `L` to avoid colliding with partial top-level `const`
+  // declarations of the same name (which would cause TDZ issues).
+  function makeRenderPart(lang) {
+    const tFn = (k) => t(lang, k);
+    function renderPart(file, locals) {
+      const full = path.join(config.viewsDir, file);
+      const src = fs.readFileSync(full, 'utf8');
+      return ejs.render(src, { lang, t: tFn, renderPart, L: locals || {} });
+    }
+    return renderPart;
+  }
+
+  // Helper for pages: pre-render header + footer partials for the layout.
+  function renderShell(lang, locals) {
+    const rp = makeRenderPart(lang);
+    const ctx = { langPath: (locals && locals.langPath) || '/' };
+    return {
+      header: rp('partials/header.ejs', ctx),
+      footer: rp('partials/footer.ejs', ctx),
+    };
+  }
+
   // JSON + form bodies
   app.use(express.json({ limit: '1mb' }));
   app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
   applyBaseMiddleware(app);
 
-  // Static assets (hashed query string in later phases; fine here)
   app.use(express.static(config.publicDir, { maxAge: '1h', etag: true }));
 
-  // Health check — outside lang prefix, JSON, no auth
+  // /healthz
   app.get('/healthz', (req, res) => {
     let dbOk = false;
     try {
@@ -48,27 +70,54 @@ export function createApp({ db = openDb() } = {}) {
     });
   });
 
-  // robots.txt (Phase 5 will expand)
+  // /robots.txt
   app.get('/robots.txt', (req, res) => {
     res.type('text/plain').send('User-agent: *\nAllow: /\nDisallow: /admin\n');
   });
 
-  // Locale home pages — render the scaffold home
+  // ---------- Style guide (dev only) ----------
+  if (!config.isProduction) {
+    for (const lang of SUPPORTED) {
+      app.get(`/${lang}/dev/styleguide`, (req, res) => {
+        const tFn = (k) => t(lang, k);
+        const renderPart = makeRenderPart(lang);
+        const body = ejs.render(
+          fs.readFileSync(path.join(config.viewsDir, 'pages', 'styleguide.ejs'), 'utf8'),
+          { lang, t: tFn, renderPart }
+        );
+        const shell = renderShell(lang, { langPath: '/dev/styleguide' });
+        res.render('layouts/main.ejs', {
+          lang,
+          t: tFn,
+          renderPart,
+          title: lang === 'zh' ? 'SDCA 樣式指南' : 'SDCA Style Guide',
+          description: 'SDCA design system style guide.',
+          body,
+          header: shell.header,
+          footer: shell.footer,
+        });
+      });
+    }
+  }
+
+  // ---------- Locale home pages ----------
   for (const lang of SUPPORTED) {
     app.get(`/${lang}`, (req, res) => {
+      const tFn = (k) => t(lang, k);
+      const renderPart = makeRenderPart(lang);
       const body = ejs.render(fs.readFileSync(path.join(config.viewsDir, 'pages', 'home.ejs'), 'utf8'), {
-        lang,
-        t: (k) => t(lang, k),
+        lang, t: tFn, renderPart,
       });
       res.render('layouts/main.ejs', {
         lang,
-        t: (k) => t(lang, k),
+        t: tFn,
+        renderPart,
         title: lang === 'zh' ? 'SDCA — 聖地牙哥中華學苑' : 'SDCA — San Diego Chinese Academy',
         description: 'Non-profit Chinese language school in San Diego since 1988.',
         body,
+        ...renderShell(lang, { langPath: '/' }),
       });
     });
-    // /en/anything-unknown → 404 (via the below catch-all)
   }
 
   // 404

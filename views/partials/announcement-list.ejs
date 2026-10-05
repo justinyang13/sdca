@@ -1,0 +1,52 @@
+<%
+  // announcement-list.ejs — list with optional filter tabs.
+  // Read from L: annTabs, annItems, annTabId
+  const items = (typeof L !== 'undefined' && L.annItems) ? L.annItems : [];
+  const tabs = (typeof L !== 'undefined' && L.annTabs) ? L.annTabs : null;
+  const current = (typeof L !== 'undefined' && L.annTabId) ? L.annTabId : 'all';
+
+  const chipClass = { weekly: 'chip-weekly', news: 'chip-news', press: 'chip-press', notice: 'chip-notice' };
+  const chipLabel = { weekly: 'W', news: 'N', press: 'P', notice: '!' };
+%>
+<section class="announcement-section">
+  <% if (tabs) { %>
+  <div class="filter-tabs" data-tabs="kind" role="tablist" aria-label="<%= t('tabs.announcements') %>">
+    <% tabs.forEach(function(t) {
+         const selected = t.id === current;
+    %>
+      <button type="button" role="tab" id="tab-<%= t.id %>"
+              data-tab="<%= t.id %>"
+              aria-selected="<%= String(selected) %>"
+              aria-controls="panel-<%= t.id %>"
+              tabindex="<%= selected ? 0 : -1 %>">
+        <%= t.label %>
+      </button>
+    <% }) %>
+  </div>
+  <% } %>
+
+  <ul class="announcement-list" role="tabpanel" aria-labelledby="tab-<%= current %>">
+    <% if (!items.length) { %>
+      <li class="ann-empty" style="padding:24px; color: var(--gray-500);">
+        <%= t('tabs.no_results') %>
+      </li>
+    <% } %>
+    <% items.forEach(function(it) { %>
+      <li class="announcement-item">
+        <div>
+          <span class="chip <%= chipClass[it.kind] || '' %>"><%= chipLabel[it.kind] || '' %> <%= it.kind %></span>
+          <h3 class="ann-title" style="margin-top:8px">
+            <a href="<%= it.href %>"><%= it.title %></a>
+          </h3>
+          <% if (it.summary) { %><p class="ann-body"><%= it.summary %></p><% } %>
+          <div class="ann-meta">
+            <% if (it.date) { %><time datetime="<%= it.date %>"><%= it.date %></time><% } %>
+          </div>
+        </div>
+        <div class="ann-cta">
+          <a class="btn btn-ghost btn-sm" href="<%= it.href %>"><%= t('button.read_more') %></a>
+        </div>
+      </li>
+    <% }) %>
+  </ul>
+</section>

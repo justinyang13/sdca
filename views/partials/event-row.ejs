@@ -1,0 +1,31 @@
+<%
+  // event-row.ejs — event row with date badge. Read from L: evDate, evTitle, evHref, evLocation, evTime
+  const d = (typeof L !== 'undefined' && L.evDate) ? L.evDate : new Date();
+  const months = lang === 'zh'
+    ? ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+    : ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const m = months[d.getMonth()];
+  const day = d.getDate();
+  const yr = d.getFullYear();
+  const title = (typeof L !== 'undefined' && L.evTitle) || '';
+  const href = (typeof L !== 'undefined' && L.evHref) || null;
+  const loc = (typeof L !== 'undefined' && L.evLocation) || '';
+  const time = (typeof L !== 'undefined' && L.evTime) || '';
+%>
+<div class="event-row">
+  <div class="date-badge" aria-hidden="true">
+    <span class="d-month"><%= m %></span>
+    <span class="d-day"><%= day %></span>
+    <span class="d-year"><%= yr %></span>
+  </div>
+  <div>
+    <h3 class="ev-title">
+      <% if (href) { %><a href="<%= href %>"><%= title %></a><% } else { %><%= title %><% } %>
+    </h3>
+    <p class="ev-meta">
+      <% if (loc) { %><%= loc %><% if (time) { %> <span class="dot">·</span><% } %><% } %>
+      <% if (time) { %><%= time %><% } %>
+    </p>
+  </div>
+  <% if (href) { %><a class="btn btn-ghost ev-cta" href="<%= href %>"><%= t('button.read_more') %></a><% } %>
+</div>

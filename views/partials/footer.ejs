@@ -1,33 +1,66 @@
+<%
+  const L = lang;
+  const alt = lang === 'zh' ? 'en' : 'zh';
+  const current = (typeof langPath !== 'undefined' && langPath) || '/';
+  const year = new Date().getFullYear();
+%>
 <footer class="site-footer" role="contentinfo">
   <div class="footer-grid">
-    <div class="footer-col">
-      <h2><%= t('footer.school') %></h2>
-      <p><%= t('footer.tagline') %></p>
+    <div class="footer-col footer-brand">
+      <img src="/img/logo.png" alt="<%= L === 'zh' ? 'SDCA 校徽' : 'SDCA logo' %>" width="64" height="64">
+      <p class="brand-zh" style="margin:0 0 4px; font-family: var(--font-serif); font-size: 1.15rem; color:#fff; font-weight:600;"><%= L === 'zh' ? '聖地牙哥中華學苑' : 'San Diego Chinese Academy' %></p>
+      <p class="brand-en" style="margin:0 0 12px; color: var(--gray-400); font-size: 0.85rem;"><%= L === 'zh' ? 'San Diego Chinese Academy' : '聖地牙哥中華學苑' %></p>
+      <p style="margin:0 0 16px; font-size: 0.9rem;"><%= t('footer.tagline') %></p>
+      <a class="footer-portal" href="https://register.sandiegochineseschool.com" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style="margin-right:6px" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 8h8M8 4l4 4-4 4"/><rect x="10" y="3" width="4" height="10" rx="1"/></svg>
+        <%= t('footer.portal') %>
+      </a>
     </div>
+
     <div class="footer-col">
-      <h2><%= t('footer.links') %></h2>
+      <h2><%= t('footer.about') %></h2>
       <ul>
-        <li><a href="/<%= lang %>/about"><%= t('nav.about') %></a></li>
-        <li><a href="/<%= lang %>/programs"><%= t('nav.programs') %></a></li>
-        <li><a href="/<%= lang %>/news"><%= t('nav.news') %></a></li>
-        <li><a href="/<%= lang %>/privacy"><%= t('footer.privacy') %></a></li>
-        <li><a href="/<%= lang %>/disclaimer"><%= t('footer.disclaimer') %></a></li>
+        <li><a href="/<%= L %>/about"><%= t('nav.about') %></a></li>
+        <li><a href="/<%= L %>/about/board"><%= t('nav.about_board') %></a></li>
+        <li><a href="/<%= L %>/about/staff"><%= t('nav.about_staff') %></a></li>
+        <li><a href="/<%= L %>/programs"><%= t('nav.programs') %></a></li>
       </ul>
     </div>
+
+    <div class="footer-col">
+      <h2><%= t('footer.parent_links') %></h2>
+      <ul>
+        <li><a href="/<%= L %>/news"><%= t('nav.news_announcements') %></a></li>
+        <li><a href="/<%= L %>/events"><%= t('nav.news_events') %></a></li>
+        <li><a href="/<%= L %>/media"><%= t('nav.news_media') %></a></li>
+        <li><a href="/<%= L %>/parents/handbook"><%= t('nav.parents_handbook') %></a></li>
+        <li><a href="/<%= L %>/documents"><%= t('nav.parents_docs') %></a></li>
+      </ul>
+    </div>
+
     <div class="footer-col">
       <h2><%= t('footer.contact') %></h2>
-      <p>(858) 205-7322</p>
-      <p>Office.SDCA@gmail.com</p>
-    </div>
-    <div class="footer-col">
-      <h2><%= t('footer.follow') %></h2>
+      <ul>
+        <li><a href="tel:+18582057322">(858) 205-7322</a></li>
+        <li><a href="mailto:Office.SDCA@gmail.com">Office.SDCA@gmail.com</a></li>
+        <li><%= t('footer.addr') %></li>
+      </ul>
+      <h2 style="margin-top:20px;"><%= t('footer.follow') %></h2>
       <ul class="social">
         <li><a href="https://www.facebook.com/SanDiegoChineseAcademy/" rel="noopener" target="_blank">Facebook</a></li>
+        <li><a href="https://www.yelp.com/search?find_desc=San+Diego+Chinese+Academy" rel="noopener" target="_blank">Yelp</a></li>
         <li><a href="https://www.youtube.com/channel/UCbURJMa8pWixTD51QEnWMdA" rel="noopener" target="_blank">YouTube</a></li>
+        <li><a href="https://sdcapta.org/" rel="noopener" target="_blank">PTA Blog</a></li>
       </ul>
     </div>
   </div>
+
   <div class="footer-legal">
-    <p>© <%= new Date().getFullYear() %> SDCA. <%= t('footer.rights') %></p>
+    <div>© <%= year %> San Diego Chinese Academy (聖地牙哥中華學苑). <%= t('footer.rights') %></div>
+    <div style="display:flex; gap:16px; flex-wrap:wrap;">
+      <a href="/<%= L %>/privacy"><%= t('footer.privacy') %></a>
+      <a href="/<%= L %>/disclaimer"><%= t('footer.disclaimer') %></a>
+      <a href="/<%= alt %>/"><%= alt === 'zh' ? t('nav.switch_lang_to_zh') : t('nav.switch_lang_to_en') %></a>
+    </div>
   </div>
 </footer>

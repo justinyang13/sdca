@@ -1,0 +1,26 @@
+<%
+  // card.ejs — generic card. Read from L: cardImage, cardImageAlt, cardTitle, cardTitleHref, cardDesc, cardHref, cardFooterHtml
+  const img = (typeof L !== 'undefined' && L.cardImage) || '';
+  const imgAlt = (typeof L !== 'undefined' && L.cardImageAlt) || '';
+  const title = (typeof L !== 'undefined' && L.cardTitle) || '';
+  const titleHref = (typeof L !== 'undefined' && L.cardTitleHref) || null;
+  const desc = (typeof L !== 'undefined' && L.cardDesc) || '';
+  const href = (typeof L !== 'undefined' && L.cardHref) || null;
+  const footer = (typeof L !== 'undefined' && L.cardFooterHtml) || null;
+%>
+<article class="card">
+  <% if (img) { %>
+  <a class="card-media" href="<%= href || titleHref || '#' %>" aria-label="<%= imgAlt %>">
+    <img src="<%= img %>" alt="<%= imgAlt %>" width="800" height="500" loading="lazy">
+  </a>
+  <% } %>
+  <div class="card-body">
+    <% if (title) { %>
+      <h3 class="card-title">
+        <% if (titleHref) { %><a href="<%= titleHref %>"><%= title %></a><% } else { %><%= title %><% } %>
+      </h3>
+    <% } %>
+    <% if (desc) { %><p class="card-desc"><%= desc %></p><% } %>
+    <% if (footer) { %><div class="card-footer"><%- footer %></div><% } %>
+  </div>
+</article>

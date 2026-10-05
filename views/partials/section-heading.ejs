@@ -1,0 +1,20 @@
+<%
+  // section-heading.ejs — kicker + title + optional description + optional link
+  const secKicker = (typeof L !== 'undefined' && L.secKicker) || '';
+  const secTitle = (typeof L !== 'undefined' && L.secTitle) || '';
+  const secDesc = (typeof L !== 'undefined' && L.secDesc) || '';
+  const secLink = (typeof L !== 'undefined' && L.secLink) || null;
+%>
+<div class="section-head">
+  <div>
+    <% if (secKicker) { %><div class="section-kicker"><%= secKicker %></div><% } %>
+    <h2 class="section-title"><%= secTitle %></h2>
+    <% if (secDesc) { %><p class="section-desc"><%= secDesc %></p><% } %>
+  </div>
+  <% if (secLink && secLink.href) { %>
+    <a class="section-link" href="<%= secLink.href %>" <%= secLink.target ? 'target="_blank" rel="noopener"' : '' %>>
+      <%= secLink.label %>
+      <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+    </a>
+  <% } %>
+</div>

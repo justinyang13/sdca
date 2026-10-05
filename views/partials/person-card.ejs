@@ -1,0 +1,17 @@
+<%
+  // person-card.ejs — staff/board card. Read from L: personPhoto, personName, personRole, personBio
+  const photo = (typeof L !== 'undefined' && L.personPhoto) || '';
+  const name = (typeof L !== 'undefined' && L.personName) || '';
+  const role = (typeof L !== 'undefined' && L.personRole) || '';
+  const bio = (typeof L !== 'undefined' && L.personBio) || '';
+%>
+<div class="person-card">
+  <% if (photo) { %>
+  <div class="person-photo">
+    <img src="<%= photo %>" alt="<%= name %>" width="96" height="96" loading="lazy">
+  </div>
+  <% } %>
+  <h3 class="person-name"><%= name %></h3>
+  <% if (role) { %><p class="person-role"><%= role %></p><% } %>
+  <% if (bio) { %><p class="card-desc"><%= bio %></p><% } %>
+</div>

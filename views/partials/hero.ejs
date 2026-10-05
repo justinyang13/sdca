@@ -1,0 +1,28 @@
+<%
+  // hero.ejs — page hero / banner.
+  // Read from L: heroTitle, heroSub, heroImage, heroVariant, heroKicker, heroCtas
+  const variant = (typeof L !== 'undefined' && L.heroVariant) || 'default';
+  const ctas = (typeof L !== 'undefined' && L.heroCtas) ? L.heroCtas : [];
+  const title = (typeof L !== 'undefined' && L.heroTitle) || t('hero.default_title');
+  const sub = (typeof L !== 'undefined' && L.heroSub) || '';
+  const img = (typeof L !== 'undefined' && L.heroImage) || '';
+  const kicker = (typeof L !== 'undefined' && L.heroKicker) || '';
+%>
+<section class="hero <%= variant === 'photo' ? 'hero--photo' : '' %> <%= variant === 'slim' ? 'hero--slim' : '' %>"
+         <%= img ? `style="background-image:url('${img}')"` : '' %>>
+  <div class="hero-inner">
+    <% if (kicker) { %><div class="section-kicker"><%= kicker %></div><% } %>
+    <h1><%= title %></h1>
+    <% if (sub) { %><p class="hero-sub"><%= sub %></p><% } %>
+    <% if (ctas.length) { %>
+    <div class="hero-cta">
+      <% ctas.forEach(function(c) { %>
+        <a class="btn <%= c.variant || 'btn-primary' %> <%= c.size || 'btn-lg' %>"
+           href="<%= c.href %>" <%= c.target ? `target="_blank" rel="noopener"` : '' %>>
+          <%= c.label %>
+        </a>
+      <% }) %>
+    </div>
+    <% } %>
+  </div>
+</section>

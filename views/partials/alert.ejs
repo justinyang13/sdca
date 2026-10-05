@@ -1,0 +1,24 @@
+<%
+  // alert.ejs — info/success/warn/error. Read from L: alertVariant, alertTitle, alertBody
+  const variant = (typeof L !== 'undefined' && L.alertVariant) || 'info';
+  const title = (typeof L !== 'undefined' && L.alertTitle) || '';
+  const body = (typeof L !== 'undefined' && L.alertBody) || '';
+
+  const icons = {
+    info: '<circle cx="8" cy="8" r="7"/><path d="M8 5v3M8 11v.5"/>',
+    success: '<circle cx="8" cy="8" r="7"/><path d="M5 8l2 2 4-4"/>',
+    warn: '<path d="M8 2l7 13H1z"/><path d="M8 7v3M8 13v.5"/>',
+    error: '<circle cx="8" cy="8" r="7"/><path d="M6 6l4 4M10 6l-4 4"/>'
+  };
+%>
+<div class="alert alert-<%= variant %>" role="alert">
+  <span class="alert-icon" aria-hidden="true">
+    <svg viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6">
+      <%= icons[variant] || icons.info %>
+    </svg>
+  </span>
+  <div>
+    <% if (title) { %><p class="alert-title"><%= title %></p><% } %>
+    <% if (body) { %><p class="alert-body"><%= body %></p><% } %>
+  </div>
+</div>

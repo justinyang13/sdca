@@ -9,6 +9,11 @@ export const config = {
   isProduction: process.env.NODE_ENV === 'production',
   port: Number(process.env.PORT || 3000),
   host: process.env.HOST || '0.0.0.0',
+  // https: true when the server is served behind a TLS terminator (or on
+  // https:// URLs directly). The Phase 1 demo runs on plain http over
+  // Tailscale, so this must stay false — otherwise helmet's
+  // upgrade-insecure-requests CSP breaks CSS/JS.
+  https: process.env.HTTPS === 'true',
   root,
   dataDir: process.env.DATA_DIR || path.join(root, 'data'),
   dbFile: process.env.DB_FILE || path.join(root, 'data', 'sdca.db'),

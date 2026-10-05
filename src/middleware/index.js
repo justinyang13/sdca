@@ -3,6 +3,7 @@ import helmet from 'helmet';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import session from 'express-session';
+import { config } from '../config.js';
 import { langMiddleware } from './lang.js';
 import { csrfMiddleware } from './csrf.js';
 
@@ -21,25 +22,41 @@ export const generalLimiter = createLimiter({ max: 300 });
 /** Contact form / login limiter (strict). */
 export const strictLimiter = createLimiter({ max: 10 });
 
+function buildCsp() {
+  const directives = {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'"],
+    styleSrc: ["'self'", "'unsafe-inline'"],
+    imgSrc: ["'self'", 'data:', 'https://www.youtube.com', 'https://www.youtube-nocookie.com'],
+    frameSrc: ["'self'", 'https://www.youtube-nocookie.com', 'https://register.sandiegochineseschool.com'],
+    connectSrc: ["'self'"],
+    objectSrc: ["'none'"],
+    baseUri: ["'self'"],
+    formAction: ["'self'", 'https://register.sandiegochineseschool.com'],
+  };
+  // Only enable upgrade-insecure-requests when we know we're on https.
+  // Plain-http demo (Tailscale) needs CSS/JS to load without being
+  // upgraded to https, so we keep it disabled unless config.https.
+  if (config.https) {
+    directives.upgradeInsecureRequests = [];
+  } else {
+    directives.upgradeInsecureRequests = null;
+  }
+  return { directives };
+}
+
+export function buildHelmet() {
+  return helmet({
+    contentSecurityPolicy: buildCsp(),
+    // HSTS must be off on http demo; enable only if HTTPS is real.
+    hsts: config.https ? {} : false,
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  });
+}
+
 export function applyBaseMiddleware(app) {
   app.disable('x-powered-by');
-  app.use(helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", 'data:', 'https://www.youtube.com', 'https://www.youtube-nocookie.com'],
-        frameSrc: ["'self'", 'https://www.youtube-nocookie.com', 'https://register.sandiegochineseschool.com'],
-        connectSrc: ["'self'"],
-        objectSrc: ["'none'"],
-        baseUri: ["'self'"],
-        formAction: ["'self'", 'https://register.sandiegochineseschool.com'],
-      },
-    },
-    hsts: false, // demo runs over http
-    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-  }));
+  app.use(buildHelmet());
   app.use(compression());
   app.use(generalLimiter);
 

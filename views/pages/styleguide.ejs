@@ -1,0 +1,222 @@
+<%
+  // styleguide.ejs — /dev/styleguide — every design-system component, EN + ZH.
+  // Rendered into a full page; header/footer are provided by the layout.
+  const L = lang;
+  const isZh = L === 'zh';
+  const name = isZh ? '林小美' : 'Mei Lin';
+  const role = isZh ? '數學教師' : 'Math Teacher';
+  const bio = isZh ? '教中文數學十年。' : 'Ten years teaching Chinese math.';
+  const evDate = new Date(2026, 9, 15);
+  const evTitle = isZh ? '2026 年中秋節慶祝活動' : '2026 Mid-Autumn Celebration';
+  const evLoc = isZh ? '聖地牙哥中華學苑，La Jolla' : 'SDCA, La Jolla';
+  const evTime = isZh ? '上午 10:00' : '10:00 AM';
+  const week28Summary = isZh ? '本週課程重點與下週預告。' : 'This weeks class focus and next-week preview.';
+%>
+<div class="container">
+  <div class="section" style="padding-top: var(--sp-7);">
+    <div class="section-kicker">SDCA · <%- t('styleguide.title') %></div>
+    <h1 style="font-size: var(--fs-05); margin-bottom: var(--sp-3);"><%= isZh ? '設計系統 — 樣式指南' : 'Design System — Style Guide' %></h1>
+    <p class="section-desc" style="max-width: 60ch;">
+      <%= isZh
+          ? 'SDCA 設計系統的所有元件，以英文與繁體中文呈現。用於視覺 QA。'
+          : 'Every component in the SDCA design system, rendered in English and Traditional Chinese. For visual QA.' %>
+    </p>
+    <p style="color: var(--gray-500); font-size: 0.9rem;">
+      <%= isZh ? '目前語言：繁體中文' : 'Current language: English' %>
+      · <a href="/<%= isZh ? 'en' : 'zh' %>/dev/styleguide"><%= isZh ? '查看英文版' : 'View in 繁體中文' %></a>
+    </p>
+  </div>
+
+  <!-- ====== BUTTONS ====== -->
+  <div class="section section-alt">
+    <h2 class="section-title" style="max-width:100%"><%= isZh ? '按鈕' : 'Buttons' %></h2>
+    <div class="grid grid-2" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <a class="btn btn-primary btn-lg" href="#"><%= isZh ? '主要行動（大）' : 'Primary (lg)' %></a>
+        <a class="btn btn-primary" href="#"><%= isZh ? '主要行動' : 'Primary' %></a>
+        <a class="btn btn-primary btn-sm" href="#"><%= isZh ? '主要行動（小）' : 'Primary (sm)' %></a>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <a class="btn btn-navy" href="#"><%= isZh ? 'Navy' : 'Navy' %></a>
+        <a class="btn btn-outline" href="#"><%= isZh ? '輪廓' : 'Outline' %></a>
+        <a class="btn btn-ghost" href="#"><%= isZh ? 'Ghost' : 'Ghost' %></a>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <a class="btn btn-light" href="#"><%= isZh ? 'Light（深色背景上）' : 'Light (on dark)' %></a>
+        <button class="btn btn-primary" disabled><%= isZh ? '禁用' : 'Disabled' %></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== CARDS / ICON TILES ====== -->
+  <div class="section">
+    <h2 class="section-title" style="max-width:100%"><%= isZh ? '圖示磚（功能卡）' : 'Icon tiles (feature cards)' %></h2>
+    <div class="grid grid-3">
+      <% const tiles = [
+        { icon: '<path d="M3 3h10v10H3z"/><path d="M3 7h10M7 3v10"/>', title: isZh ? '傳統文化' : 'Cultural heritage', desc: isZh ? '書法、詩詞、節慶活動。' : 'Calligraphy, poetry, festivals.' },
+        { icon: '<path d="M8 2l5 3v6l-5 3-5-3V5z"/><path d="M8 2v14"/>', title: isZh ? '分級教學' : 'Placement classes', desc: isZh ? '從入門到進階，適合 K-12 與成人。' : 'From beginner to advanced, K-12 and adults.' },
+        { icon: '<circle cx="8" cy="5" r="2"/><path d="M4 14c0-2 2-4 4-4s4 2 4 4"/>', title: isZh ? '師資團隊' : 'Dedicated faculty', desc: isZh ? '經驗豐富的教師與志工。' : 'Experienced teachers and volunteers.' }
+      ]; %>
+      <% tiles.forEach(function(x) { %>
+        <%- renderPart('partials/icon-tile.ejs', { tileIcon: x.icon, tileTitle: x.title, tileDesc: x.desc }) %>
+      <% }) %>
+    </div>
+  </div>
+
+  <!-- ====== EVENT ROW ====== -->
+  <div class="section section-alt">
+    <h2 class="section-title" style="max-width:100%"><%= isZh ? '活動列' : 'Event row' %></h2>
+    <div class="container" style="max-width:800px;">
+      <%- renderPart('partials/event-row.ejs', {
+            evDate: evDate, evTitle: evTitle, evHref: '#',
+            evLocation: evLoc, evTime: evTime
+      }) %>
+    </div>
+  </div>
+
+  <!-- ====== ANNOUNCEMENTS ====== -->
+  <div class="section">
+    <h2 class="section-title" style="max-width:100%"><%= isZh ? '通告清單' : 'Announcement list' %></h2>
+    <%- renderPart('partials/announcement-list.ejs', {
+         annTabs: [
+           { id: 'all', label: t('tabs.all'), selected: true },
+           { id: 'weekly', label: t('tabs.weekly') },
+           { id: 'news', label: t('tabs.news') },
+           { id: 'press', label: t('tabs.press') }
+         ],
+         annTabId: 'all',
+         annItems: [
+           { slug: 'w28', kind: 'weekly', title: isZh ? '第 28 週 — 家庭聯絡事項' : 'Week 28 — Family newsletter', summary: week28Summary, date: '2026-04-10', href: '#' },
+           { slug: 'w27', kind: 'weekly', title: isZh ? '第 27 週 — 家庭聯絡事項' : 'Week 27 — Family newsletter', summary: isZh ? '詩詞朗誦比賽報名截止。' : 'Poetry recitation contest deadline.', date: '2026-04-03', href: '#' },
+           { slug: 'press-1', kind: 'press', title: isZh ? '《世界日報》報導 SDCA 30 週年' : 'World Journal features SDCA 30th', summary: isZh ? '社區媒體報導我校 30 週年慶祝。' : 'Local press covers our 30th anniversary.', date: '2026-03-20', href: '#' }
+         ]
+    }) %>
+  </div>
+
+  <!-- ====== PERSON CARDS ====== -->
+  <div class="section section-alt">
+    <h2 class="section-title" style="max-width:100%"><%= isZh ? '人物卡片' : 'Person card' %></h2>
+    <div class="grid grid-3">
+      <% const people = [
+        { personPhoto: '', personName: name, personRole: role, personBio: bio },
+        { personPhoto: '', personName: isZh ? '陳志明' : 'Chen Zhi-ming', personRole: isZh ? '數學教師' : 'Math Teacher', personBio: isZh ? '熱愛數學教育。' : 'Passionate about math education.' },
+        { personPhoto: '', personName: isZh ? '王芳' : 'Wang Fang', personRole: isZh ? '藝術教師' : 'Art Teacher', personBio: isZh ? '教書法與水彩。' : 'Teaches calligraphy and watercolor.' }
+      ]; %>
+      <% people.forEach(function(p) { %>
+        <%- renderPart('partials/person-card.ejs', p) %>
+      <% }) %>
+    </div>
+  </div>
+
+  <!-- ====== SPONSOR GRID ====== -->
+  <div class="section">
+    <h2 class="section-title" style="max-width:100%"><%= isZh ? '贊助者格線' : 'Sponsor grid' %></h2>
+    <%- renderPart('partials/sponsor-grid.ejs', {
+         sponsors: [
+           { name: 'East-West Bank', logo: '/img/logo.png', url: '#', tier: 'platinum' },
+           { name: '99 Ranch', logo: '/img/logo.png', url: '#', tier: 'gold' },
+           { name: 'GoldenVision', logo: '/img/logo.png', url: '#', tier: 'partner' },
+           { name: 'Law Offices of Peter Chu', logo: '/img/logo.png', url: '#', tier: 'partner' }
+         ]
+    }) %>
+  </div>
+
+  <!-- ====== DOCUMENT LIST ====== -->
+  <div class="section section-alt">
+    <h2 class="section-title" style="max-width:100%"><%= isZh ? '文件清單' : 'Document list' %></h2>
+    <div class="container" style="max-width:800px;">
+      <%- renderPart('partials/document-list.ejs', {
+         docs: [
+           { slug: 'handbook', title: isZh ? '2026 學年手冊' : '2026 School Year Handbook', href: '#', mime: 'pdf', size: '2.4 MB', year: '2026', category: isZh ? '政策' : 'Policies' },
+           { slug: 'calendar', title: isZh ? '2026–27 學年日曆' : '2026–27 School Calendar', href: '#', mime: 'pdf', size: '512 KB', year: '2026', category: isZh ? '日曆' : 'Calendar' },
+           { slug: 'tuition', title: isZh ? '學費表' : 'Tuition Schedule', href: '#', mime: 'pdf', size: '180 KB', year: '2026', category: isZh ? '財務' : 'Finance' }
+         ]
+      }) %>
+    </div>
+  </div>
+
+  <!-- ====== ALERTS ====== -->
+  <div class="section">
+    <h2 class="section-title" style="max-width:100%"><%= isZh ? '警示' : 'Alerts' %></h2>
+    <%- renderPart('partials/alert.ejs', { alertVariant: 'info', alertTitle: isZh ? '資訊' : 'Information', alertBody: isZh ? '這是資訊型警示。' : 'An information alert.' }) %>
+    <%- renderPart('partials/alert.ejs', { alertVariant: 'success', alertTitle: isZh ? '成功' : 'Success', alertBody: isZh ? '訊息已送出。' : 'Message sent.' }) %>
+    <%- renderPart('partials/alert.ejs', { alertVariant: 'warn', alertTitle: isZh ? '警告' : 'Warning', alertBody: isZh ? '請注意截止日期。' : 'Deadline approaching.' }) %>
+    <%- renderPart('partials/alert.ejs', { alertVariant: 'error', alertTitle: isZh ? '錯誤' : 'Error', alertBody: isZh ? '請重新送出。' : 'Please try again.' }) %>
+  </div>
+
+  <!-- ====== BREADCRUMB ====== -->
+  <div class="section section-alt">
+    <h2 class="section-title" style="max-width:100%"><%= isZh ? '麵包屑' : 'Breadcrumb' %></h2>
+    <%- renderPart('partials/breadcrumb.ejs', {
+         crumbList: [
+           { label: isZh ? '首頁' : 'Home', href: '/' },
+           { label: isZh ? '關於我們' : 'About', href: '/about' },
+           { label: isZh ? '董事會' : 'Board' }
+         ]
+    }) %>
+  </div>
+
+  <!-- ====== FORMS ====== -->
+  <div class="section">
+    <h2 class="section-title" style="max-width:100%"><%= isZh ? '表單' : 'Forms' %></h2>
+    <div class="container" style="max-width:640px;">
+      <form data-enhance style="background:var(--paper); padding: var(--sp-5); border-radius: var(--radius-lg); border: 1px solid var(--gray-200);">
+        <div class="form-row">
+          <div class="form-field">
+            <label class="form-label" for="f-name"><%= t('form.name') %><span class="req">*</span></label>
+            <input class="form-input" id="f-name" name="name" type="text" placeholder="<%= t('form.name_placeholder') %>" required data-required-msg="<%= t('form.required') %>">
+            <p class="form-error" id="err-name" data-error-for="name" hidden></p>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="f-email"><%= t('form.email') %><span class="req">*</span></label>
+            <input class="form-input" id="f-email" name="email" type="email" placeholder="<%= t('form.email_placeholder') %>" required data-required-msg="<%= t('form.required') %>">
+            <p class="form-error" id="err-email" data-error-for="email" hidden></p>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="f-topic"><%= t('form.topic') %></label>
+          <select class="form-select" id="f-topic" name="topic">
+            <option value=""><%= t('form.topic_choose') %></option>
+            <option>Tuition</option>
+            <option>Class placement</option>
+            <option>Volunteer</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="f-msg"><%= t('form.message') %></label>
+          <textarea class="form-textarea" id="f-msg" name="message" placeholder="<%= t('form.message_placeholder') %>"></textarea>
+        </div>
+        <div style="display:flex; gap:12px; margin-top: 8px;">
+          <button class="btn btn-primary" type="submit"><%= t('button.send') %></button>
+          <button class="btn btn-ghost" type="reset"><%= t('button.cancel') %></button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====== HERO (default) ====== -->
+  <div class="section">
+    <h2 class="section-title" style="max-width:100%"><%= isZh ? 'Hero（預設）' : 'Hero (default)' %></h2>
+    <%- renderPart('partials/hero.ejs', {
+         heroVariant: 'default',
+         heroKicker: isZh ? 'SDCA · 聖地牙哥中華學苑' : 'SDCA · San Diego Chinese Academy',
+         heroTitle: isZh ? '歡迎來到 SDCA' : 'Welcome to SDCA',
+         heroSub: isZh ? '自 1988 年起教授中文與中華文化。' : 'Teaching Mandarin and Chinese culture since 1988.',
+         heroCtas: [
+           { label: isZh ? '了解更多' : 'Learn more', href: '#', variant: 'btn-light' },
+           { label: isZh ? '立即報名' : 'Enroll now', href: 'https://register.sandiegochineseschool.com', target: true, variant: 'btn-primary' }
+         ]
+    }) %>
+  </div>
+
+  <!-- ====== HERO (photo overlay) ====== -->
+  <div class="section section-alt">
+    <h2 class="section-title" style="max-width:100%"><%= isZh ? 'Hero（相片疊層）' : 'Hero (photo overlay)' %></h2>
+    <%- renderPart('partials/hero.ejs', {
+         heroVariant: 'photo',
+         heroImage: '/img/logo.png',
+         heroTitle: isZh ? '真實教室照片會在此' : 'Real classroom photo goes here',
+         heroSub: isZh ? 'Navy 漸層疊層確保文字可讀。' : 'Navy gradient overlay ensures legible text.'
+    }) %>
+  </div>
+</div>

@@ -1,0 +1,96 @@
+/* tokens.css — design system tokens (Phase 1) */
+:root {
+  /* Brand */
+  --navy: #0B2545;
+  --navy-700: #13315C;
+  --navy-900: #071A33;
+  --ink: #14213D;
+  --red: #B3112A;
+  --red-700: #8E0E22;
+  --red-500: #C62F45;
+  --surface: #F3F7FC;
+  --surface-2: #E8EFF8;
+  --paper: #FFFFFF;
+  --gold: #C9A227;
+  --gold-soft: #E5CE85;
+
+  /* Neutrals */
+  --gray-900: #1B2430;
+  --gray-700: #33415A;
+  --gray-600: #47566F;
+  --gray-500: #6B7A90;
+  --gray-400: #94A1B8;
+  --gray-300: #C5CFDE;
+  --gray-200: #E2E8F0;
+  --gray-100: #F3F7FC;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-lg: 20px;
+  --radius-full: 999px;
+
+  /* Spacing (8-pt scale) */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+  --sp-8: 64px;
+  --sp-9: 96px;
+
+  /* Type scale (fluid via clamp) */
+  --fs-11: clamp(0.75rem, 0.72rem + 0.15vw, 0.85rem);
+  --fs-10: clamp(0.875rem, 0.85rem + 0.1vw, 0.9375rem);
+  --fs-09: clamp(1rem, 0.97rem + 0.15vw, 1.0625rem);
+  --fs-08: clamp(1.125rem, 1.07rem + 0.3vw, 1.25rem);
+  --fs-07: clamp(1.375rem, 1.27rem + 0.55vw, 1.625rem);
+  --fs-06: clamp(1.75rem, 1.55rem + 1vw, 2.25rem);
+  --fs-05: clamp(2.25rem, 1.9rem + 2vw, 3.25rem);
+  --fs-04: clamp(2.75rem, 2.2rem + 3vw, 4.25rem);
+
+  --lh-tight: 1.15;
+  --lh-normal: 1.6;
+  --lh-relaxed: 1.8;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.08), 0 2px 6px rgba(16, 24, 40, 0.04);
+  --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.08), 0 10px 24px rgba(16, 24, 40, 0.06);
+  --shadow-lg: 0 8px 24px rgba(16, 24, 40, 0.10), 0 20px 48px rgba(16, 24, 40, 0.08);
+  --shadow-red: 0 6px 18px rgba(179, 17, 42, 0.28);
+
+  /* Focus ring */
+  --focus-ring: 0 0 0 3px rgba(11, 37, 69, 0.28);
+  --focus-ring-red: 0 0 0 3px rgba(179, 17, 42, 0.30);
+
+  /* Layout */
+  --content-max: 1200px;
+  --content-narrow: 800px;
+  --header-h: 76px;
+
+  /* Fonts */
+  --font-sans: -apple-system, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", "Segoe UI", system-ui, sans-serif;
+  --font-serif: "Noto Serif TC", "Songti TC", "PMingLiU", Georgia, "Times New Roman", serif;
+
+  /* Motion */
+  --dur-1: 120ms;
+  --dur-2: 180ms;
+  --dur-3: 240ms;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-1: 0.01ms;
+    --dur-2: 0.01ms;
+    --dur-3: 0.01ms;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

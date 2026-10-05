@@ -11,23 +11,29 @@
   <link rel="alternate" hreflang="en" href="<%= typeof enUrl !== 'undefined' ? enUrl : '/en/' %>">
   <link rel="alternate" hreflang="zh-Hant" href="<%= typeof zhUrl !== 'undefined' ? zhUrl : '/zh/' %>">
   <link rel="alternate" hreflang="x-default" href="<%= typeof enUrl !== 'undefined' ? enUrl : '/en/' %>">
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/img/logo.png" type="image/png">
   <meta property="og:site_name" content="San Diego Chinese Academy">
   <meta property="og:title" content="<%= typeof title !== 'undefined' ? title : 'SDCA' %>">
   <meta property="og:description" content="<%= typeof description !== 'undefined' ? description : 'Non-profit Chinese language school in San Diego since 1988.' %>">
   <meta property="og:type" content="website">
   <% if (typeof ogImage !== 'undefined' && ogImage) { %><meta property="og:image" content="<%= ogImage %>"><% } %>
+  <link rel="stylesheet" href="/css/tokens.css">
   <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
 </head>
 <body>
   <a class="skip-link" href="#main"><%= t('nav.skip') %></a>
   <div id="site">
     <%- typeof header !== 'undefined' ? header : '' %>
-    <main id="main" class="site-main">
+    <main id="main" class="site-main" tabindex="-1">
       <%- body %>
     </main>
     <%- typeof footer !== 'undefined' ? footer : '' %>
   </div>
   <script type="module" src="/js/nav.js" defer></script>
+  <script type="module" src="/js/tabs.js" defer></script>
+  <script type="module" src="/js/lightbox.js" defer></script>
+  <script type="module" src="/js/forms.js" defer></script>
 </body>
 </html>

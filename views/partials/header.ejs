@@ -1,20 +1,145 @@
+<%
+  // header.ejs — 7-item nav with dropdowns, search, lang switch, donate, mobile drawer
+  const L = lang;
+  const alt = lang === 'zh' ? 'en' : 'zh';
+  const current = (typeof langPath !== 'undefined' && langPath) || '/';
+  const isActive = (p) => p === current || current.startsWith(p + '/');
+  const href = (p) => `/${L}${p}`;
+  const hrefAlt = (p) => `/${alt}${p}`;
+
+  const NAV = [
+    {
+      id: 'about', label: t('nav.about'), items: [
+        { p: '/about', l: t('nav.about_about') },
+        { p: '/about/board', l: t('nav.about_board') },
+        { p: '/about/staff', l: t('nav.about_staff') },
+        { p: '/about/principal', l: t('nav.about_principal') },
+      ],
+    },
+    {
+      id: 'programs', label: t('nav.programs'), items: [
+        { p: '/programs/classes', l: t('nav.programs_classes') },
+        { p: '/programs/tcml', l: t('nav.programs_tcml') },
+        { p: '/programs/recreational', l: t('nav.programs_recreational') },
+        { p: '/programs/ta', l: t('nav.programs_ta') },
+        { p: '/programs/bell', l: t('nav.programs_bell') },
+      ],
+    },
+    { id: 'enroll', label: t('nav.enroll'), href: 'https://register.sandiegochineseschool.com' },
+    {
+      id: 'news', label: t('nav.news'), items: [
+        { p: '/news', l: t('nav.news_announcements') },
+        { p: '/events', l: t('nav.news_events') },
+        { p: '/news?kind=press', l: t('nav.news_press') },
+        { p: '/media', l: t('nav.news_media') },
+      ],
+    },
+    {
+      id: 'parents', label: t('nav.parents'), items: [
+        { p: '/parents/handbook', l: t('nav.parents_handbook') },
+        { p: '/parents/volunteer', l: t('nav.parents_volunteer') },
+        { p: '/parents/scrip', l: t('nav.parents_scrip') },
+        { p: '/documents', l: t('nav.parents_docs') },
+      ],
+    },
+    {
+      id: 'support', label: t('nav.support'), items: [
+        { p: '/support', l: t('nav.support_donate') },
+        { p: '/support/sponsors', l: t('nav.support_sponsors') },
+        { p: '/parents/scrip', l: t('nav.support_scrip') },
+      ],
+    },
+    { id: 'contact', label: t('nav.contact'), p: '/contact' },
+  ];
+%>
 <header class="site-header" role="banner">
   <div class="header-inner">
-    <a class="brand" href="/<%= lang %>/">
-      <img src="/img/logo.png" alt="SDCA" width="40" height="40">
-      <span class="brand-name"><%= lang === 'zh' ? '聖地牙哥中華學苑' : 'San Diego Chinese Academy' %></span>
+    <a class="brand" href="/<%= L %>/">
+      <img src="/img/logo.png" alt="<%= L === 'zh' ? 'SDCA 校徽' : 'SDCA logo' %>" width="48" height="48">
+      <span class="brand-text">
+        <span class="brand-zh">聖地牙哥中華學苑</span>
+        <span class="brand-en">San Diego Chinese Academy</span>
+      </span>
     </a>
-    <nav class="site-nav" aria-label="Main">
+
+    <nav class="site-nav" aria-label="<%= t('nav.aria_main') %>">
       <ul>
-        <li><a href="/<%= lang %>/"><%= t('nav.home') %></a></li>
-        <li><a href="/<%= lang %>/about"><%= t('nav.about') %></a></li>
-        <li><a href="/<%= lang %>/programs"><%= t('nav.programs') %></a></li>
-        <li><a href="/<%= lang %>/news"><%= t('nav.news') %></a></li>
-        <li><a href="/<%= lang %>/contact" class="cta"><%= t('nav.donate') %></a></li>
+        <% NAV.forEach(function(item) { %>
+          <% if (item.href) { %>
+          <li>
+            <a href="<%= item.href %>" target="_blank" rel="noopener"><%= item.label %> <svg class="caret" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg></a>
+          </li>
+          <% } else if (item.items) { %>
+          <li>
+            <button type="button" class="nav-trigger"
+                    data-dropdown="<%= item.id %>"
+                    aria-expanded="false"
+                    aria-controls="menu-<%= item.id %>">
+              <%= item.label %>
+              <svg class="caret" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg>
+            </button>
+            <div class="dropdown" id="menu-<%= item.id %>">
+              <% item.items.forEach(function(s) { %>
+                <a href="<%= href(s.p) %>" <%= isActive(s.p) ? 'aria-current="page"' : '' %>><%= s.l %></a>
+              <% }) %>
+            </div>
+          </li>
+          <% } else { %>
+          <li>
+            <a href="<%= href(item.p) %>" <%= isActive(item.p) ? 'aria-current="page"' : '' %>><%= item.label %></a>
+          </li>
+          <% } %>
+        <% }) %>
       </ul>
     </nav>
-    <a href="/<%= lang === 'zh' ? 'en' : 'zh' %><%= langPath === '/' ? '' : langPath %>" class="lang-switch" aria-label="<%= t('nav.switch_lang') %>">
-      <%= t('nav.switch_lang') %>
-    </a>
+
+    <div class="header-actions">
+      <a class="btn btn-primary btn-donate" href="<%= href('/support') %>"><%= t('nav.donate') %></a>
+      <a class="lang-switch" href="<%= hrefAlt(current === '/' ? '/' : current) %>"
+         aria-label="<%= L === 'zh' ? t('nav.switch_lang_to_en') : t('nav.switch_lang_to_zh') %>">
+        <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="7"/><path d="M1 8h14M8 1c2 2 2 12 0 14M8 1c-2 2-2 12 0 14"/></svg>
+        <%= L === 'zh' ? t('nav.switch_lang_to_en') : t('nav.switch_lang_to_zh') %>
+      </a>
+      <button type="button" class="nav-toggle" data-nav-toggle aria-label="<%= t('nav.menu') %>" aria-expanded="false" aria-controls="mobile-drawer">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
   </div>
 </header>
+
+<div class="drawer-overlay" aria-hidden="true"></div>
+<aside class="mobile-drawer" id="mobile-drawer" role="dialog" aria-modal="true" aria-label="<%= t('nav.menu') %>">
+  <div class="drawer-head">
+    <span class="sr-only"><%= t('nav.menu') %></span>
+    <button type="button" class="drawer-close" aria-label="<%= t('nav.close_menu') %>">
+      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <ul class="nav-tree">
+    <% NAV.forEach(function(item) { %>
+      <% if (item.href) { %>
+      <li>
+        <a href="<%= item.href %>" target="_blank" rel="noopener"><%= item.label %></a>
+      </li>
+      <% } else if (item.items) { %>
+      <li>
+        <button type="button" class="nav-trigger" aria-expanded="false" aria-controls="dsub-<%= item.id %>">
+          <%= item.label %> <svg class="caret" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg>
+        </button>
+        <ul class="sublist" id="dsub-<%= item.id %>" hidden>
+          <% item.items.forEach(function(s) { %>
+            <li><a href="<%= href(s.p) %>" <%= isActive(s.p) ? 'aria-current="page"' : '' %>><%= s.l %></a></li>
+          <% }) %>
+        </ul>
+      </li>
+      <% } else { %>
+      <li>
+        <a href="<%= href(item.p) %>" <%= isActive(item.p) ? 'aria-current="page"' : '' %>><%= item.label %></a>
+      </li>
+      <% } %>
+    <% }) %>
+  </ul>
+  <div class="drawer-cta">
+    <a class="btn btn-primary btn-lg" href="<%= href('/support') %>"><%= t('nav.donate') %></a>
+  </div>
+</aside>

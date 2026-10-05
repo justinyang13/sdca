@@ -1,0 +1,15 @@
+<%
+  // icon-tile.ejs — feature icon tile. Read from L: tileIcon, tileTitle, tileDesc, tileHref
+  const icon = (typeof L !== 'undefined' && L.tileIcon) || '<circle cx="8" cy="8" r="6"/>';
+  const title = (typeof L !== 'undefined' && L.tileTitle) || '';
+  const desc = (typeof L !== 'undefined' && L.tileDesc) || '';
+  const href = (typeof L !== 'undefined' && L.tileHref) || null;
+%>
+<div class="icon-tile">
+  <span class="icon-badge" aria-hidden="true">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><%= icon %></svg>
+  </span>
+  <h3><%= title %></h3>
+  <p><%= desc %></p>
+  <% if (href) { %><a href="<%= href %>"><%= t('button.read_more') %> →</a><% } %>
+</div>
