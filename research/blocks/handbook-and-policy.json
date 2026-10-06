@@ -1,0 +1,43 @@
+{
+  "slug": "handbook-and-policy",
+  "blocks": [
+    {
+      "heading": {
+        "level": 1,
+        "text": "Handbook and Policy"
+      }
+    },
+    {
+      "list": {
+        "ordered": false,
+        "items": [
+          "家長須知 Parent Handbook",
+          "學生守則 Student Handbook",
+          "學分班規則 Credit Class Attendance and Grading Guidelines",
+          "旁聽生收費及管理辦法 Policy for Guest Students",
+          "特殊註冊收費辦法 Policy for Second Semester Late Registration"
+        ]
+      }
+    },
+    {
+      "heading": {
+        "level": 1,
+        "text": "Form and Document"
+      }
+    },
+    {
+      "list": {
+        "ordered": false,
+        "items": [
+          "費用支出申報表 Expense Reimbursement Form",
+          "TA 申請表 TA Application"
+        ]
+      }
+    }
+  ],
+  "signature": [
+    "1col"
+  ],
+  "notes": [],
+  "missing_local_files": []
+}

@@ -16,3 +16,10 @@ Phase 8c (page images: relative-path bug, image parity audit, gaps on about/boar
 
 
 ROADMAP v3 FAITHFUL REBUILD (2026-10-05): parse old DOM -> verbatim ordered BLOCK TREE -> clean new components; same content/order/layout/images; chain work/run_chain3.sh: Phase 9 (running) -> DP -> 8d -> 8e -> V -> 7 -> release.
+
+## HANDOFF (2026-10-05 5:15PM) — if Claude stops, read AGENTS.md
+- Control: `work/ctl.sh status | stop | resume | preview`. Chain `work/run_chain4.sh` is running in the background (survives Claude stopping): DP -> 8d -> 8e -> V -> 7. Resumable; phases skip when work/<phase>-report.md exists.
+- Done and committed: research wiki, architecture, design system, assets/logo family, seed, public pages, news/events/docs/search/redirects, admin, phase 8/8b/9. In progress: Phase DP (faithful page rebuild).
+- Remaining after chain: Claude-style review gates (see AGENTS.md), docs, push to main + GitHub release sdca v1.0.0.
+- Open owner items: review research/CONTENT-LEDGER.md NEEDS OWNER REVIEW; ZH labels translated by Qwen in the menu; ambiguous headshot-to-name matches.
+

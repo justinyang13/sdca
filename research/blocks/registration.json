@@ -1,0 +1,61 @@
+{
+  "slug": "registration",
+  "blocks": [
+    {
+      "image": {
+        "src": "/img/old/2026/SDCA-Ad-half-page.d161d891.jpg",
+        "alt": "",
+        "caption": "",
+        "width": null,
+        "height": null,
+        "sha256": "672f53708f03b09621750b4e625f9082b5700337b93992470f62ddaea85fb949",
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Ad-half-page.d161d891.jpg"
+      }
+    },
+    {
+      "heading": {
+        "level": 1,
+        "text": "2026-2027 學年度網上註冊 Online Registration"
+      }
+    },
+    {
+      "richtext": "我們不再接受郵寄註冊. 請在九月十三日開學日到辦公室辦理註冊. We are no longer accepting registration by mail. Please submit the Registration Form and your payment to the office on the first day of school, September 13."
+    },
+    {
+      "list": {
+        "ordered": false,
+        "items": [
+          "註冊須知與網路註冊說明",
+          "Registration Notice and Online Registration Instructions",
+          "義工工作說明 Volunteer Job Descriptions"
+        ]
+      }
+    },
+    {
+      "button": {
+        "label": "新家庭註冊 New Family Sign Up",
+        "href": "https://register.sandiegochineseschool.com/signin/register",
+        "target": "_blank"
+      }
+    },
+    {
+      "button": {
+        "label": "舊生註冊 Returning Student Sign In",
+        "href": "https://register.sandiegochineseschool.com/signin",
+        "target": "_blank"
+      }
+    },
+    {
+      "richtext": "如果有任何問題, 請\nemail\n或是洽電 (858)205-7322. If you have any questions, please\nemail\nor contact us at (858)205-7322."
+    }
+  ],
+  "signature": [
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col"
+  ],
+  "notes": [],
+  "missing_local_files": []
+}

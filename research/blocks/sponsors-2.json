@@ -1,0 +1,93 @@
+{
+  "slug": "sponsors-2",
+  "blocks": [
+    {
+      "heading": {
+        "level": 2,
+        "text": "贊助商 Sponsors"
+      }
+    },
+    {
+      "image": {
+        "src": "/img/old/2022/99Ranch2018Banner.jpg",
+        "alt": "",
+        "caption": "",
+        "width": null,
+        "height": null,
+        "sha256": "9128ea89212d88a60ce1a8c14ad5c8bd0ddc367946947744965e06eb1cd3f377",
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/99Ranch2018Banner.jpg"
+      }
+    },
+    {
+      "image": {
+        "src": "/img/old/2022/Mandrin-House.jpeg",
+        "alt": "",
+        "caption": "",
+        "width": null,
+        "height": null,
+        "sha256": "798f3357eb40ce341eca91073a2a2a84a47213283ff7e1f2464bb6ceedbbe4fc",
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Mandrin-House.jpeg"
+      }
+    },
+    {
+      "image": {
+        "src": "/img/old/2022/Law-Offices-of-Peter-Darwin-Chu.png",
+        "alt": "",
+        "caption": "",
+        "width": null,
+        "height": null,
+        "sha256": "07678bf9f435ac1e4052021030b4b5e94aa7a4c4f01de87469cdf81f21cdc16b",
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Law-Offices-of-Peter-Darwin-Chu.png"
+      }
+    },
+    {
+      "image": {
+        "src": "/img/old/2022/C2-Education.png",
+        "alt": "",
+        "caption": "",
+        "width": null,
+        "height": null,
+        "sha256": "d7aeab3aad720065358e70c26a999a032add810518f418b21ece7f19fcfd61bd",
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/C2-Education.png"
+      }
+    },
+    {
+      "image": {
+        "src": "/img/old/2022/Dr.-Liu-ad-banner1.png",
+        "alt": "",
+        "caption": "",
+        "width": null,
+        "height": null,
+        "sha256": "249c45019ad883e7ebd32241ee7c0bda91ed3fc46bcc573d4a335c21ee7e1a54",
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Dr.-Liu-ad-banner1.png"
+      }
+    },
+    {
+      "image": {
+        "src": "/img/old/2022/GoldenVisionBanner.png",
+        "alt": "",
+        "caption": "",
+        "width": null,
+        "height": null,
+        "sha256": "5e71a2a9704d731245c76e25e4d2aa4d266be7ad0a19a966608b5738f0fc3b18",
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/GoldenVisionBanner.png"
+      }
+    },
+    {
+      "image": {
+        "src": "/img/old/2022/East-West-Bank.png",
+        "alt": "",
+        "caption": "",
+        "width": null,
+        "height": null,
+        "sha256": "ebc4c4be8cd0c24c3c0cb5bcd90ef0e3fb79caad712f9367bd69aa73de8a6a2b",
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/East-West-Bank.png"
+      }
+    }
+  ],
+  "signature": [
+    "1col"
+  ],
+  "notes": [],
+  "missing_local_files": []
+}

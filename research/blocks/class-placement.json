@@ -1,0 +1,128 @@
+{
+  "slug": "class-placement",
+  "blocks": [
+    {
+      "heading": {
+        "level": 1,
+        "text": "課程安排 Class Placement"
+      }
+    },
+    {
+      "image": {
+        "src": "/img/old/2018/Class-Placement-Image-WP-768x576.gif",
+        "alt": "",
+        "caption": "",
+        "width": null,
+        "height": null,
+        "sha256": "c89fb4746d97b1d791d3681e11c7a20594962475740892bc9c2431b48abe9e57",
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Class-Placement-Image-WP-768x576.gif"
+      }
+    },
+    {
+      "richtext": "We are proud of our class-placement structure at SDCA because it is designed to accommodate various needs for both children and adults who are interested in learning Chinese."
+    },
+    {
+      "divider": {}
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2018/SDCA-Preschool-Program-1-768x552.jpeg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "df40362c377adde54b5e8210de3efc829b50d3f7c60f3d6c69c31a1dfa916ba9",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Preschool-Program-1-768x552.jpeg"
+        },
+        "title": "",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "divider": {}
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2018/SDCA-Beginner-Class-1.jpeg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "c2f97ba803d7d5ea751ce33adcd1fa7c4d42dbfb34395386f2f8bf0ebf009029",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Beginner-Class-1.jpeg"
+        },
+        "title": "",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "divider": {}
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2018/SDCA-Regular-Class-Original.jpeg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "3fd55f5099e6243310348d87830e868316a4e36fde725a62fe82e6b67bec0d84",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Regular-Class-Original.jpeg"
+        },
+        "title": "",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "divider": {}
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2018/SDCA-Bilingual-Class-1-1.jpeg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "ebe45ae999206c4e5f48d4545c49b08dc0433982287119ceecc87ce69be5950c",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Bilingual-Class-1-1.jpeg"
+        },
+        "title": "",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "divider": {}
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2018/SDCA-Credit-Class-Cultural-Activity-7.jpeg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "5553592eabe96e07560b20664568f6428e2c76e18e083c248801343cfa1c9c39",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Credit-Class-Cultural-Activity-7.jpeg"
+        },
+        "title": "",
+        "text": "",
+        "side": "left"
+      }
+    }
+  ],
+  "signature": [
+    "1col",
+    "1col",
+    "1col",
+    "1col"
+  ],
+  "notes": [],
+  "missing_local_files": []
+}

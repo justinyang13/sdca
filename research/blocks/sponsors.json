@@ -1,0 +1,88 @@
+{
+  "slug": "sponsors",
+  "blocks": [
+    {
+      "heading": {
+        "level": 1,
+        "text": "Support SDCA!"
+      }
+    },
+    {
+      "heading": {
+        "level": 3,
+        "text": "There are many ways you can help our school. Check out all the different method below and support our school today! You can even support our school when you shop!"
+      }
+    },
+    {
+      "richtext": "Making a Tax Deductible Donation\n:\nIt is easy to help our school, you can make a tax deductible donation by sending a check to our school or make your donation via PayPal by clicking the button below."
+    },
+    {
+      "file": {
+        "label": "Donation by check",
+        "href": "__OLD_PDF__/misc/SDCA_Donation_Form - 2008.pdf",
+        "sha256": "",
+        "local_path": ""
+      }
+    },
+    {
+      "richtext": ":  If you are making a donation by check, please mail your check to San Diego Chinese Academy, P.O. Box 910093, San Diego, CA 92191-0093. We will send you a receipt when we receive your check.\nDonation through PayPal\n:  To donate through PayPal, simply click on the button below and follow the direction.  Don’t forget to include your name, phone number, and mailing address so we can send your tax deductible receipt to you in the mail:"
+    },
+    {
+      "divider": {}
+    },
+    {
+      "richtext": "Purchase Scrip on our scrip sale date at school:\nWe sell scrips/certificates from various vendors and stores such as grocery stores, restaurants, retails, and others. If you are already doing business with these stores, why not purchase the scrips from our school which will help our school raise a little funds. Restaurant scrips also makes wonderful gifts, so it’s like the Chinese saying, killing two birds with one stone, a win-win situation."
+    },
+    {
+      "divider": {}
+    },
+    {
+      "richtext": "Shop AmazonSmile and Earn Money for SDCA:\nIf you shop on Amazon, then you can earn money for SDCA with AmazonSmile. AmazonSmile is a program operated by the same Amazon you know, with the same selection of products and same savings. The only difference is that when you shop with AmazonSmile, 0.5% of your eligible purchases will be donated automatically to SDCA, at no additional cost to you.\nVisit\nhttp://smile.amazon.com/ch/33-0290580\nand login with your existing Amazon account.\nChoose San Diego Chinese Academy as your charity when prompted.\nBookmark or point your browser to\nhttp://smile.amazon.com\nevery time you shop.\nGo shopping!"
+    },
+    {
+      "image": {
+        "src": "/img/old/2023/amazon-smile-small-1.jpg",
+        "alt": "",
+        "caption": "",
+        "width": null,
+        "height": null,
+        "sha256": "10c4c68c40b25965dc677efc58afb7f18c4f4da4013df277e220ec8dca702e85",
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/amazon-smile-small-1.jpg"
+      }
+    },
+    {
+      "divider": {}
+    },
+    {
+      "richtext": "Sign up with eScrip\n:\nSign up with eScrip is a great way to support our school. Our school earns contribution from participating merchants when you shop. It’s so simple, just click below to sign up so you can start earning for our school."
+    },
+    {
+      "image": {
+        "src": "/img/old/2023/escrip-small.jpg",
+        "alt": "",
+        "caption": "",
+        "width": null,
+        "height": null,
+        "sha256": "0770e2200803af21186200b0e49e21891c0fb20921d8825e9c51ae411116eece",
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/escrip-small.jpg"
+      }
+    },
+    {
+      "divider": {}
+    },
+    {
+      "richtext": "Help our school by Shopping through iGive\n:\nIf you like shopping, shop through a network of vendors at iGive.com and you will automatically help our school. It has over 700 stores including name brands such as Macy’s, Borders, PetsMart, Pottery Barn, Amazon, and many more. Click below to sign up and shop with iGive."
+    },
+    {
+      "divider": {}
+    },
+    {
+      "richtext": "Advertise in our school publications:\nHave a business? Why not advertise in our school publication?  To find out about the opportunity to advertise your business , please contact\nsdca.board.vice.president@gmail.com"
+    }
+  ],
+  "signature": [
+    "1col"
+  ],
+  "notes": [],
+  "missing_local_files": []
+}

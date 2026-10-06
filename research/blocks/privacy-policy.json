@@ -1,0 +1,42 @@
+{
+  "slug": "privacy-policy",
+  "blocks": [
+    {
+      "heading": {
+        "level": 1,
+        "text": "Privacy Policy"
+      }
+    },
+    {
+      "richtext": "What information do we collect?\nWe collect information from you when you register on our site or fill out a form. When registering or making payment on our site, as appropriate, you may be asked to enter your name, email, address, phone number or other information.\nWhat do we use your information for?\nAny of the information we collect from you may be used in one of the following ways:"
+    },
+    {
+      "list": {
+        "ordered": false,
+        "items": [
+          "To process registrations",
+          "To communication with parents"
+        ]
+      }
+    },
+    {
+      "richtext": "How do we protect your information?\nWe implement a variety of security measures to maintain the safety of your personal information when you make payment, or enter, submit, or access your personal information. All supplied information is transmitted via Secure Socket Layer (SSL) technology.\nDo we disclose any information to outside parties?\nYour information will not be sold, exchanged, transferred, or given to any other company for any reason whatsoever, other than for the express purpose of delivering the service requested. We may release your information when we believe release is appropriate to comply with the law, enforce our site policies, or protect ours or others’ rights, property, or safety.\nYour Consent\nBy using our site, you consent to our privacy policy.\nChanges to our Privacy Policy\nIf we decide to change our privacy policy, we will post these changes on this page.\nContacting Us\nIf there are any questions regarding this privacy policy, you may contact us using the information below:"
+    },
+    {
+      "list": {
+        "ordered": false,
+        "items": [
+          "Web Site: https://www.sandiegochineseschool.com/",
+          "By Mail: San Diego Chinese Academy, P.O. Box 910093, San Diego, CA 92191-0093",
+          "By Phone: (858)205-SDCA (7322)",
+          "Email: office.sdca@gmail.com"
+        ]
+      }
+    }
+  ],
+  "signature": [
+    "1col"
+  ],
+  "notes": [],
+  "missing_local_files": []
+}

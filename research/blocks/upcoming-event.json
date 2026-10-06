@@ -1,0 +1,28 @@
+{
+  "slug": "upcoming-event",
+  "blocks": [
+    {
+      "heading": {
+        "level": 1,
+        "text": "家庭聯絡事項 Weekly Announcement"
+      }
+    },
+    {
+      "list": {
+        "ordered": false,
+        "items": [
+          "本週",
+          "上週",
+          "This Week",
+          "Last Week"
+        ]
+      }
+    }
+  ],
+  "signature": [
+    "1col",
+    "1col"
+  ],
+  "notes": [],
+  "missing_local_files": []
+}

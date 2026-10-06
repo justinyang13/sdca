@@ -1,0 +1,62 @@
+{
+  "slug": "countact-us",
+  "blocks": [
+    {
+      "tabs": [
+        {
+          "title": "學校電話 School Phone",
+          "blocks": [
+            {
+              "richtext": "(Please DO NOT contact  La Jolla Country Day School)\n(858)205-SDCA (7322)"
+            }
+          ]
+        },
+        {
+          "title": "通訊地址 Mailing Address",
+          "blocks": [
+            {
+              "richtext": "San Diego Chinese Academy\nP.O. Box 910093\nSan Diego, CA 92191-0093"
+            }
+          ]
+        },
+        {
+          "title": "網址與電子信箱 Website and Email",
+          "blocks": [
+            {
+              "richtext": "學校網址 School Website\nhttps://sandiegochineseschool.com\n學校電子信箱 School Email\nOffice.SDCA@gmail.com"
+            }
+          ]
+        },
+        {
+          "title": "簡訊發送 Text Message",
+          "blocks": [
+            {
+              "richtext": "Text to join SDCA Text Message\nText\n@sdcaparent\nto the number\n81010"
+            }
+          ]
+        },
+        {
+          "title": "學校電話 School Phone",
+          "blocks": []
+        },
+        {
+          "title": "通訊地址 Mailing Address",
+          "blocks": []
+        },
+        {
+          "title": "網址與電子信箱 Website and Email",
+          "blocks": []
+        },
+        {
+          "title": "簡訊發送 Text Message",
+          "blocks": []
+        }
+      ]
+    }
+  ],
+  "signature": [
+    "1col"
+  ],
+  "notes": [],
+  "missing_local_files": []
+}

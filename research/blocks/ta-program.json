@@ -1,0 +1,41 @@
+{
+  "slug": "ta-program",
+  "blocks": [
+    {
+      "heading": {
+        "level": 1,
+        "text": "TA Program"
+      }
+    },
+    {
+      "richtext": "San Diego Chinese Academy welcomes local high school students with interest and dedication of assisting our teachers with both clerical and instructional work during school hours. Each teaching assistant can be tasked with various responsibilities which include, but not limits to classroom activities, school events assistants, equipment set up and/or preparation of materials, and lead students as needed by the assigned teachers. Bilingual in Chinese is preferred and you will also improve your Chinese along the way. The school track their volunteer hours and each TA will receive a certificate at the end of the school year. This TA program has long been successfully providing support to our teacher while our teaching assistants gain leadership opportunities and earn their community volunteer hours which works toward their college applications."
+    },
+    {
+      "image": {
+        "src": "/img/old/2018/TA-2017-2018.jpg",
+        "alt": "",
+        "caption": "",
+        "width": null,
+        "height": null,
+        "sha256": "f5c256045160d22a6e1dbd8bdffebf4b1e331651710a8f8ea9a3be3f578eaf76",
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/TA-2017-2018.jpg"
+      }
+    },
+    {
+      "richtext": "Join our TA team! Fill out the application below. Or\nContact Us\nshould you have any questions."
+    },
+    {
+      "button": {
+        "label": "SDCA TA Application",
+        "href": "https://forms.gle/HmuYPR5RXbAYGsHh9",
+        "target": "_blank"
+      }
+    }
+  ],
+  "signature": [
+    "1col",
+    "1col"
+  ],
+  "notes": [],
+  "missing_local_files": []
+}

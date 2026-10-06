@@ -1,0 +1,157 @@
+{
+  "slug": "volunteer-opportunity",
+  "blocks": [
+    {
+      "heading": {
+        "level": 1,
+        "text": "義工服務\nVolunteer Opportunity"
+      }
+    },
+    {
+      "image": {
+        "src": "/img/old/2018/SDCA-Volunteers-4-768x490.jpg",
+        "alt": "",
+        "caption": "",
+        "width": null,
+        "height": null,
+        "sha256": "ee018cce3cd17b9a23c286c4cffb01e85468fa243112fb72a9ed49ce96d82748",
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Volunteers-4-768x490.jpg"
+      }
+    },
+    {
+      "gallery": {
+        "mode": "grid",
+        "items": [
+          {
+            "src": "/img/old/2018/Regular-K-Class-1-150x150.jpeg",
+            "alt": "",
+            "caption": "Regular K Class 1",
+            "width": null,
+            "height": null,
+            "sha256": "4913c9494acb8f49986282dc21d91867ebb7d2868d2fee9e93b7b551ca86bec1",
+            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Regular-K-Class-1-150x150.jpeg"
+          },
+          {
+            "src": "/img/old/2018/SDCA-Cultural-Day.f3d89943.jpeg",
+            "alt": "",
+            "caption": "SDCA Cultural Day",
+            "width": null,
+            "height": null,
+            "sha256": "8b8932fc4148d47c20959a83912690389a93399b6027f6579104be32be14398c",
+            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Cultural-Day.f3d89943.jpeg"
+          },
+          {
+            "src": "/img/old/2018/SDCA-BOD-5-1-150x150.gif",
+            "alt": "",
+            "caption": "SDCA BOD 5",
+            "width": null,
+            "height": null,
+            "sha256": "ee81e73a2342108b6e32bf09662d5d8f533b09bdfac95bb3a8b01c4aa3bea005",
+            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-BOD-5-1-150x150.gif"
+          },
+          {
+            "src": "/img/old/2018/SDCA-Community-Service.afeae869.jpeg",
+            "alt": "",
+            "caption": "SDCA Community Service",
+            "width": null,
+            "height": null,
+            "sha256": "780230f4c8f85b8158bfa3068316d514de71e04f83cd726ee1ce82c8531784b6",
+            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Community-Service.afeae869.jpeg"
+          },
+          {
+            "src": "/img/old/2018/SDCA-Qigong-Seminar.9caf4036.jpeg",
+            "alt": "",
+            "caption": "SDCA Qigong Seminar",
+            "width": null,
+            "height": null,
+            "sha256": "efb1d55b301baf721efe69f7ff8d364d6904f01e6c712d1015ca970893874e0c",
+            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Qigong-Seminar.9caf4036.jpeg"
+          },
+          {
+            "src": "/img/old/2018/SDCA-Volunteers-2-150x150.jpg",
+            "alt": "",
+            "caption": "SDCA Volunteers 2",
+            "width": null,
+            "height": null,
+            "sha256": "f185e4932a518c38817b8e6e70e1357548f3e795432742a673bb5d534a96cb69",
+            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Volunteers-2-150x150.jpg"
+          },
+          {
+            "src": "/img/old/2018/SDCA-Volunteers-3-150x150.jpg",
+            "alt": "",
+            "caption": "SDCA Volunteers 3",
+            "width": null,
+            "height": null,
+            "sha256": "3998f1fe8a052ff9ae92aa70814634ae8dbc840e5a332391c1bbae1279f05ca2",
+            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Volunteers-3-150x150.jpg"
+          },
+          {
+            "src": "/img/old/2018/SDCA-PTA-and-Parent-Meeting-150x150.jpeg",
+            "alt": "",
+            "caption": "SDCA PTA and Parent Meeting",
+            "width": null,
+            "height": null,
+            "sha256": "d4669f9c5e376a1f5ae78d07bff01b217ff2299c523af0e284e205f0bf76777a",
+            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-PTA-and-Parent-Meeting-150x150.jpeg"
+          }
+        ]
+      }
+    },
+    {
+      "richtext": "聖地牙哥中華學苑\n需要您報名義工。校內所有文化活動與部份的輔助教學活動大多仰賴家長服務才得以舉辦。 本校酌收每個家庭代勞費一百元。但只要家長參與校內服務達一定時數， 此項訂金即可退還。 在每個月的禮券日到辦公室領取等值一百元的禮卡。參與的家長人數越多， 每人分擔的工作就越少。請熱心參與您孩子的教育。感謝您！\n請參考"
+    },
+    {
+      "file": {
+        "label": "義工工作說明",
+        "href": "__OLD_PDF__/misc/Volunteer Job Descriptions.pdf",
+        "sha256": "",
+        "local_path": ""
+      }
+    },
+    {
+      "richtext": "或是與家長會長聯絡\nsdcapta@gmail.com\nSDCA\nneeds you sign up for volunteers. We rely heavily on parent volunteers to assist academic and maintain all non-academic functions of the school. We charge a service fee of $100 per family, which is refundable when a parent participates as a volunteer and completes the service. Refund will be given in the form of $100 value of gift cards when scrip sales at the office. The more parents we have to volunteer, the less duty each parent will have to do. Your involvement will always be highly appreciated!\nPlease review the"
+    },
+    {
+      "file": {
+        "label": "Volunteer Job Descriptions",
+        "href": "__OLD_PDF__/misc/Volunteer Job Descriptions.pdf",
+        "sha256": "",
+        "local_path": ""
+      }
+    },
+    {
+      "richtext": "or contact the PTA Director at\nsdcapta@gmail.com"
+    },
+    {
+      "image": {
+        "src": "/img/old/2024/Sign-UP-GIF.gif",
+        "alt": "",
+        "caption": "",
+        "width": null,
+        "height": null,
+        "sha256": "b95887990823e57ab40338b0db3bba8362dd78d903247e16bc34a26c6010ca3d",
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Sign-UP-GIF.gif"
+      }
+    },
+    {
+      "heading": {
+        "level": 1,
+        "text": "義工工作說明 Volunteer Job Descriptions"
+      }
+    },
+    {
+      "richtext": "Room Parent\n– To assist School, Classroom Teacher & PTA in communicating with the parents, help Classroom Teacher with class/school activities as needed, and help hosting Culture Day and Chinese New Year Carnival by arranging a Class Booth. (Serve for the entire school year)\n班媽\n/\n班爸\n–\n做為學校\n/\n老師\n/\n家長會與家長之間的溝通橋梁\n,\n協助老師安排班級和學校的活動\n,\n以及統籌文化節和新年園遊會的攤位事宜\n(\n服務一學年\n)\n*Need 1 room parent for each class, 2 for classes with 15 students and more*\nGround Supervision\n– To patrol campus and ring Bell during school recesses Shift during Chinese New Year Festival will help directing traffic and parking. (Serve for 5 weeks)\n校園巡邏組\n–\n下課休息時間巡邏校園\n,\n若逢新年園遊會則協助指揮交通。\n(\n服務五週\n)\n*Need __ Volunteers*\nOffice Duty\n– To ring Bell at 1:30pm and 4:30pm, prepare coffee/tea for the staff, and assist with clerical work in the office. (Serve for 5 weeks)\n辦公室職勤\n–\n在\n1:30 pm\n和\n4:30 pm\n的時候敲鐘\n,\n幫教職及行政人員準備咖啡\n/\n茶\n,\n協助家長會和行政人員處理瑣事\n. (\n服務五週\n)\n*Need 6 Volunteers*\nStudent Store Assistance\n– To help Coupon Day Distribution by coordinating with the Board Director. (Serve for the entire school year)\n學生商店組\n–\n協助理事準備學生商店日事項與分配。\n(\n服務一學年\n)\n*Need _\nVolunteer*\nSchool Contest Assistance\n– To help with the setup and assist in contestants checking-in, score keeping or other tasks at Speech Contest and Poetry Recitation Contest (Serve at both contests)\n校\n內比賽服務組\n–\n服務演講比賽以及詩詞朗誦比賽,\n協助佈置，簽到及計算成績\n*Need 6 Volunteers*\nPhotographers for School Events\n– To take pictures at school activities & events and upload them to a dedicated link afterwards. (Serve for 5 weeks/events)\n學校活動攝影組\n–\n拍攝學校活動，並於活動結束後將照片上傳指定的網路鏈結\n(\n服務五次\n)\n*Need 3 Volunteers*\nRegistration Assistance\n– To help as cashiers during registration weeks and assist with imputing student data into the school’s database while applicable. (Serve for 6 weeks)\n協助註冊組\n–\n於預註冊和開學期間幫忙收錢及整理註冊資料\n(\n服務六週\n)\n*Need 5 Volunteers*\nScrip Sales\n– To help Scrip Director on bookkeeping and distribution for Scrip Sale Day (Serve for the entire school year)\n禮券銷售組\n–\n協助理事清點禮券\n,\n結帳\n,\n與分配禮券\n(\n服務一學年\n)\n*Need 1 Volunteers*\nYearbook Editors\n– To help the Board Editorial Director to create and edit yearbook pages from February to May.\n年刊編輯\n–\n從二月至五月協助年刊的製作與編輯\n.\n*Need 2 Volunteers*\n***Preschool Parents have priority to select the following jobs because they need to stay in the classroom with their students from 1:30 pm to 4:00 pm.\nTeacher’s Snack Duty\n– To purchase snacks for the staff and TAs (work 5 weeks for full refund)\n***Priority for Preschool Parents***\n老師點心輪\n值\n–\n準備老師點心\n(\n服務五週\n)\n***\n學前班家長優先\n***\n*Need 6 Volunteers*"
+    }
+  ],
+  "signature": [
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col"
+  ],
+  "notes": [],
+  "missing_local_files": []
+}

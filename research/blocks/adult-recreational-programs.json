@@ -1,0 +1,115 @@
+{
+  "slug": "adult-recreational-programs",
+  "blocks": [
+    {
+      "heading": {
+        "level": 2,
+        "text": "成人文化課\nAdult Recreational Program"
+      }
+    },
+    {
+      "heading": {
+        "level": 3,
+        "text": "跳舞課 Dance with U-Jam"
+      }
+    },
+    {
+      "image": {
+        "src": "/img/old/2020/Ujam-300x225.jpg",
+        "alt": "",
+        "caption": "",
+        "width": null,
+        "height": null,
+        "sha256": "8eb2d91e22df1126952875d1a0a271d9d199bfed1768c996f3eb5766f9ca45fe",
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Ujam-300x225.jpg"
+      }
+    },
+    {
+      "embed": {
+        "kind": "youtube",
+        "url": "https://youtu.be/EIxcBh_wkj4",
+        "title": ""
+      }
+    },
+    {
+      "image": {
+        "src": "/img/old/2020/Dance-together-300x194.jpeg",
+        "alt": "",
+        "caption": "",
+        "width": null,
+        "height": null,
+        "sha256": "b7d882cc08dc6a03a729c2edee09fda9b2a34adb56ec22eb08a59da2e40092c9",
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Dance-together-300x194.jpeg"
+      }
+    },
+    {
+      "richtext": "大家一起來跳舞！ 星期天下午三點到四點請來 MS112 參加舞蹈課。\nCome dance with us, World of Dance U-Jam is here! Come to this addictive dance cardio fitness workout that fuses the hottest world beats with fun choreography that will make you move, sweat, and smile! Remember to bring water bottle, towel, comfortable outfit, exercise shoes, bandanna (optional) and get ready to sweat!\nClass Fee:\nPunch Card $40/5 classes ($8/class)\nPunch Card $70/10 classes ( $7/class; FREE bandanna while supplies last)\nDrop In: $9"
+    },
+    {
+      "divider": {}
+    },
+    {
+      "heading": {
+        "level": 3,
+        "text": "瑜珈課 Yoga Class"
+      }
+    },
+    {
+      "richtext": "Yoga class is teaching by Celine Chen. To learn more about Celine and the class, please email\nYoga By Celine\n."
+    },
+    {
+      "image": {
+        "src": "/img/old/2019/Yoga.jpg",
+        "alt": "",
+        "caption": "",
+        "width": null,
+        "height": null,
+        "sha256": "971966b3a2ab9b5c6397ea6db9b48c2015e7596ec211f40374a66415dc72e2f2",
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Yoga.jpg"
+      }
+    },
+    {
+      "image": {
+        "src": "/img/old/2019/Yoga-Class-1024x683.jpg",
+        "alt": "",
+        "caption": "",
+        "width": null,
+        "height": null,
+        "sha256": "c4b9bebcf54066e9380a0202fb451716a8b616c2b6a7f54331e610171759cb1c",
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Yoga-Class-1024x683.jpg"
+      }
+    },
+    {
+      "divider": {}
+    },
+    {
+      "heading": {
+        "level": 3,
+        "text": "中華學苑棒球隊 SDCA Baseball Team"
+      }
+    },
+    {
+      "richtext": "Established in 2013, our baseball team been organized by SDCA parents. We practice on Sunday afternoons while our children are in the Chinese school. Please contact\nJerry Han\nif you are interested."
+    },
+    {
+      "image": {
+        "src": "/img/old/2018/SDCA-baseball-team-768x584.jpg",
+        "alt": "",
+        "caption": "",
+        "width": null,
+        "height": null,
+        "sha256": "10bddd1bf8149111fa19d745e4ea8ad38b5c48f388fb15321b7d1b15465b1ab6",
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-baseball-team-768x584.jpg"
+      }
+    }
+  ],
+  "signature": [
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col"
+  ],
+  "notes": [],
+  "missing_local_files": []
+}

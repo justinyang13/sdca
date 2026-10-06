@@ -1,0 +1,170 @@
+{
+  "slug": "about-sdca",
+  "blocks": [
+    {
+      "richtext": "San Diego Chinese Academy (SDCA)\nis a non-profit California organization that was founded in 1988. Our mission is to teach Chinese Language and the Culture through lectures and fun, interactive activities so that the students can apply what they learn at school into their daily lives. We also believe that bonding among students, teachers and parents plays a crucial role in children’s learning. We find that children are more willing to make efforts to take up challenges in Chinese learning when their parents constantly give them encouragement and support. Each year we send our teachers to various trainings to make sure their knowledge and teaching techniques are up to date. Our teachers work closely with parents and pay attention to each learner’s progress."
+    },
+    {
+      "image": {
+        "src": "/img/old/2019/2018-2019-Teachers.6e2da143.jpg",
+        "alt": "",
+        "caption": "",
+        "width": null,
+        "height": null,
+        "sha256": "ca1a3370eafadc896e5c1a02a8feff9ba3c3ef683072d013016cb4fd0d6bc256",
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/2018-2019-Teachers.6e2da143.jpg"
+      }
+    },
+    {
+      "richtext": "SDCA initially held classes at UCSD from 1988 to 1990. Since the Fall of 1991, it has held classes at La Jolla Country Day School in La Jolla. The enrollment grew from 120 to 350 over this short period of time. First Credit class that met the foreign language credit requirements towards high school graduation was opened in 1996."
+    },
+    {
+      "image": {
+        "src": "/img/old/2018/SDCA-30th-Anniversary-5.dbbd3020.jpg",
+        "alt": "",
+        "caption": "",
+        "width": null,
+        "height": null,
+        "sha256": "8fe9528e2f47873ecfe5c845db0d5139fef948269aec56d9bd3ec4f118d54056",
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-30th-Anniversary-5.dbbd3020.jpg"
+      }
+    },
+    {
+      "richtext": "Currently SDCA has about 30 classes including pre-K and K-12 plus adult classes. Over all these years, through the hard work and dedication from – both past and present – Principals, faculty/staff members, Board of Directors, PTA chairpersons, Community Service (CS) coordinators and parent volunteers, SDCA is standing strongly tall. By offering an excellent environment for learning Chinese to our students and the community, we look forward to continuing to serve everyone who is interested in Chinese culture as well as learning the language for many years to come."
+    },
+    {
+      "gallery": {
+        "mode": "slider",
+        "items": [
+          {
+            "src": "/img/old/misc/Speech-Contest-photos.jpg",
+            "alt": "",
+            "caption": "",
+            "width": null,
+            "height": null,
+            "sha256": "bc16e905e08915401e9a24f94e366f57b0090c554940216d6d963c84f9efd9e4",
+            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Speech-Contest-photos.jpg"
+          },
+          {
+            "src": "/img/old/misc/Credit-Class-Activities.jpg",
+            "alt": "",
+            "caption": "",
+            "width": null,
+            "height": null,
+            "sha256": "a27428b7bfad20dc13ab3ed2930966b70aeab93551c2fe2294d4e9b8b0aaa1ea",
+            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Credit-Class-Activities.jpg"
+          },
+          {
+            "src": "/img/old/misc/Recital-Contest.jpg",
+            "alt": "",
+            "caption": "",
+            "width": null,
+            "height": null,
+            "sha256": "f9d49de02e353ee90b774458dc8fe581c37656c6bdf671eb1e3f2dc6ed9d09f1",
+            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Recital-Contest.jpg"
+          },
+          {
+            "src": "/img/old/misc/coupon-day.jpg",
+            "alt": "",
+            "caption": "",
+            "width": null,
+            "height": null,
+            "sha256": "042246b1d82b5585ef6decd37e7c7c553effa4049b76be1768f950bb538d991b",
+            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/coupon-day.jpg"
+          },
+          {
+            "src": "/img/old/misc/SDCA-Graduation-Ceremony-1.jpg",
+            "alt": "",
+            "caption": "",
+            "width": null,
+            "height": null,
+            "sha256": "123fc5f26e3c1ea8faf6077d470bbd41f2b7025003132649db955d307cb28ebe",
+            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Graduation-Ceremony-1.jpg"
+          }
+        ]
+      }
+    },
+    {
+      "heading": {
+        "level": 3,
+        "text": "What makes SDCA unique?"
+      }
+    },
+    {
+      "list": {
+        "ordered": false,
+        "items": [
+          "Small class size: student number for most of our classes is under 20. We provide TAs to some classes to make sure each student gets quality attention from the teacher.",
+          "Bilingual system: enabling students with no prior exposure to learn Chinese.",
+          "Versatile teaching methods: a variety of activities are used to stimulate learning and practical use of the Chinese language.",
+          "Outstanding faculty: experienced, well trained and dedicated teachers make all the differences.",
+          "Parent volunteers: helping hands from parent volunteers makes SDCA’s pledge of keeping the tuition and fees from rising possible.",
+          "Community service: as an academic organization in San Diego, SDCA arranges seminars for its members and participates in various activities."
+        ]
+      }
+    },
+    {
+      "gallery": {
+        "mode": "slider",
+        "items": [
+          {
+            "src": "/img/old/misc/Cultural-Day.jpg",
+            "alt": "",
+            "caption": "",
+            "width": null,
+            "height": null,
+            "sha256": "4ec3cdea62cbf59699021a8288bf5f32cc0ec02ebe8ecd9e197595c2020a3ec0",
+            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Cultural-Day.jpg"
+          },
+          {
+            "src": "/img/old/misc/CNY-1.jpg",
+            "alt": "",
+            "caption": "",
+            "width": null,
+            "height": null,
+            "sha256": "ae08a602fb9797d5ce266290a3386fcb120d0e3b9c511cfa46d698bb15b1a336",
+            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/CNY-1.jpg"
+          },
+          {
+            "src": "/img/old/misc/CNY-2.jpg",
+            "alt": "",
+            "caption": "",
+            "width": null,
+            "height": null,
+            "sha256": "2cd8a6eb82e0db2617e63a10023a81ace4d9ebd5769f7dcc1bb5d4cc0bd4d6c3",
+            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/CNY-2.jpg"
+          },
+          {
+            "src": "/img/old/misc/CNY-3.jpg",
+            "alt": "",
+            "caption": "",
+            "width": null,
+            "height": null,
+            "sha256": "da415ccd527bbf6ce2f380b722ea640b01fb50fd1eec2da7d9f05c0690b5e6bc",
+            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/CNY-3.jpg"
+          },
+          {
+            "src": "/img/old/misc/SDCA-Teacher-Appreciation-Dinner.jpg",
+            "alt": "",
+            "caption": "",
+            "width": null,
+            "height": null,
+            "sha256": "77e428f55c7a24c0e48422c910a1fe2061de36111596a6ec685f848a79179a34",
+            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Teacher-Appreciation-Dinner.jpg"
+          }
+        ]
+      }
+    }
+  ],
+  "signature": [
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col"
+  ],
+  "notes": [],
+  "missing_local_files": []
+}

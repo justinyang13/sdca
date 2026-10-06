@@ -1,0 +1,670 @@
+{
+  "slug": "news",
+  "blocks": [
+    {
+      "heading": {
+        "level": 1,
+        "text": "SDCA on the News"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2024/image0.c2c31c4f.jpeg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "bb0906aea1a71b106965620e31f90cb899860c2626df1df7c6bee5f9fb76404c",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/image0.c2c31c4f.jpeg"
+        },
+        "title": "02/04/2024 中華學苑36年慶暨園遊會舉行Chinese New Year Festival, 36th Anniversary (News from 大紀元 Epoch Times)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2023/IMG_4871.10b189b2.jpg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "b8f81826be7cb985c7fb14a3dd4bfc8f1961e16b69cbaa2048a6a306ddc8f066",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/IMG_4871.10b189b2.jpg"
+        },
+        "title": "10/08/2023 聖地牙哥台僑升旗慶中華民國112年國慶 Flag Raising Ceremony (News from 聖地牙哥生活美食 SD Food & Life)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2023/IMG_4864.eeca5dee.jpg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "c17182dace7e19670da0f6196f47d54b60409df000d5a1e7cd687e1d457d3085",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/IMG_4864.eeca5dee.jpg"
+        },
+        "title": "10/08/2023 聖地亞哥臺僑升旗慶中華民國112年國慶 Flag Raising Ceremony (News from 大紀元 Epoch Times)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2023/IMG_3544.03739f14.jpg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "8b3ec725b29a3e77530559665e346f04041aba9a257058ac06c171ecbf34ab36",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/IMG_3544.03739f14.jpg"
+        },
+        "title": "05/26/2023 堅持中文教育 聖地亞哥中華學苑歡送畢業生 SDCA Graduation (News from 大紀元 Epoch Times)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2022/image0.e2b5ecc7.jpeg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "68df5bd8866928700b2badae5e8eeba17b42e75cdc9b8d4cf426178f7f79742a",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/image0.e2b5ecc7.jpeg"
+        },
+        "title": "11/13/2022 湯圓文化節重回聖地牙哥中華學苑 SDCA Cultural Day Festival (News from 大紀元 Epoch Times)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2022/image0.c0bebe21.jpeg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "2fae5d2ca042b31f046b1f94ae11793856aee1eb7c9323dc7684d84ce1378e47",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/image0.c0bebe21.jpeg"
+        },
+        "title": "5/15/2022 聖地牙哥中華學苑作文比賽 SDCA Essay Contest (News from 華人 We Chinese in America)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2022/2022-Poety-Recitation-Contest-2.jpeg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "37e28fb0cba5caf63d7b7d606b4aefe0876c8264029e8ed876c7089cfc5bf7e2",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/2022-Poety-Recitation-Contest-2.jpeg"
+        },
+        "title": "3/20/2022 中華學苑成功舉辦首次線上詩詞朗誦比賽 SDCA online Poetry Recitation Contest ( News from 華人 We Chinese in America)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2022/2022-Poety-Recitation-Contest-1-768x742.jpeg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "5cc2caa7416d722a23f0b38bb4af797b7d259a40044ad64744048d3271e56d21",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/2022-Poety-Recitation-Contest-1-768x742.jpeg"
+        },
+        "title": "3/20/2022 聖地亞哥中華學苑首辦線上朗誦比賽 SDCA online Poetry Recitation Contest (News from 大紀元 Epoch Times)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2021/IMG_4364.jpg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "9fe3fed2dbb19e59f15794597a30f7ea50a668b11da4b9dbf00f6b7f4a5c0926",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/IMG_4364.jpg"
+        },
+        "title": "1/1/2021 二十四節氣與我們的生活 24 Solar Terms and our daily life (News from 大紀元 Epoch Times)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2021/IMG_3774.jpg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "bb6bbea94722fd76ac6cb9941fc18b5c88acf6e14e96096d90532137a35b9adb",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/IMG_3774.jpg"
+        },
+        "title": "12/23/2020 聖地牙哥中華學苑 二十四節氣冬至搓湯圓 24 Solar Terms and Winter Solstice Handmade Rice Balls (OCAC News)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2020/image0.a387f319.jpeg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "70f839041c18090c90c78586ed9dac212b451118f956eb8c11b6f44f2d9a9150",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/image0.a387f319.jpeg"
+        },
+        "title": "01/28/2020 中華學苑園遊會 SDCA Lunar New Year Festival",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2019/Double-Ten-Flag-2019.jpg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "9d5bf596a88ad904ca1ee0c7a597db635ef9cc45e0dc9c6081261a3e0b6495fd",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Double-Ten-Flag-2019.jpg"
+        },
+        "title": "10/07/2019 聖地亞哥升旗典禮 慶中華民國108年 Flag Raising Ceremony Taiwan 108 Celebration (News from Epoch Times)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2019/2020-Double-10-News.jpeg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "f4f2261daf6a3873bb111318d74102cd5b2ba22c63e47f0a9b7f139792553618",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/2020-Double-10-News.jpeg"
+        },
+        "title": "10/07/2019 迎雙十 聖地牙哥升旗 僑民熱情揮國旗 Taiwan Double 10 Celebration (News from World Journal)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2019/20190602-Graduation.jpeg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "435a7ab36a333b28d55a84eb18924c66216cba7ae4683efc716697b6d4e64cf4",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/20190602-Graduation.jpeg"
+        },
+        "title": "5/21/2019 中華學苑畢典 校長連任 理事會添新血 San Diego Chinese Academy Graduation Ceremony",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2019/20190507-WJ.jpg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "7bee2846ae5c1feefbc627a365873f5263270048883c716044a43606ec430636",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/20190507-WJ.jpg"
+        },
+        "title": "5/7/2019 聖地牙哥中華學苑作文比賽 11學生獲獎 San Diego Chinese Academy Essay Contest (News from World Journal)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2019/20190402-Karaoke-2-WJ.jpg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "3c3898339d4f0840bcff1bcd5f67b4d25629dafdb13fb26f41d5b2c0925fa951",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/20190402-Karaoke-2-WJ.jpg"
+        },
+        "title": "4/2/2019 唱歌學中文! 中華學苑卡拉ok大賽 學分班二甲奪冠 (新聞取自世界日報) Singing to learn Chinese! San Diego Chinese Academy Karaoke Contest (News from World Journal)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2019/20190402-Karaoke-WJ.jpg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "9b9bd7a93bb36323a49ccfa4cee62b0463aa058106bda0454c172695c64b21b2",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/20190402-Karaoke-WJ.jpg"
+        },
+        "title": "4/2/2019 中華學苑卡拉ok賽 精采熱鬧 (新聞取自世界日報) San Diego Chinese Academy Karaoke Contest (News from World Journal)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2019/20190322-Chinese-Typing-WeChinese.png",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "57c667c05659e9414e7db669466d33802e835c223f2b10c40da9dd3a12f3fdac",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/20190322-Chinese-Typing-WeChinese.png"
+        },
+        "title": "3/22/2019 聖地牙哥中華學苑舉辦中文打字比賽頒獎典禮 (新聞取自華人周末) San Diego Chinese Academy Chinese Typing Contest Award Ceremony (News from WeChinese)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2019/20190319-Typing-WJ.jpg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "f5b9a8b9e2ef93345d30e07a57b7300b27239224ee8c0fa3acf4c91115e31a7e",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/20190319-Typing-WJ.jpg"
+        },
+        "title": "3/19/2019 中華學苑中文打字賽 高手出爐 (新聞取自世界日報) San Diego Chinese Academy Chinese Typing Contest (News from World Journal)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2019/20190312-epochtimes.jpg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "d252db38114c13cf500e0fb852730c3841b01c153f76486390bb0d9897ef6f7d",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/20190312-epochtimes.jpg"
+        },
+        "title": "3/12/2019 中華學苑詩詞朗誦賽 評委讚學生挑戰自我 (新聞取自大紀元) San Diego Chinese Academy Poetry Recitation Contest (News from Epoch Times)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2019/20190318-WeChinse.jpg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "83e978f697e7f04e6d2e26a92b9d611c9c12d5f11386d3c4107e828469c0d08a",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/20190318-WeChinse.jpg"
+        },
+        "title": "3/15/2019 聖地牙哥中華學苑詩詞朗誦比賽成功舉辦六十多學生參加 (新聞取自華人週末) San Deigo Chinese Academy Poetry Recitation Contest (News from WeChinese)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2019/2018-2019-Poetry-Recitation-Contest-WWJ.jpeg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "dee2c75b8e46d7477862147a99840e28a8abe1d8628ac2d05d93ccd7a4f7b2f4",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/2018-2019-Poetry-Recitation-Contest-WWJ.jpeg"
+        },
+        "title": "3/12/2019 中華學苑詩詞朗誦比賽 「等一下」最受歡迎 (新聞取自世界日報) San Diego Chinese Academy Poetry Recitation Contest (News from World Journal)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2019/20190308.jpg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "bf0509373fc83f3708e638de935667588d239a9cee6ce41cf62d2ae6974cd235",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/20190308.jpg"
+        },
+        "title": "3/8/2019 中華學苑舉辦\"學華語向前走研討會\"邀三位任課老師分享(新聞取自華人周末) \"Let's Learn Chinese\" Teacher Conference (News from WeChinese)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2019/20190127-WJ-CNY.jpg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "514965ef8b21b744ae96be2544503531a42e6d16c7cf18986edfd82a3efa02f9",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/20190127-WJ-CNY.jpg"
+        },
+        "title": "1/29/2019 中華學苑31周年校慶 推廣中華文化 (新聞取自世界日報) San Diego Chinese Academy Chinese New Year Festival and 31st Anniversary (News from World Journal)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2019/Cultural-Day-WeChinese.jpg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "29c958ca8d50324c3e356a47e033dc52ca28a57d2ccb4a05ce59222495feaa86",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Cultural-Day-WeChinese.jpg"
+        },
+        "title": "12/14/2018 中華學苑2018文化節迎冬至熱鬧溫馨 (新聞取自華人) San Diego Chinese Academy Cultural Day (News from WeChinese)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2018/Cultural-Day-WJ-2.jpg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "35a9c159ea05c4b25ea08d195ce638ebff785108b9f1786ec7399ffafbbe61b2",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Cultural-Day-WJ-2.jpg"
+        },
+        "title": "12/11/2018 中華學苑搓湯圓 數百家長學生同樂 (新聞取自世界日報) San Diego Chinese Academy Cultural Day and Credit Class Chinese Speech Contest (News from World Journal)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2018/20181030-WJ-Side-1.jpg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "a9f338fb4a1e6e6ba39c155b76a3d53f8e45ade597540ee9e762105a7d961fbd",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/20181030-WJ-Side-1.jpg"
+        },
+        "title": "10/30/2018 中華學苑中文演講賽 為普悠瑪車禍募款 (新聞取自世界日報) San Diego Chinese Academy Chinese Speech Contest and Fundraising for Taiwan Puyuma Express Train Accident (News from World Journal)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2018/Double-Ten-Flags.jpg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "e460ae0ab9af242867c35835c99206fad3053ed3c84aad43bb5bafee1ddf66d2",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Double-Ten-Flags.jpg"
+        },
+        "title": "10/9/2018 雙十國慶升旗典禮 聖地亞哥台僑自豪 (新聞取自大紀元) Double Ten Celebration Dinner and Flag Raising Ceremony (News from Epoch Times)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2018/Double-Ten-Sing.jpeg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "0dbf0c1719177f2a832da06c745967af2b76c90c70897468c599e6064adebfd8",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Double-Ten-Sing.jpeg"
+        },
+        "title": "10/9/2018 聖地牙哥僑界慶雙十晚宴 合唱中華民國頌 (新聞取自世界日報) Double Ten Celebration Dinner and Flag Raising Ceremony (News from World Journal)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2018/2018-International-Tour-of-Taiwan-Gourmet.png",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "7587bf2730c00c110d42074f55c098ef7469b07ef1045e5bbf9abdcb58badb23",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/2018-International-Tour-of-Taiwan-Gourmet.png"
+        },
+        "title": "5/1/2018 爭睹名廚絕技 聖地牙哥「台灣美食講座」爆滿 (新聞取自世界日報) 2018 International Tour of Taiwan Gourmet (News from World Journal)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2018/SDCA-Essay-Competition-1.png",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "63bc83260b74b3432eb119fc6477dddac1207d03f167bfd0584367d5a5a48aa3",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Essay-Competition-1.png"
+        },
+        "title": "5/1/2018 「我最喜歡去中文學校」中華學苑作文比賽頒獎 (新聞取自世界日報) SDCA Essay competition award ceremony (News from World Journal)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2018/SDCA-Karaoke-Contest.jpg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "491e49d6e6e4ca85a8d70327a8b82a1dd408599daa112f63f614d24d5a36b4d8",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Karaoke-Contest.jpg"
+        },
+        "title": "4/17/2018 中華學苑卡拉OK賽 校長變「小蘋果」 家長成「派對動物」(新聞取自世界日報) SDCA Karaoke Contest (News from World Journal)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2018/SDCA-Poetry-Recitation-Contest-2.jpeg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "9f4b4e96b39ab62782dd653e5f2da965fd3458ac88d700cfe7f7711aee4cd537",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Poetry-Recitation-Contest-2.jpeg"
+        },
+        "title": "4/3/2018 鼓勵學中文 中華學苑詩詞朗誦賽提高得獎人數(新聞取自世界日報) SDCA Poetry Recitation Contest (News from World Journal)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2018/SDCA-Poetry-Recitation-Contest-News-from-We-Chinese.jpeg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "b4252e7c45fbb64a9c49854b53c506be81a8fb8e6c31e65eea7275252cfb5320",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Poetry-Recitation-Contest-News-from-We-Chinese.jpeg"
+        },
+        "title": "3/23/2018 中華學苑中文詩詞朗誦比賽表現佳 (新聞取自 華人周末) SDCA Poetry Recitation Contest (News from We Chinese)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2018/SDCA-30th-Anniversary-and-Chinese-New-Year-Festival-News-from-Epoch-Times.jpeg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "5970a3d8dc3eb8f09f6c62d8672d21c9ba5128b8ada1ff250baa015813aa95bd",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-30th-Anniversary-and-Chinese-New-Year-Festival-News-from-Epoch-Times.jpeg"
+        },
+        "title": "2/15/2018 聖地亞哥中華學苑30載 薪火相傳迎狗年(新聞取自大紀元) SDCA 30th Anniversary and Chinese New Year Festival (News from Epoch Times)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2018/SDCA-30th-Anniversary-and-Chinese-New-Year-Festival.png",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "7ed23e70d467c647d07c2aabe3a22423c9814490924bb692cbf8593c932814a6",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-30th-Anniversary-and-Chinese-New-Year-Festival.png"
+        },
+        "title": "2/20/2018 中華學苑30周年校慶 有吃有玩(新聞取自世界日報) SDCA 30th Anniversary and Chinese New Year Festival (News from World Journal)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2018/SDCA-30th-Anniversary-and-Chinese-New-Year-Festival-News-from-We-Chinese.png",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "220d190deeee1753c5e3dee97ac36260ec6f20cf4a02fe50eac46e5ceb443a44",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-30th-Anniversary-and-Chinese-New-Year-Festival-News-from-We-Chinese.png"
+        },
+        "title": "2/16/2018 中華學苑30周年校慶與新年慶典 (新聞取自華人雜誌) SDCA 30th Anniversary and Chinese New Year Festival (News from We Chinese)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2018/SDCA-30th-Anniversary-and-Chinese-New-Year-Festival-News-from-World-Journal.jpeg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "bedf07fb539c154863e63cb1ddec5729de9baa85bec68412b82d45d75ab986c7",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-30th-Anniversary-and-Chinese-New-Year-Festival-News-from-World-Journal.jpeg"
+        },
+        "title": "2/13/2018 聖地牙哥中華學苑 30 周年校慶與新年慶祝活動 (新聞取自世界日報: 中華學苑春節園遊會 為台地震受難者默哀) SDCA 30th Anniversary and Chinese New Year Festival (News from World Journal)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "image_text": {
+        "image": {
+          "src": "/img/old/2018/2017-SDCASEA-Scholarship.jpeg",
+          "alt": "",
+          "caption": "",
+          "width": null,
+          "height": null,
+          "sha256": "f6f2ac43105f8df810f399ccd48096922f11baec6fde41406b9e99003684e7a3",
+          "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/2017-SDCASEA-Scholarship.jpeg"
+        },
+        "title": "2/13/2018 恭喜!聖地牙哥中華科工聯誼會獎學金得獎學生, 三位獎學金得主都是中華學苑學生(新聞取自世界日報: 台留學生減 科工會憂缺人才) Congratulations! SDCASEA Scholarship Winners. The three winners are all SDCA students. (News from World Journal)",
+        "text": "",
+        "side": "left"
+      }
+    },
+    {
+      "heading": {
+        "level": 3,
+        "text": "More News.."
+      }
+    }
+  ],
+  "signature": [
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col",
+    "1col"
+  ],
+  "notes": [],
+  "missing_local_files": []
+}

@@ -1,0 +1,39 @@
+{
+  "slug": "education-resource",
+  "blocks": [
+    {
+      "heading": {
+        "level": 2,
+        "text": "中文文化教育網站\nChinese Cultural & Educational Website"
+      }
+    },
+    {
+      "heading": {
+        "level": 2,
+        "text": "中文文化教育網站 Chinese Cultural & Educational Website"
+      }
+    },
+    {
+      "list": {
+        "ordered": false,
+        "items": [
+          "中文聽說讀寫 Integrated Chinese",
+          "美洲華語 MeiZhou Chinese",
+          "Better Chinese",
+          "學華語開步走",
+          "全球華文網 E-learning Huayu of Taiwan",
+          "國語日報社網站 Mandarin Daily News",
+          "南加州中文學校聯合會 Southern California Council of Chinese Schools",
+          "林語堂 當代漢英字典 Chinese-English Dictionary"
+        ]
+      }
+    }
+  ],
+  "signature": [
+    "1col",
+    "1col",
+    "1col"
+  ],
+  "notes": [],
+  "missing_local_files": []
+}

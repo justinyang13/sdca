@@ -1,0 +1,19 @@
+{
+  "slug": "disclaimer",
+  "blocks": [
+    {
+      "heading": {
+        "level": 1,
+        "text": "Disclaimer"
+      }
+    },
+    {
+      "richtext": "The\nFood Order Service\nis a fundraising effort to support SDCA PTA events. SDCA is not responsible for Lai Chen’s business conducts and their food quality. SDCA appreciates all the participating parents and friends, but it is participants’ responsibility to check the ingredients with Lai Chen for any food allergy concerns. Thank you!"
+    }
+  ],
+  "signature": [
+    "1col"
+  ],
+  "notes": [],
+  "missing_local_files": []
+}
