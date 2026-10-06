@@ -1,0 +1,8 @@
+<%# Block: richtext — verbatim text, line breaks preserved %>
+<div class="blk-richtext">
+  <% b.split('\n').forEach(function(line) { %>
+    <% if (line.trim()) { %>
+    <p><%= line %></p>
+    <% } %>
+  <% }) %>
+</div>

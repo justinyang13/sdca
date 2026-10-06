@@ -23,3 +23,9 @@ ROADMAP v3 FAITHFUL REBUILD (2026-10-05): parse old DOM -> verbatim ordered BLOC
 - Remaining after chain: Claude-style review gates (see AGENTS.md), docs, push to main + GitHub release sdca v1.0.0.
 - Open owner items: review research/CONTENT-LEDGER.md NEEDS OWNER REVIEW; ZH labels translated by Qwen in the menu; ambiguous headshot-to-name matches.
 
+## STOPPED CLEANLY (Claude session ended 2026-10-05 ~5:20PM)
+- Qwen chain is STOPPED (`work/ctl.sh stop`), heartbeat removed. Nothing is running except the :3100 preview server (stale snapshot; refresh with `work/ctl.sh preview`).
+- Phase DP (faithful page rebuild) is IN PROGRESS and its work is uncommitted/WIP in the tree (src/, views/, scripts/, research/blocks/ may be partial). `npm test`: 124 pass, 1 FAIL — expected mid-DP; first thing to do on resume is `npm test` and let DP continue (it resumes from work/phaseDP-log.md).
+- To continue: `work/ctl.sh resume` (Qwen) or open opencode in this folder and follow AGENTS.md.
+- NOT done yet: DP, 8d (original menu), 8e (hero 5 slides), V (visual/spacing QA incl. events page whitespace), 7 (hardening, launchd service, docs), final review, push to main + GitHub release sdca v1.0.0.
+

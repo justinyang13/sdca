@@ -391,9 +391,11 @@ export function parsePage(html, assets) {
   const notes = [];
   const signature = [];
 
-  const sections = allDesc(elNode).filter((n) => n.tag === 'section'
-    && ((n.attrs['data-element_type'] === 'section' || n.attrs['data-element-type'] === 'section') || (n.attrs.class || '').includes('elementor-top-section')))
-    .filter((s) => allDesc(elNode).includes(s));
+  // Sections can be <section> OR <main> tags with elementor-top-section class
+  const sections = allDesc(elNode).filter((n) =>
+    (n.tag === 'section' || n.tag === 'main')
+    && ((n.attrs['data-element_type'] === 'section' || n.attrs['data-element-type'] === 'section') || (n.attrs.class || '').includes('elementor-top-section'))
+  );
 
   for (const sec of sections) {
     let directCols = [];
