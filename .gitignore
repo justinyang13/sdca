@@ -13,3 +13,4 @@ research/logs/
 research/__pycache__/
 .claude/
 storage/uploads/
+dist/

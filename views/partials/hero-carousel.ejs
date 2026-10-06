@@ -78,7 +78,7 @@
         <div class="hero-carousel-caption">
           <span class="hero-carousel-caption-text"><%= lang === 'zh' ? (slide.caption_zh || slide.caption_en) : (slide.caption_en || slide.caption_zh) %></span>
           <% if (slide.link_url) { %>
-            <a class="btn btn-light btn-sm" href="<%= slide.link_url %>"><%= lang === 'zh' ? '了解更多' : 'Learn more' %> →</a>
+            <a class="btn btn-light btn-sm" href="<%= /^\/(en|zh)(\/|$)/.test(slide.link_url) || !/^\//.test(slide.link_url) ? slide.link_url : '/' + lang + slide.link_url %>"><%= lang === 'zh' ? '了解更多' : 'Learn more' %> →</a>
           <% } %>
         </div>
         <% } %>
