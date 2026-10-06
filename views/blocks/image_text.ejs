@@ -1,0 +1,18 @@
+<%# Block: image_text — image left|right + title + text; href = title link target. L: {b:{image,title,text,side,href,links}, idx} %>
+<% const im = L.b && L.b.image; %>
+<% const side = (L.b && L.b.side === 'right') ? 'right' : 'left'; %>
+<% const links = (L.b && L.b.links) || []; %>
+<div class="blk-image-text blk-it-<%= side %>">
+  <% if (im && im.src) { %>
+  <figure class="blk-it-figure">
+    <a href="<%= (L.b && L.b.href) || im.src %>"<% if (!(L.b && L.b.href)) { %> data-lightbox="blk-<%= L.idx %>" data-full="<%= im.src %>" data-caption="<%= L.h.escAttr(im.caption || im.alt || '') %>" aria-label="<%= L.h.escAttr(im.alt || im.caption || 'photo') %>"<% } %>>
+      <img src="<%= im.src %>" alt="<%= L.h.escAttr(im.alt || '') %>" loading="lazy" decoding="async">
+    </a>
+    <% if (im.caption) { %><figcaption><%- L.h.linkifySmart(im.caption, links) %></figcaption><% } %>
+  </figure>
+  <% } %>
+  <div class="blk-it-body">
+    <% if (L.b && L.b.title) { %><h3 class="blk-it-title"><% if (L.b.href) { %><a href="<%= L.b.href %>"><%- L.h.linkifySmart(L.b.title, links) %></a><% } else { %><%- L.h.linkifySmart(L.b.title, links) %><% } %></h3><% } %>
+    <% if (L.b && L.b.text) { %><div class="blk-it-text"><%- L.h.parasSmart(L.b.text, links) %></div><% } %>
+  </div>
+</div>

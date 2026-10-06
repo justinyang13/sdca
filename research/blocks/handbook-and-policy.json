@@ -16,6 +16,28 @@
           "學分班規則 Credit Class Attendance and Grading Guidelines",
           "旁聽生收費及管理辦法 Policy for Guest Students",
           "特殊註冊收費辦法 Policy for Second Semester Late Registration"
+        ],
+        "links": [
+          {
+            "t": "家長須知 Parent Handbook",
+            "href": "/pdf/parent-handbook"
+          },
+          {
+            "t": "學生守則 Student Handbook",
+            "href": "/pdf/student-handbook"
+          },
+          {
+            "t": "學分班規則 Credit Class Attendance and Grading Guidelines",
+            "href": "/pdf/credit-class-rules"
+          },
+          {
+            "t": "旁聽生收費及管理辦法 Policy for Guest Students",
+            "href": "/pdf/policy-guest-students"
+          },
+          {
+            "t": "特殊註冊收費辦法 Policy for Second Semester Late Registration",
+            "href": "/pdf/policy-second-semester-late-registration"
+          }
         ]
       }
     },
@@ -31,6 +53,16 @@
         "items": [
           "費用支出申報表 Expense Reimbursement Form",
           "TA 申請表 TA Application"
+        ],
+        "links": [
+          {
+            "t": "費用支出申報表 Expense Reimbursement Form",
+            "href": "/pdf/expense-reimbursement-form"
+          },
+          {
+            "t": "TA 申請表 TA Application",
+            "href": "https://docs.google.com/forms/d/e/1FAIpQLSdDLuL1-ythqDNTFo8BPycBCZWdMoaGnZ2zuPrO9xL_J3iNWg/viewform?usp=send_form"
+          }
         ]
       }
     }
@@ -38,6 +70,19 @@
   "signature": [
     "1col"
   ],
-  "notes": [],
+  "notes": [
+    "DP repair 2026-10-05 (Claude): handbook/form list links restored (PDF bytes verified identical to documents rows).",
+    "DP repair 2026-10-05 (Claude): handbook/form list links restored (PDF bytes verified identical to documents rows).",
+    "DP repair 2026-10-05 (Claude): handbook/form list links restored (PDF bytes verified identical to documents rows).",
+    "DP repair 2026-10-05 (Claude): handbook/form list links restored (PDF bytes verified identical to documents rows).",
+    "DP repair 2026-10-05 (Claude): handbook/form list links restored (PDF bytes verified identical to documents rows).",
+    "DP repair 2026-10-05 (Claude): handbook/form list links restored (PDF bytes verified identical to documents rows).",
+    "DP repair 2026-10-05 (Claude): handbook/form list links restored (PDF bytes verified identical to documents rows).",
+    "DP repair 2026-10-05 (Claude): handbook/form list links restored (PDF bytes verified identical to documents rows).",
+    "DP repair 2026-10-05 (Claude): handbook/form list links restored (PDF bytes verified identical to documents rows).",
+    "DP repair 2026-10-05 (Claude): handbook/form list links restored (PDF bytes verified identical to documents rows).",
+    "DP repair 2026-10-05 (Claude): handbook/form list links restored (PDF bytes verified identical to documents rows).",
+    "DP repair 2026-10-05 (Claude): handbook/form list links restored (PDF bytes verified identical to documents rows)."
+  ],
   "missing_local_files": []
 }

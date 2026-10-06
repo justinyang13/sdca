@@ -1,0 +1,16 @@
+<%# Block: tabs — progressive enhancement via /js/tabs.js (all panels visible without JS). L: {b:[{title,blocks}], idx} %>
+<% const tabs = Array.isArray(L.b) ? L.b : []; %>
+<% if (tabs.length) { %>
+<div class="blk-tabs" data-tabs="blk<%= L.idx %>">
+  <div class="blk-tablist" role="tablist" aria-label="<%= lang === 'zh' ? '內容分頁' : 'Content tabs' %>">
+    <% tabs.forEach(function(tb, i) { %>
+    <button type="button" role="tab" id="bt-<%= L.idx %>-<%= i %>" aria-selected="<%= i === 0 ? 'true' : 'false' %>" aria-controls="bp-<%= L.idx %>-<%= i %>" data-tab="<%= i %>" tabindex="<%= i === 0 ? '0' : '-1' %>"><%= (tb && tb.title) || ('Tab ' + (i + 1)) %></button>
+    <% }) %>
+  </div>
+  <% tabs.forEach(function(tb, i) { %>
+  <div class="blk-tabpanel" role="tabpanel" id="bp-<%= L.idx %>-<%= i %>" aria-labelledby="bt-<%= L.idx %>-<%= i %>">
+    <%- renderPart('partials/blocks.ejs', { blocks: (tb && tb.blocks) || [] }) %>
+  </div>
+  <% }) %>
+</div>
+<% } %>

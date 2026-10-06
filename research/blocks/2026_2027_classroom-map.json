@@ -1,7 +1,31 @@
 {
-  "slug": "2026_2027_classroom-map",
-  "blocks": [],
-  "signature": [],
-  "notes": [],
-  "missing_local_files": []
+  "blocks": [
+    {
+      "heading": {
+        "level": 1,
+        "text": "2026_2027 Classroom Map"
+      }
+    },
+    {
+      "image": {
+        "alt": "2026_2027 Classroom Map (PDF)",
+        "caption": "",
+        "height": null,
+        "href": "/pdf/2026-2027-classroom-map",
+        "local_path": "research/assets/images/2026_2027_Classroom-Map-pdf-300x232.jpg",
+        "sha256": "",
+        "src": "/img/old/misc/2026_2027_Classroom-Map-pdf-300x232.jpg",
+        "width": null
+      }
+    }
+  ],
+  "missing_local_files": [],
+  "notes": [
+    "DP hand-written 2026-10-05: old page is a PDF attachment (title + thumbnail linked to the PDF). Title kept verbatim including the underscore."
+  ],
+  "signature": [
+    "heading",
+    "image"
+  ],
+  "slug": "2026_2027_classroom-map"
 }

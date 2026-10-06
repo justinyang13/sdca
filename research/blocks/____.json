@@ -1,7 +1,30 @@
 {
-  "slug": "____",
-  "blocks": [],
-  "signature": [],
-  "notes": [],
-  "missing_local_files": []
+  "blocks": [
+    {
+      "heading": {
+        "level": 1,
+        "text": "吉他海報"
+      }
+    },
+    {
+      "image": {
+        "alt": "吉他海報",
+        "caption": "",
+        "height": null,
+        "local_path": "research/assets/images/____-pdf-232x300.jpg",
+        "sha256": "22ad3ad4f18a8b4964b395f29721bf4fc9534071f84fde535470d35695e5926d",
+        "src": "/img/old/misc/____-pdf-232x300.jpg",
+        "width": null
+      }
+    }
+  ],
+  "missing_local_files": [],
+  "notes": [
+    "DP hand-written 2026-10-05: old page links a thumbnail to 吉他海報.pdf, but the PDF was never captured (not in research/assets, 404 on old site). Poster thumbnail placed; missing PDF recorded in CONTENT-LEDGER NEEDS OWNER REVIEW."
+  ],
+  "signature": [
+    "heading",
+    "image"
+  ],
+  "slug": "____"
 }

@@ -287,3 +287,77 @@
 .gallery-grid-archive a { aspect-ratio: 4 / 3; overflow: hidden; border-radius: 10px; }
 .gallery-grid-archive img { width: 100%; height: 100%; object-fit: cover; }
 .empty-note { color: var(--text-soft, #666); font-style: italic; }
+
+/* ---- Volunteer page ---- */
+.volunteer-hero-img {
+  display: none;
+  margin-bottom: var(--sp-5, 20px);
+}
+.volunteer-hero-img img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius, 8px);
+}
+.volunteer-gallery {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: var(--sp-2, 8px);
+  margin-bottom: var(--sp-6, 28px);
+}
+.volunteer-gallery figure {
+  margin: 0;
+}
+.volunteer-gallery img {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+  display: block;
+}
+.volunteer-intro {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-6, 28px);
+  margin-bottom: var(--sp-6, 28px);
+}
+.volunteer-intro p {
+  margin: 0 0 var(--sp-3, 14px);
+  line-height: 1.7;
+}
+.volunteer-intro p:last-child {
+  margin-bottom: 0;
+}
+.volunteer-signup {
+  text-align: center;
+  margin-bottom: var(--sp-6, 28px);
+}
+.volunteer-signup img {
+  max-width: 100%;
+  height: auto;
+}
+.volunteer-jobs-title {
+  font-size: 1.25rem;
+  margin: 0 0 var(--sp-4, 18px);
+}
+.volunteer-jobs-title a {
+  color: var(--navy, #1a365d);
+  text-decoration: none;
+}
+.volunteer-jobs-title a:hover {
+  text-decoration: underline;
+}
+.volunteer-jobs-content p {
+  margin: 0 0 var(--sp-3, 14px);
+  line-height: 1.7;
+}
+
+@media (max-width: 768px) {
+  .volunteer-hero-img {
+    display: block;
+  }
+  .volunteer-gallery {
+    display: none;
+  }
+  .volunteer-intro {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,7 +1,31 @@
 {
-  "slug": "sdca-yearbook-cover-art-contest-guidelines-2025-2026",
-  "blocks": [],
-  "signature": [],
-  "notes": [],
-  "missing_local_files": []
+  "blocks": [
+    {
+      "heading": {
+        "level": 1,
+        "text": "SDCA Yearbook Cover Art Contest Guidelines 2025-2026"
+      }
+    },
+    {
+      "image": {
+        "alt": "SDCA Yearbook Cover Art Contest Guidelines 2025-2026 (PDF)",
+        "caption": "",
+        "height": null,
+        "href": "/pdf/yearbook-cover-art-contest-2025-26",
+        "local_path": "research/assets/images/SDCA-Yearbook-Cover-Art-Contest-Guidelines-2025-2026-pdf-232x300.jpg",
+        "sha256": "",
+        "src": "/img/old/misc/SDCA-Yearbook-Cover-Art-Contest-Guidelines-2025-2026-pdf-232x300.jpg",
+        "width": null
+      }
+    }
+  ],
+  "missing_local_files": [],
+  "notes": [
+    "DP hand-written 2026-10-05: old page is a PDF attachment (title + thumbnail linked to the PDF)."
+  ],
+  "signature": [
+    "heading",
+    "image"
+  ],
+  "slug": "sdca-yearbook-cover-art-contest-guidelines-2025-2026"
 }

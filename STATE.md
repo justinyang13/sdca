@@ -23,9 +23,15 @@ ROADMAP v3 FAITHFUL REBUILD (2026-10-05): parse old DOM -> verbatim ordered BLOC
 - Remaining after chain: Claude-style review gates (see AGENTS.md), docs, push to main + GitHub release sdca v1.0.0.
 - Open owner items: review research/CONTENT-LEDGER.md NEEDS OWNER REVIEW; ZH labels translated by Qwen in the menu; ambiguous headshot-to-name matches.
 
-## STOPPED CLEANLY (Claude session ended 2026-10-05 ~5:20PM)
-- Qwen chain is STOPPED (`work/ctl.sh stop`), heartbeat removed. Nothing is running except the :3100 preview server (stale snapshot; refresh with `work/ctl.sh preview`).
-- Phase DP (faithful page rebuild) is IN PROGRESS and its work is uncommitted/WIP in the tree (src/, views/, scripts/, research/blocks/ may be partial). `npm test`: 124 pass, 1 FAIL — expected mid-DP; first thing to do on resume is `npm test` and let DP continue (it resumes from work/phaseDP-log.md).
-- To continue: `work/ctl.sh resume` (Qwen) or open opencode in this folder and follow AGENTS.md.
+## RESUMED (2026-10-05 06:13PM PDT) → CLAUDE TAKEOVER (owner: "complete the tasks, not just monitor Qwen")
+- Qwen chain STOPPED (`work/ctl.sh stop`). Claude is doing DP directly. Chain order preserved: DP → 8d → 8e → V → 7 (V stays with Claude per owner).
+- DP DONE except visual review + report: block renderer (11 views/blocks/*.ejs + blocks.css + ported.ejs), import-blocks.js (24 pages in pages.blocks), 7 hand-written block files, repair-blocks.js (class levels, inline-link maps, merges), parity.js **24/24 PASS** (research/PARITY.md), tests/parity.test.js, **npm test 128 pass 0 fail**, CONTENT-LEDGER DP addendum (DP-1..DP-11), redirects + sitemap updated, migration 006 (body_source).
+- Visual review IN PROGRESS: work/shots/ has 72 shots (24 routes × EN1280/EN375/ZH1280). Viewed: en-about, en-about-board. Next: view rest, fix defects, write work/phaseDP-report.md, then 8d.
+- Dev server: detached on :3100 (RATE_LIMIT=5000, /tmp/sdca-dev.log). Preview snapshot dir is stale; :3100 serves live repo.
+- Known: `work/ctl.sh preview` hangs the shell — re-sync + restart manually, never via ctl preview.
+- Qwen chain RESUMED via `work/ctl.sh resume` (qwen + chain RUNNING). Phase DP continues from `work/phaseDP-log.md` (283 tool calls).
+- Preview server on :3100 is up (detached, PID owned by init) but a STALE snapshot — re-sync + restart it after DP finishes before visual review.
+- Phase DP (faithful page rebuild) is IN PROGRESS: 283 tool calls at resume. Uncommitted changes are in `research/blocks/*.json` and `tests/db.test.js`, plus untracked PDFs under `storage/uploads/`. Last known mid-DP test result: 124 pass, 1 FAIL.
 - NOT done yet: DP, 8d (original menu), 8e (hero 5 slides), V (visual/spacing QA incl. events page whitespace), 7 (hardening, launchd service, docs), final review, push to main + GitHub release sdca v1.0.0.
+- Was STOPPED CLEANLY 06:11PM, RESUMED 06:13PM. Preview snapshot refresh: do NOT use `work/ctl.sh preview` (hangs the shell) — re-sync + restart manually.
 

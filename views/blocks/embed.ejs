@@ -1,0 +1,16 @@
+<%# Block: embed — YouTube (nocookie) or generic iframe (maps/forms). L: {b:{kind,url,title}} %>
+<% const url = (L.b && L.b.url) || ''; %>
+<% if (url) { %>
+<% const id = L.h.ytId(url); %>
+<% if (id) { %>
+<div class="blk-embed blk-embed-video">
+  <iframe src="https://www.youtube-nocookie.com/embed/<%= id %>" title="<%= L.h.escAttr((L.b && L.b.title) || 'video') %>" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+</div>
+<% } else if (/^https?:\/\//i.test(url)) { %>
+<div class="blk-embed blk-embed-frame">
+  <iframe src="<%= url %>" title="<%= L.h.escAttr((L.b && L.b.title) || 'embedded content') %>" loading="lazy" allowfullscreen></iframe>
+</div>
+<% } else { %>
+<p class="blk-embed-link"><a href="<%= url %>" rel="noopener"><%= L.h.esc(L.b.title || url) %></a></p>
+<% } %>
+<% } %>

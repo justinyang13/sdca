@@ -1,63 +1,22 @@
 <%
   const L = lang;
-  const pg = (_pg !== undefined && _pg) || { title_en: 'Our Sponsors', title_zh: '贊助商', body_en: '', body_zh: '' };
-  const sponsors = (_sponsors !== undefined && _sponsors) || [];
-  const bodyEn = pg.body_en || '';
-  const bodyZh = pg.body_zh || '';
+  const pg = (_pg !== undefined && _pg) || { title_en: 'Sponsors', title_zh: '贊助商', body_en: '', body_zh: '' };
   const useZh = (L === 'zh');
-  const body = useZh ? (bodyZh || bodyEn) : (bodyEn || bodyZh);
-  const noteKey = (useZh)
-    ? (bodyZh ? null : (bodyEn ? 'meta.lang_note_zh' : null))
-    : (bodyEn ? null : (bodyZh ? 'meta.lang_note_en' : null));
   const title = useZh ? (pg.title_zh || pg.title_en) : (pg.title_en || pg.title_zh);
-  const html = (typeof renderMarkdown === 'function') ? renderMarkdown(body) : '';
-  const settings = (_settings !== undefined && _settings) || {};
+  const noteKey = (useZh)
+    ? (pg.body_zh ? null : (pg.body_en ? 'meta.lang_note_zh' : null))
+    : (pg.body_en ? null : (pg.body_zh ? 'meta.lang_note_en' : null));
+  const hasBlocks = (typeof useBlocks !== 'undefined' && useBlocks && typeof blocks !== 'undefined' && blocks.length);
 %>
-
-<section class="hero hero--slim">
-  <div class="hero-inner">
-    <div class="section-kicker"><%= L === 'zh' ? '支持' : 'Support' %></div>
-    <h1><%= title %></h1>
-    <p class="hero-sub"><%= L === 'zh'
-      ? '感謝我們的贊助商對 SDCA 的支持。'
-      : 'Thank you to our sponsors for supporting SDCA.' %></p>
-  </div>
-</section>
-
 <section class="section">
-  <div class="container container-narrow">
-    <% if (noteKey) { %><p class="lang-note"><%= t(noteKey) %></p><% } %>
-    <div class="prose">
-      <%- html %>
-    </div>
-  </div>
-</section>
-
-<section class="section section-alt">
   <div class="container">
-    <div class="sponsor-grid sponsor-grid-lg" role="list">
-      <% sponsors.forEach(function(s) { %>
-      <div class="sponsor-card sponsor-tier-<%= s.tier || 'business' %>" role="listitem">
-        <% if (s.url) { %>
-        <a href="<%= s.url %>" target="_blank" rel="noopener" aria-label="<%= s.name %>">
-          <img src="<%= assetUrl(s.logo) %>" alt="<%= s.name %>" loading="lazy">
-        </a>
-        <% } else { %>
-        <img src="<%= assetUrl(s.logo) %>" alt="<%= s.name %>" loading="lazy">
-        <% } %>
-      </div>
-      <% }) %>
+    <% if (noteKey && !hasBlocks) { %><p class="lang-note"><%= t(noteKey) %></p><% } %>
+    <% if (hasBlocks && typeof renderPart === 'function') { %>
+    <div class="blocks prose">
+      <%- renderPart('partials/blocks.ejs', { blocks: blocks }) %>
     </div>
+    <% } else { %>
+      <%- (typeof renderMarkdown === 'function' && (pg.body_en || pg.body_zh)) ? renderMarkdown(useZh ? (pg.body_zh || pg.body_en) : (pg.body_en || pg.body_zh)) : '' %>
+    <% } %>
   </div>
 </section>
-
-<% if (settings.email_vp) { %>
-<section class="section">
-  <div class="container container-narrow">
-    <div class="alert alert-info">
-      <strong><%= L === 'zh' ? '想成為贊助商？' : 'Interested in sponsoring? ' %></strong>
-      <a href="mailto:<%= settings.email_vp %>"><%= settings.email_vp %></a>
-    </div>
-  </div>
-</section>
-<% } %>

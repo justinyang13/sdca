@@ -1,0 +1,14 @@
+<%# Block: list — L: {b:{ordered,items,links?}} (links = verbatim inline-link map) %>
+<% const items = (L.b && L.b.items) || []; %>
+<% const links = (L.b && L.b.links) || []; %>
+<% if (items.length) { %>
+<% if (L.b.ordered) { %>
+<ol class="blk-list">
+  <% items.forEach(function(it) { %><li><%- L.h.linkifySmart(it, links) %></li><% }) %>
+</ol>
+<% } else { %>
+<ul class="blk-list">
+  <% items.forEach(function(it) { %><li><%- L.h.linkifySmart(it, links) %></li><% }) %>
+</ul>
+<% } %>
+<% } %>

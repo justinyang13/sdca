@@ -12,7 +12,7 @@
     },
     {
       "image": {
-        "src": "/img/old/2018/TA-2017-2018.jpg",
+        "src": "/img/old/misc/TA-2017-2018.jpg",
         "alt": "",
         "caption": "",
         "width": null,
@@ -22,7 +22,15 @@
       }
     },
     {
-      "richtext": "Join our TA team! Fill out the application below. Or\nContact Us\nshould you have any questions."
+      "richtext": {
+        "text": "Join our TA team! Fill out the application below. Or\nContact Us\nshould you have any questions.",
+        "links": [
+          {
+            "t": "Contact Us",
+            "href": "/en/contact"
+          }
+        ]
+      }
     },
     {
       "button": {
@@ -36,6 +44,8 @@
     "1col",
     "1col"
   ],
-  "notes": [],
+  "notes": [
+    "DP repair 2026-10-05 (Claude): Contact Us inline link restored."
+  ],
   "missing_local_files": []
 }

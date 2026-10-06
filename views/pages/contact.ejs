@@ -17,7 +17,12 @@
 </section>
 
 <section class="section">
-  <div class="container container-narrow">
+  <div class="container">
+    <% if (typeof useBlocks !== 'undefined' && useBlocks && typeof blocks !== 'undefined' && blocks.length) { %>
+    <div class="blocks" style="margin-bottom: var(--sp-6);">
+      <%- renderPart('partials/blocks.ejs', { blocks: blocks }) %>
+    </div>
+    <% } %>
     <div class="grid grid-2 contact-grid">
       <div>
         <h2 class="section-title"><%= L === 'zh' ? '直接聯絡' : 'Direct Contact' %></h2>

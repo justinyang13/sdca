@@ -20,6 +20,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { lookupRedirect } from '../src/redirects.js';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const RAW_DIR = path.join(ROOT, 'research', 'raw', 'pages');
@@ -184,54 +185,61 @@ function makeFileBlock(href, label) {
   };
 }
 
+export const MARK_B0 = '\uE000', MARK_B1 = '\uE001', MARK_I0 = '\uE002', MARK_I1 = '\uE003';
 // inline-level -> verbatim fragments (text/list/table/image/file/embed)
 function inlineFrags(node) {
   const frags = [];
-  function pushText(s) {
-    const t = normWs(s);
-    if (t) {
-      if (frags.length && frags[frags.length - 1].richtext) frags[frags.length - 1].richtext += '\n' + t;
-      else frags.push({ richtext: t });
-    }
+  // Inline text accumulates in `cur` (one paragraph); block-level boundaries
+  // flush it. Bold/italic are kept as private-use markers (see MARK_*), which
+  // the renderer turns into <strong>/<em>; parity strips them.
+  let cur = '';
+  function flush() {
+    const t = normWs(cur);
+    cur = '';
+    if (!t.replace(/[\uE000-\uE003\s]/g, '')) return;
+    if (frags.length && frags[frags.length - 1].richtext) frags[frags.length - 1].richtext += '\n' + t;
+    else frags.push({ richtext: t });
   }
+  const BLOCKISH = ['p', 'div', 'blockquote', 'figure', 'figcaption', 'section', 'article'];
+  const INLINE = ['strong','b','em','i','u','s','del','ins','mark','sub','sup','small','code','abbr','q','cite','bdi','bdo','time','wbr','span'];
   function go(n) {
-    if (n.tag === '#text') { pushText(decodeEnt(n.text)); return; }
+    if (n.tag === '#text') { cur += decodeEnt(n.text); return; }
     const tag = n.tag;
-    if (tag === 'br') { pushText('\n'); return; }
+    if (tag === 'br') { flush(); return; }
     if (tag === 'script' || tag === 'style' || tag === 'noscript') return;
-    if (/^h[1-6]$/.test(tag)) { frags.push({ heading: { level: Number(tag[1]), text: normWs(textOf(n)) } }); return; }
+    if (/^h[1-6]$/.test(tag)) { flush(); frags.push({ heading: { level: Number(tag[1]), text: normWs(textOf(n)) } }); return; }
     if (tag === 'ul' || tag === 'ol') {
+      flush();
       const items = descendants(n, (x) => x.tag === 'li' && !descendants(x, (y) => y.tag === 'ul' || y.tag === 'ol').length)
         .map((li) => normWs(textOf(li))).filter(Boolean);
-      if (items.length) frags.push({ list: { ordered: tag === 'ol', items } });
+      const lnk = linksOf(n);
+      if (items.length) frags.push({ list: { ordered: tag === 'ol', items, ...(lnk.length ? { links: lnk } : {}) } });
       else { const flat = descendants(n, (x) => x.tag === 'li').map((li) => normWs(textOf(li))).filter(Boolean); if (flat.length) frags.push({ list: { ordered: tag === 'ol', items: flat } }); }
       return;
     }
-    if (tag === 'table') { frags.push({ table: extractTable(n) }); return; }
+    if (tag === 'table') { flush(); frags.push({ table: extractTable(n) }); return; }
     if (tag === 'img') {
+      flush();
       const r = resolveImage(n.attrs.src || n.attrs['data-src'], assetsGlobal);
       if (r) frags.push({ image: makeImageBlock(r.asset, n.attrs.alt) });
       return;
     }
     if (tag === 'a') {
-      if ((n.attrs.href || '').endsWith('.pdf')) { frags.push({ file: makeFileBlock(n.attrs.href, textOf(n)) }); return; }
+      if ((n.attrs.href || '').endsWith('.pdf')) { flush(); frags.push({ file: makeFileBlock(n.attrs.href, textOf(n)) }); return; }
       for (const c of n.children || []) go(c);
       return;
     }
-    if (tag === 'iframe') { frags.push({ embed: { kind: 'html', html: htmlOf(n) } }); return; }
-    if (tag === 'p' || tag === 'div' || tag === 'blockquote' || tag === 'figure' || tag === 'figcaption' || tag === 'span' || tag === 'section' || tag === 'article') {
-      for (const c of n.children || []) go(c);
-      return;
-    }
-    // inline tags: a/strong/b/em/i/u/small/code/sup/sub -> keep as text with inline markers
-    if (['strong','b','em','i','u','s','del','ins','mark','sub','sup','small','code','abbr','q','cite','bdi','bdo','time','wbr'].includes(tag)) {
-      for (const c of n.children || []) go(c);
-      return;
-    }
-    // unknown block-ish: descend
+    if (tag === 'iframe') { flush(); frags.push({ embed: { kind: 'html', html: htmlOf(n) } }); return; }
+    if (tag === 'strong' || tag === 'b') { cur += MARK_B0; for (const c of n.children || []) go(c); cur += MARK_B1; return; }
+    if (tag === 'em' || tag === 'i') { cur += MARK_I0; for (const c of n.children || []) go(c); cur += MARK_I1; return; }
+    if (INLINE.includes(tag)) { for (const c of n.children || []) go(c); return; }
+    // block-level (p, div, ...) and unknown: paragraph boundary around children
+    flush();
     for (const c of n.children || []) go(c);
+    flush();
   }
   go(node);
+  flush();
   return frags;
 }
 
@@ -242,7 +250,7 @@ function blocksFromWidget(w, notes) {
   switch (type) {
     case 'heading': {
       const node = findAny(w, (n) => /^h[1-6]$/.test(n.tag));
-      if (node) return [{ heading: { level: Number(node.tag[1]), text: normWs(textOf(node)) } }];
+      if (node) { const links = linksOf(node); return [{ heading: { level: Number(node.tag[1]), text: normWs(textOf(node)), ...(links.length ? { links } : {}) } }]; }
       return [{ heading: { level: 2, text: normWs(textOf(container)) } }];
     }
     case 'text-editor':
@@ -295,7 +303,8 @@ function blocksFromWidget(w, notes) {
         items.push({ ...makeImageBlock(r.asset, imgNode && imgNode.attrs.alt, figcap ? textOf(figcap) : titleAttr),
           local_path: r.asset.local_path || '', sha256: r.asset.sha256 || '' });
       }
-      return items.length ? [{ gallery: { mode: 'grid', items } }] : [];
+      const gc = String((w && allDesc(w).map((n) => n.attrs.class || '').find((c) => /gallery-columns-\d+/.test(c))) || '').match(/gallery-columns-(\d+)/);
+      return items.length ? [{ gallery: { mode: 'grid', items, ...(gc ? { cols: Number(gc[1]) } : {}) } }] : [];
     }
     case 'smartslider': {
       const imgs = allDesc(w).filter((n) => n.tag === 'img');
@@ -374,6 +383,22 @@ function blocksFromWidget(w, notes) {
 }
 
 // ---------- page walk ----------
+// old-site href -> new site (internal pages via the redirect table; external kept exact)
+function normHref(h) {
+  const href = String(h || '').trim();
+  const m = href.match(/^https?:\/\/(?:www\.)?sandiegochineseschool\.com(\/[^?#]*)?/i);
+  if (!m) return href;
+  const hit = lookupRedirect(m[1] || '/');
+  return hit ? hit[1] : href;
+}
+// links inside a node -> verbatim link map [{t, href}]
+function linksOf(node) {
+  return descendants(node, (n) => n.tag === 'a' && n.attrs.href && !n.attrs.href.startsWith('#'))
+    .map((a) => ({ t: normWs(textOf(a)), href: normHref(a.attrs.href) })).filter((l) => l.t);
+}
+const hideOf = (w) => ['desktop', 'tablet', 'phone'].filter((d) => hasClass(w, `elementor-hidden-${d}`));
+const hasClass = (n, cls) => String((n.attrs && n.attrs.class) || '').split(/\s+/).includes(cls);
+
 function mainContent(root) {
   const main = findAny(root, (n) => n.tag === 'main');
   if (!main) return root;
@@ -401,9 +426,9 @@ export function parsePage(html, assets) {
     let directCols = [];
     for (const c of sec.children || []) {
       if (c.tag === '#text') continue;
-      if (c.tag === 'div' && (c.attrs.class || '').includes('elementor-column')) directCols.push(c);
-      else if (c.tag === 'div' && (c.attrs.class || '').includes('elementor-container')) {
-        for (const cc of c.children || []) if (cc.tag !== '#text' && (cc.attrs.class || '').includes('elementor-column')) directCols.push(cc);
+      if (c.tag === 'div' && hasClass(c, 'elementor-column')) directCols.push(c);
+      else if (c.tag === 'div' && hasClass(c, 'elementor-container')) {
+        for (const cc of c.children || []) if (cc.tag !== '#text' && hasClass(cc, 'elementor-column')) directCols.push(cc);
       }
     }
     const nCols = directCols.length || 1;
@@ -412,7 +437,7 @@ export function parsePage(html, assets) {
       const widgets = allDesc(col).filter((n) => n.attrs['data-element_type'] === 'widget' || n.attrs['data-element-type'] === 'widget');
       const got = [];
       for (const w of widgets) {
-        if (!colList.includes(w) && allDesc(col).includes(w)) got.push(...blocksFromWidget(w, notes));
+        if (!colList.includes(w) && allDesc(col).includes(w)) { const bs = blocksFromWidget(w, notes); const hide = hideOf(w); if (hide.length) bs.forEach((b) => { b.hide = hide; }); got.push(...bs); }
       }
       return got;
     });

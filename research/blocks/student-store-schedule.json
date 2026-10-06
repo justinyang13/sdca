@@ -1,7 +1,31 @@
 {
-  "slug": "student-store-schedule",
-  "blocks": [],
-  "signature": [],
-  "notes": [],
-  "missing_local_files": []
+  "blocks": [
+    {
+      "heading": {
+        "level": 1,
+        "text": "Student Store Schedule"
+      }
+    },
+    {
+      "image": {
+        "alt": "Student Store Schedule (PDF)",
+        "caption": "",
+        "height": null,
+        "href": "/pdf/student-store-schedule",
+        "local_path": "research/assets/images/Student-Store-Schedule-pdf-232x300.jpg",
+        "sha256": "",
+        "src": "/img/old/misc/Student-Store-Schedule-pdf-232x300.jpg",
+        "width": null
+      }
+    }
+  ],
+  "missing_local_files": [],
+  "notes": [
+    "DP hand-written 2026-10-05: old page is a PDF attachment (title + thumbnail linked to the PDF). Thumbnail placed, linked to the PDF (opens inline in a new tab)."
+  ],
+  "signature": [
+    "heading",
+    "image"
+  ],
+  "slug": "student-store-schedule"
 }

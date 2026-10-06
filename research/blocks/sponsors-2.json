@@ -4,90 +4,105 @@
     {
       "heading": {
         "level": 2,
-        "text": "贊助商 Sponsors"
+        "text": "贊助商 Sponsors",
+        "links": [
+          {
+            "t": "贊助商 Sponsors",
+            "href": "/en/support/sponsors"
+          }
+        ]
       }
     },
     {
       "image": {
-        "src": "/img/old/2022/99Ranch2018Banner.jpg",
+        "src": "/img/old/misc/99Ranch2018Banner.jpg",
         "alt": "",
         "caption": "",
         "width": null,
         "height": null,
         "sha256": "9128ea89212d88a60ce1a8c14ad5c8bd0ddc367946947744965e06eb1cd3f377",
-        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/99Ranch2018Banner.jpg"
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/99Ranch2018Banner.jpg",
+        "href": "https://www.99ranch.com/"
       }
     },
     {
       "image": {
-        "src": "/img/old/2022/Mandrin-House.jpeg",
+        "src": "/img/old/misc/Mandrin-House.jpeg",
         "alt": "",
         "caption": "",
         "width": null,
         "height": null,
         "sha256": "798f3357eb40ce341eca91073a2a2a84a47213283ff7e1f2464bb6ceedbbe4fc",
-        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Mandrin-House.jpeg"
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Mandrin-House.jpeg",
+        "href": "https://mandarinhouselj.com/"
       }
     },
     {
       "image": {
-        "src": "/img/old/2022/Law-Offices-of-Peter-Darwin-Chu.png",
+        "src": "/img/old/misc/Law-Offices-of-Peter-Darwin-Chu.png",
         "alt": "",
         "caption": "",
         "width": null,
         "height": null,
         "sha256": "07678bf9f435ac1e4052021030b4b5e94aa7a4c4f01de87469cdf81f21cdc16b",
-        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Law-Offices-of-Peter-Darwin-Chu.png"
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Law-Offices-of-Peter-Darwin-Chu.png",
+        "href": "https://peterchu.com/"
       }
     },
     {
       "image": {
-        "src": "/img/old/2022/C2-Education.png",
+        "src": "/img/old/misc/C2-Education.png",
         "alt": "",
         "caption": "",
         "width": null,
         "height": null,
         "sha256": "d7aeab3aad720065358e70c26a999a032add810518f418b21ece7f19fcfd61bd",
-        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/C2-Education.png"
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/C2-Education.png",
+        "href": "https://www.c2educate.com/"
       }
     },
     {
       "image": {
-        "src": "/img/old/2022/Dr.-Liu-ad-banner1.png",
+        "src": "/img/old/misc/Dr.-Liu-ad-banner1.png",
         "alt": "",
         "caption": "",
         "width": null,
         "height": null,
         "sha256": "249c45019ad883e7ebd32241ee7c0bda91ed3fc46bcc573d4a335c21ee7e1a54",
-        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Dr.-Liu-ad-banner1.png"
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Dr.-Liu-ad-banner1.png",
+        "href": "/img/old/misc/Dr.-Liu-ad-banner1.png"
       }
     },
     {
       "image": {
-        "src": "/img/old/2022/GoldenVisionBanner.png",
+        "src": "/img/old/misc/GoldenVisionBanner.png",
         "alt": "",
         "caption": "",
         "width": null,
         "height": null,
         "sha256": "5e71a2a9704d731245c76e25e4d2aa4d266be7ad0a19a966608b5738f0fc3b18",
-        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/GoldenVisionBanner.png"
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/GoldenVisionBanner.png",
+        "href": "https://www.goldenvision2020.com/cn/golden-plaza-optometry/"
       }
     },
     {
       "image": {
-        "src": "/img/old/2022/East-West-Bank.png",
+        "src": "/img/old/misc/East-West-Bank.png",
         "alt": "",
         "caption": "",
         "width": null,
         "height": null,
         "sha256": "ebc4c4be8cd0c24c3c0cb5bcd90ef0e3fb79caad712f9367bd69aa73de8a6a2b",
-        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/East-West-Bank.png"
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/East-West-Bank.png",
+        "href": "https://www.eastwestbank.com/"
       }
     }
   ],
   "signature": [
     "1col"
   ],
-  "notes": [],
+  "notes": [
+    "DP repair 2026-10-05 (Claude): banner links restored (exact old URLs; Dr.-Liu full-ad target never captured, links to placed banner — ledger)."
+  ],
   "missing_local_files": []
 }

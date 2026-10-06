@@ -1,7 +1,30 @@
 {
-  "slug": "new-student-advertisments-2026",
-  "blocks": [],
-  "signature": [],
-  "notes": [],
-  "missing_local_files": []
+  "blocks": [
+    {
+      "heading": {
+        "level": 1,
+        "text": "New student Advertisments 2026"
+      }
+    },
+    {
+      "image": {
+        "alt": "New student Advertisments 2026",
+        "caption": "",
+        "height": null,
+        "local_path": "research/assets/images/New-student-Advertisments-2026-scaled.jpg",
+        "sha256": "",
+        "src": "/img/old/misc/New-student-Advertisments-2026-scaled.jpg",
+        "width": null
+      }
+    }
+  ],
+  "missing_local_files": [],
+  "notes": [
+    "DP hand-written 2026-10-05: old page is the 2026 recruiting poster image only (title kept verbatim including original spelling)."
+  ],
+  "signature": [
+    "heading",
+    "image"
+  ],
+  "slug": "new-student-advertisments-2026"
 }

@@ -1,0 +1,14 @@
+<%# partials/blocks.ejs — render an ordered block tree. L: {blocks:[...]} %>
+<% const __list = (L && L.blocks) || []; %>
+<% __list.forEach(function(__wrap, __i) { %>
+  <% const __key = __wrap ? Object.keys(__wrap)[0] : null; %>
+   <% const __map = { heading: 'heading.ejs', richtext: 'richtext.ejs', image: 'image.ejs', gallery: 'gallery.ejs', list: 'list.ejs', embed: 'embed.ejs', divider: 'divider.ejs', image_text: 'image_text.ejs', people: 'people.ejs', tabs: 'tabs.ejs', file: 'file.ejs', button: 'button.ejs', columns: 'columns.ejs', html: 'html.ejs' }; %>
+  <% if (__key && __map[__key]) { %>
+    <% const __hide = (__wrap.hide || []).map(function(d){ return 'hide-' + d; }).join(' '); %>
+    <% if (__hide) { %><div class="blk-vis <%= __hide %>"><% } %>
+    <%- renderPart('blocks/' + __map[__key], { b: __wrap[__key], idx: __i }) %>
+    <% if (__hide) { %></div><% } %>
+  <% } else if (__key) { %>
+    <!-- DP: unknown block type '<%= __key %>' (index <%= __i %>) skipped, see CONTENT-LEDGER -->
+  <% } %>
+<% }) %>

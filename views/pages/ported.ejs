@@ -1,0 +1,31 @@
+<%
+  // ported.ejs — Phase DP: renders a page from its imported faithful block tree.
+  // ctx: { pg (or _pg), blocks (parsed array), useBlocks, adminHtml, bodyNote }
+  const L = lang;
+  const _pgv = (typeof _pg !== 'undefined' && _pg) ? _pg : null;
+  const pgv = ((typeof pg !== 'undefined' && pg) ? pg : _pgv) || { title_en: '', title_zh: '' };
+  const title = L === 'zh' ? (pgv.title_zh || pgv.title_en || '') : (pgv.title_en || pgv.title_zh || '');
+  const list = (typeof blocks !== 'undefined' && blocks) ? blocks : [];
+  const showBlocks = (typeof useBlocks !== 'undefined' ? useBlocks : true) && list.length > 0;
+  const admin = (typeof adminHtml !== 'undefined' && adminHtml) ? adminHtml : '';
+%>
+<%- renderPart('partials/hero.ejs', {
+  heroTitle: title,
+  heroVariant: 'slim',
+}) %>
+
+<section class="section" aria-labelledby="ported-h" data-page="<%= pgv.slug || '' %>">
+  <div class="container">
+    <h2 id="ported-h" class="sr-only"><%= title %></h2>
+    <% if (showBlocks) { %>
+    <div class="blocks">
+      <%- renderPart('partials/blocks.ejs', { blocks: list }).replace(/href="\/en\//g, 'href="/' + L + '/') %>
+    </div>
+    <% } else { %>
+    <div class="detail-body markdown">
+      <%- admin %>
+      <% if (typeof bodyNote !== 'undefined' && bodyNote) { %><p class="lang-note"><%= t(bodyNote) %></p><% } %>
+    </div>
+    <% } %>
+  </div>
+</section>

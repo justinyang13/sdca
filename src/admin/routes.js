@@ -423,7 +423,7 @@ export function registerAdminRoutes(app, { db }) {
     if (existing) {
       const id = existing.id;
       db.prepare(`
-        UPDATE pages SET title_en=?, title_zh=?, body_en=?, body_zh=?, hero_image=?, nav_section=?, nav_order=?, published=?
+        UPDATE pages SET title_en=?, title_zh=?, body_en=?, body_zh=?, hero_image=?, nav_section=?, nav_order=?, published=?, body_source='admin'
         WHERE id=?
       `).run(
         text(b.title_en), text(b.title_zh), sanitizeBody(b.body_en), sanitizeBody(b.body_zh),

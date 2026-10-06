@@ -9,7 +9,7 @@
     },
     {
       "image": {
-        "src": "/img/old/2018/SDCA-Volunteers-4-768x490.jpg",
+        "src": "/img/old/misc/SDCA-Volunteers-4-768x490.jpg",
         "alt": "",
         "caption": "",
         "width": null,
@@ -23,72 +23,72 @@
         "mode": "grid",
         "items": [
           {
-            "src": "/img/old/2018/Regular-K-Class-1-150x150.jpeg",
+            "src": "/img/old/misc/Regular-K-Class-1-150x150.jpeg",
             "alt": "",
-            "caption": "Regular K Class 1",
+            "caption": "",
             "width": null,
             "height": null,
             "sha256": "4913c9494acb8f49986282dc21d91867ebb7d2868d2fee9e93b7b551ca86bec1",
             "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Regular-K-Class-1-150x150.jpeg"
           },
           {
-            "src": "/img/old/2018/SDCA-Cultural-Day.f3d89943.jpeg",
+            "src": "/img/old/misc/SDCA-Cultural-Day.f3d89943.jpeg",
             "alt": "",
-            "caption": "SDCA Cultural Day",
+            "caption": "",
             "width": null,
             "height": null,
             "sha256": "8b8932fc4148d47c20959a83912690389a93399b6027f6579104be32be14398c",
             "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Cultural-Day.f3d89943.jpeg"
           },
           {
-            "src": "/img/old/2018/SDCA-BOD-5-1-150x150.gif",
+            "src": "/img/old/misc/SDCA-BOD-5-1-150x150.gif",
             "alt": "",
-            "caption": "SDCA BOD 5",
+            "caption": "",
             "width": null,
             "height": null,
             "sha256": "ee81e73a2342108b6e32bf09662d5d8f533b09bdfac95bb3a8b01c4aa3bea005",
             "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-BOD-5-1-150x150.gif"
           },
           {
-            "src": "/img/old/2018/SDCA-Community-Service.afeae869.jpeg",
+            "src": "/img/old/misc/SDCA-Community-Service.afeae869.jpeg",
             "alt": "",
-            "caption": "SDCA Community Service",
+            "caption": "",
             "width": null,
             "height": null,
             "sha256": "780230f4c8f85b8158bfa3068316d514de71e04f83cd726ee1ce82c8531784b6",
             "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Community-Service.afeae869.jpeg"
           },
           {
-            "src": "/img/old/2018/SDCA-Qigong-Seminar.9caf4036.jpeg",
+            "src": "/img/old/misc/SDCA-Qigong-Seminar.9caf4036.jpeg",
             "alt": "",
-            "caption": "SDCA Qigong Seminar",
+            "caption": "",
             "width": null,
             "height": null,
             "sha256": "efb1d55b301baf721efe69f7ff8d364d6904f01e6c712d1015ca970893874e0c",
             "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Qigong-Seminar.9caf4036.jpeg"
           },
           {
-            "src": "/img/old/2018/SDCA-Volunteers-2-150x150.jpg",
+            "src": "/img/old/misc/SDCA-Volunteers-2-150x150.jpg",
             "alt": "",
-            "caption": "SDCA Volunteers 2",
+            "caption": "",
             "width": null,
             "height": null,
             "sha256": "f185e4932a518c38817b8e6e70e1357548f3e795432742a673bb5d534a96cb69",
             "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Volunteers-2-150x150.jpg"
           },
           {
-            "src": "/img/old/2018/SDCA-Volunteers-3-150x150.jpg",
+            "src": "/img/old/misc/SDCA-Volunteers-3-150x150.jpg",
             "alt": "",
-            "caption": "SDCA Volunteers 3",
+            "caption": "",
             "width": null,
             "height": null,
             "sha256": "3998f1fe8a052ff9ae92aa70814634ae8dbc840e5a332391c1bbae1279f05ca2",
             "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Volunteers-3-150x150.jpg"
           },
           {
-            "src": "/img/old/2018/SDCA-PTA-and-Parent-Meeting-150x150.jpeg",
+            "src": "/img/old/misc/SDCA-PTA-and-Parent-Meeting-150x150.jpeg",
             "alt": "",
-            "caption": "SDCA PTA and Parent Meeting",
+            "caption": "",
             "width": null,
             "height": null,
             "sha256": "d4669f9c5e376a1f5ae78d07bff01b217ff2299c523af0e284e205f0bf76777a",
@@ -98,33 +98,17 @@
       }
     },
     {
-      "richtext": "聖地牙哥中華學苑\n需要您報名義工。校內所有文化活動與部份的輔助教學活動大多仰賴家長服務才得以舉辦。 本校酌收每個家庭代勞費一百元。但只要家長參與校內服務達一定時數， 此項訂金即可退還。 在每個月的禮券日到辦公室領取等值一百元的禮卡。參與的家長人數越多， 每人分擔的工作就越少。請熱心參與您孩子的教育。感謝您！\n請參考"
-    },
-    {
-      "file": {
-        "label": "義工工作說明",
-        "href": "__OLD_PDF__/misc/Volunteer Job Descriptions.pdf",
-        "sha256": "",
-        "local_path": ""
-      }
+      "richtext": "聖地牙哥中華學苑 需要您報名義工。校內所有文化活動與部份的輔助教學活動大多仰賴家長服務才得以舉辦。 本校酌收每個家庭代勞費一百元。但只要家長參與校內服務達一定時數， 此項訂金即可退還。 在每個月的禮券日到辦公室領取等值一百元的禮卡。參與的家長人數越多， 每人分擔的工作就越少。請熱心參與您孩子的教育。感謝您！ 請參考 義工工作說明"
     },
     {
       "richtext": "或是與家長會長聯絡\nsdcapta@gmail.com\nSDCA\nneeds you sign up for volunteers. We rely heavily on parent volunteers to assist academic and maintain all non-academic functions of the school. We charge a service fee of $100 per family, which is refundable when a parent participates as a volunteer and completes the service. Refund will be given in the form of $100 value of gift cards when scrip sales at the office. The more parents we have to volunteer, the less duty each parent will have to do. Your involvement will always be highly appreciated!\nPlease review the"
     },
     {
-      "file": {
-        "label": "Volunteer Job Descriptions",
-        "href": "__OLD_PDF__/misc/Volunteer Job Descriptions.pdf",
-        "sha256": "",
-        "local_path": ""
-      }
-    },
-    {
-      "richtext": "or contact the PTA Director at\nsdcapta@gmail.com"
+      "richtext": "Please review the Volunteer Job Descriptions or contact the PTA Director at sdcapta@gmail.com"
     },
     {
       "image": {
-        "src": "/img/old/2024/Sign-UP-GIF.gif",
+        "src": "/img/old/misc/Sign-UP-GIF.gif",
         "alt": "",
         "caption": "",
         "width": null,
@@ -152,6 +136,9 @@
     "1col",
     "1col"
   ],
-  "notes": [],
+  "notes": [
+    "DP repair 2026-10-05 (Claude): 請參考/Please-review leads restated as plain text (Volunteer PDFs never captured — ledger); dead file blocks removed.",
+    "DP repair 2026-10-05 (Claude): attribute-only captions dropped from gallery items (never visible old text)."
+  ],
   "missing_local_files": []
 }

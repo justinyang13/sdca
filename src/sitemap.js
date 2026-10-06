@@ -7,6 +7,8 @@ const CORE = [
   '/enroll', '/calendar', '/news', '/events', '/media',
   '/parents/handbook', '/parents/volunteer', '/parents/scrip', '/documents',
   '/support', '/support/sponsors', '/contact', '/privacy', '/disclaimer',
+  '/education-resource', '/adult', '/student-store-schedule', '/classroom-map',
+  '/guitar-poster', '/pre-k-program', '/new-student-ads', '/yearbook-contest',
 ];
 
 function xmlEscape(s) {

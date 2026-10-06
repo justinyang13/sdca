@@ -45,7 +45,7 @@
       btn.addEventListener('click', () => {
         const expanded = btn.getAttribute('aria-expanded') === 'true';
         btn.setAttribute('aria-expanded', String(!expanded));
-        const sub = drawer.querySelector(btn.getAttribute('aria-controls'));
+        const sub = document.getElementById(btn.getAttribute('aria-controls'));
         if (sub) sub.hidden = expanded;
       });
     });
@@ -60,7 +60,7 @@
     function closeAll() {
       triggers.forEach((t) => {
         t.setAttribute('aria-expanded', 'false');
-        const menu = desktopNav.querySelector(t.getAttribute('aria-controls'));
+        const menu = document.getElementById(t.getAttribute('aria-controls'));
         if (menu) menu.classList.remove('open');
       });
       openMenu = null;
@@ -68,13 +68,13 @@
     function openOne(trigger) {
       closeAll();
       trigger.setAttribute('aria-expanded', 'true');
-      const menu = desktopNav.querySelector(trigger.getAttribute('aria-controls'));
+      const menu = document.getElementById(trigger.getAttribute('aria-controls'));
       if (menu) menu.classList.add('open');
       openMenu = trigger;
     }
 
     triggers.forEach((trigger) => {
-      const menu = desktopNav.querySelector(trigger.getAttribute('aria-controls'));
+      const menu = document.getElementById(trigger.getAttribute('aria-controls'));
       trigger.addEventListener('click', (e) => {
         e.preventDefault();
         const isOpen = trigger.getAttribute('aria-expanded') === 'true';

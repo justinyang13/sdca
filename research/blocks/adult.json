@@ -1,7 +1,30 @@
 {
-  "slug": "adult",
-  "blocks": [],
-  "signature": [],
-  "notes": [],
-  "missing_local_files": []
+  "blocks": [
+    {
+      "heading": {
+        "level": 1,
+        "text": "Adult"
+      }
+    },
+    {
+      "image": {
+        "alt": "Adult",
+        "caption": "",
+        "height": null,
+        "local_path": "research/assets/images/Adult.jpg",
+        "sha256": "",
+        "src": "/img/old/misc/Adult.jpg",
+        "width": null
+      }
+    }
+  ],
+  "missing_local_files": [],
+  "notes": [
+    "DP hand-written 2026-10-05: old /adult/ is an image-attachment page (Adult.jpg, 2550x1650, no text). Image placed as-is."
+  ],
+  "signature": [
+    "heading",
+    "image"
+  ],
+  "slug": "adult"
 }

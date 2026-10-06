@@ -14,34 +14,51 @@
       }
     },
     {
-      "richtext": "Making a Tax Deductible Donation\n:\nIt is easy to help our school, you can make a tax deductible donation by sending a check to our school or make your donation via PayPal by clicking the button below."
-    },
-    {
-      "file": {
-        "label": "Donation by check",
-        "href": "__OLD_PDF__/misc/SDCA_Donation_Form - 2008.pdf",
-        "sha256": "",
-        "local_path": ""
+      "richtext": {
+        "text": "Making a Tax Deductible Donation : It is easy to help our school, you can make a tax deductible donation by sending a check to our school or make your donation via PayPal by clicking the button below. Donation by check : If you are making a donation by check, please mail your check to San Diego Chinese Academy, P.O. Box 910093, San Diego, CA 92191-0093. We will send you a receipt when we receive your check. Donation through PayPal : To donate through PayPal, simply click on the button below and follow the direction. Don’t forget to include your name, phone number, and mailing address so we can send your tax deductible receipt to you in the mail:",
+        "links": [
+          {
+            "t": "Making a Tax Deductible Donation",
+            "href": "https://www.paypal.com/donate/?token=hUlAeNF8LsPGFE8BgSVhTLqBhVqtkq_mg-NcOS-gr3IpHTyXEtoR1Ft9dwG01DgzEcAwMm&country.x=US&locale.x=US"
+          },
+          {
+            "t": "Donation through PayPal",
+            "href": "https://www.paypal.com/donate/?token=hUlAeNF8LsPGFE8BgSVhTLqBhVqtkq_mg-NcOS-gr3IpHTyXEtoR1Ft9dwG01DgzEcAwMm&country.x=US&locale.x=US"
+          }
+        ]
       }
     },
     {
-      "richtext": ":  If you are making a donation by check, please mail your check to San Diego Chinese Academy, P.O. Box 910093, San Diego, CA 92191-0093. We will send you a receipt when we receive your check.\nDonation through PayPal\n:  To donate through PayPal, simply click on the button below and follow the direction.  Don’t forget to include your name, phone number, and mailing address so we can send your tax deductible receipt to you in the mail:"
+      "divider": {}
+    },
+    {
+      "richtext": {
+        "text": "Purchase Scrip on our scrip sale date at school: We sell scrips/certificates from various vendors and stores such as grocery stores, restaurants, retails, and others. If you are already doing business with these stores, why not purchase the scrips from our school which will help our school raise a little funds. Restaurant scrips also makes wonderful gifts, so it’s like the Chinese saying, killing two birds with one stone, a win-win situation.",
+        "links": [
+          {
+            "t": "Purchase Scrip on our scrip sale date at school:",
+            "href": "/en/parents/scrip"
+          }
+        ]
+      }
     },
     {
       "divider": {}
     },
     {
-      "richtext": "Purchase Scrip on our scrip sale date at school:\nWe sell scrips/certificates from various vendors and stores such as grocery stores, restaurants, retails, and others. If you are already doing business with these stores, why not purchase the scrips from our school which will help our school raise a little funds. Restaurant scrips also makes wonderful gifts, so it’s like the Chinese saying, killing two birds with one stone, a win-win situation."
-    },
-    {
-      "divider": {}
-    },
-    {
-      "richtext": "Shop AmazonSmile and Earn Money for SDCA:\nIf you shop on Amazon, then you can earn money for SDCA with AmazonSmile. AmazonSmile is a program operated by the same Amazon you know, with the same selection of products and same savings. The only difference is that when you shop with AmazonSmile, 0.5% of your eligible purchases will be donated automatically to SDCA, at no additional cost to you.\nVisit\nhttp://smile.amazon.com/ch/33-0290580\nand login with your existing Amazon account.\nChoose San Diego Chinese Academy as your charity when prompted.\nBookmark or point your browser to\nhttp://smile.amazon.com\nevery time you shop.\nGo shopping!"
+      "richtext": {
+        "text": "Shop AmazonSmile and Earn Money for SDCA: If you shop on Amazon, then you can earn money for SDCA with AmazonSmile. AmazonSmile is a program operated by the same Amazon you know, with the same selection of products and same savings. The only difference is that when you shop with AmazonSmile, 0.5% of your eligible purchases will be donated automatically to SDCA, at no additional cost to you. Visit http://smile.amazon.com/ch/33-0290580 and login with your existing Amazon account. Choose San Diego Chinese Academy as your charity when prompted. Bookmark or point your browser to http://smile.amazon.com every time you shop. Go shopping!",
+        "links": [
+          {
+            "t": "Shop AmazonSmile and Earn Money for SDCA:",
+            "href": "http://smile.amazon.com/ch/33-0290580"
+          }
+        ]
+      }
     },
     {
       "image": {
-        "src": "/img/old/2023/amazon-smile-small-1.jpg",
+        "src": "/img/old/misc/amazon-smile-small-1.jpg",
         "alt": "",
         "caption": "",
         "width": null,
@@ -54,11 +71,19 @@
       "divider": {}
     },
     {
-      "richtext": "Sign up with eScrip\n:\nSign up with eScrip is a great way to support our school. Our school earns contribution from participating merchants when you shop. It’s so simple, just click below to sign up so you can start earning for our school."
+      "richtext": {
+        "text": "Sign up with eScrip : Sign up with eScrip is a great way to support our school. Our school earns contribution from participating merchants when you shop. It’s so simple, just click below to sign up so you can start earning for our school.",
+        "links": [
+          {
+            "t": "Sign up with eScrip",
+            "href": "http://www.escrip.com/"
+          }
+        ]
+      }
     },
     {
       "image": {
-        "src": "/img/old/2023/escrip-small.jpg",
+        "src": "/img/old/misc/escrip-small.jpg",
         "alt": "",
         "caption": "",
         "width": null,
@@ -71,18 +96,30 @@
       "divider": {}
     },
     {
-      "richtext": "Help our school by Shopping through iGive\n:\nIf you like shopping, shop through a network of vendors at iGive.com and you will automatically help our school. It has over 700 stores including name brands such as Macy’s, Borders, PetsMart, Pottery Barn, Amazon, and many more. Click below to sign up and shop with iGive."
+      "richtext": {
+        "text": "Help our school by Shopping through iGive : If you like shopping, shop through a network of vendors at iGive.com and you will automatically help our school. It has over 700 stores including name brands such as Macy’s, Borders, PetsMart, Pottery Barn, Amazon, and many more. Click below to sign up and shop with iGive.",
+        "links": [
+          {
+            "t": "Help our school by Shopping through iGive",
+            "href": "http://www.igive.com/welcome/warmwelcome.cfm?c=52012"
+          }
+        ]
+      }
     },
     {
       "divider": {}
     },
     {
-      "richtext": "Advertise in our school publications:\nHave a business? Why not advertise in our school publication?  To find out about the opportunity to advertise your business , please contact\nsdca.board.vice.president@gmail.com"
+      "richtext": "Advertise in our school publications: Have a business? Why not advertise in our school publication? To find out about the opportunity to advertise your business , please contact sdca.board.vice.president@gmail.com"
     }
   ],
   "signature": [
     "1col"
   ],
-  "notes": [],
+  "notes": [
+    "DP repair 2026-10-05 (Claude): donation paras merged (dropped Donation-Form file restated as plain text, PDF never captured — ledger); inline PayPal/scrip/Amazon/eScrip/iGive links restored verbatim.",
+    "DP fix 2026-10-05 (Claude): advertise paragraph wrapped as richtext object (was bare string, never rendered).",
+    "DP fix 2026-10-05 (Claude): removed leftover pre-merge donation paragraph (duplicated by the merged block 2)."
+  ],
   "missing_local_files": []
 }

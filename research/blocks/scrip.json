@@ -3,7 +3,7 @@
   "blocks": [
     {
       "image": {
-        "src": "/img/old/2018/SDCA-Scrip.jpg",
+        "src": "/img/old/misc/SDCA-Scrip.jpg",
         "alt": "",
         "caption": "Scrip Program",
         "width": null,
@@ -22,7 +22,7 @@
     },
     {
       "image": {
-        "src": "/img/old/2018/SDCA-Scrip-Day.png",
+        "src": "/img/old/misc/SDCA-Scrip-Day.png",
         "alt": "",
         "caption": "Scrip Schedule",
         "width": null,
@@ -41,7 +41,7 @@
     },
     {
       "image": {
-        "src": "/img/old/2018/SDCA-Scrip-Sponsors-3.jpeg",
+        "src": "/img/old/misc/SDCA-Scrip-Sponsors-3.jpeg",
         "alt": "",
         "caption": "Scrip Sponsors",
         "width": null,
@@ -60,7 +60,7 @@
     },
     {
       "image": {
-        "src": "/img/old/2018/SDCA-Scrip-Form.png",
+        "src": "/img/old/misc/SDCA-Scrip-Form.png",
         "alt": "",
         "caption": "Scrip Form",
         "width": null,
@@ -71,7 +71,7 @@
     },
     {
       "image": {
-        "src": "/img/old/2018/SDCA-Scrip-Transaction.jpg",
+        "src": "/img/old/misc/SDCA-Scrip-Transaction.jpg",
         "alt": "",
         "caption": "Scrip Transactions",
         "width": null,
@@ -89,23 +89,12 @@
       }
     },
     {
-      "image": {
-        "src": "/img/old/2020/scrip-flyer-300x169.jpg",
-        "alt": "",
-        "caption": "",
-        "width": null,
-        "height": null,
-        "sha256": "2eb7ab1abf99c554b0cae037876dc09756862476a299cba12880adf16180a092",
-        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/scrip-flyer-300x169.jpg"
-      }
-    },
-    {
       "richtext": "聖地牙哥中華學苑\n為非營利教育組織，禮券銷售盈餘將用於舉辦學校活動。註冊時，每位學生需要先預繳禮券訂金五十元。禮券就是商家的消費卡；我們賣超市、百貨公司、零售店與餐廳的禮券，學校賺取回扣， 您則拿禮券到該商家消費。每個學生家庭可選擇購買禮券，若每學年累計金額達若干數額（家中第一位學生不少於$700；第二位學生不少於$600；第三位或以上學生各不少於$500），註冊時預繳的禮券訂金將以同額的禮券退還給您 。您有一整學年的時間購買禮券，資助學校。每個月首個上課的星期天及預註冊日均為禮券日，禮券組會在辦公室賣禮券和辦理退還禮券訂金和代勞費。\nSDCA\nis a non-profit educational organization, Scrip sale profits are used to fund school activities.  Every student is charged a refundable Scrip Deposit $50 when he/she is enrolled.  Scrip are gift cards from grocery stores, department stores, retail stores or restaurants.  You can use these gift cards at stores, and our school gets a certain percentage back as rebate from the retailers.  Enrolled families are encouraged to purchase scrip, and when the accumulated amount reach a set level for the school year ($700 or more for the first enrolled child of the family; $600 or more for the second child; and $500 or more for the third and each of the rest enrolled child in the family), refund in Scrip of your choice(s) may be picked up on any Scrip Day upon fulfillment.   You have the entire school year to fulfill and exceed the refund requirement, while helping to raise fund for the school at the same time.  Scrip sale, Scrip deposit refund and service fee refund are available at the office on any Scrip Day (first available Sunday of each month and pre-registration days)."
     },
     {
       "image_text": {
         "image": {
-          "src": "/img/old/2018/SDCA-Scrip.jpg",
+          "src": "/img/old/misc/SDCA-Scrip.jpg",
           "alt": "",
           "caption": "",
           "width": null,
@@ -121,7 +110,7 @@
     {
       "image_text": {
         "image": {
-          "src": "/img/old/2018/SDCA-Scrip-Day.png",
+          "src": "/img/old/misc/SDCA-Scrip-Day.png",
           "alt": "",
           "caption": "",
           "width": null,
@@ -137,7 +126,7 @@
     {
       "image_text": {
         "image": {
-          "src": "/img/old/2018/SDCA-Scrip-Sponsors-3.jpeg",
+          "src": "/img/old/misc/SDCA-Scrip-Sponsors-3.jpeg",
           "alt": "",
           "caption": "",
           "width": null,
@@ -153,7 +142,7 @@
     {
       "image_text": {
         "image": {
-          "src": "/img/old/2018/SDCA-Scrip-Form.png",
+          "src": "/img/old/misc/SDCA-Scrip-Form.png",
           "alt": "",
           "caption": "",
           "width": null,
@@ -169,7 +158,7 @@
     {
       "image_text": {
         "image": {
-          "src": "/img/old/2018/SDCA-Scrip-Transaction.jpg",
+          "src": "/img/old/misc/SDCA-Scrip-Transaction.jpg",
           "alt": "",
           "caption": "",
           "width": null,
@@ -184,6 +173,18 @@
     },
     {
       "richtext": "Please contact\nsdca.board.scrip.director@gmail.com\nshould you have any questions."
+    },
+    {
+      "image": {
+        "src": "/img/old/misc/scrip-flyer-300x169.jpg",
+        "alt": "",
+        "caption": "",
+        "width": null,
+        "height": null,
+        "sha256": "2eb7ab1abf99c554b0cae037876dc09756862476a299cba12880adf16180a092",
+        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/scrip-flyer-300x169.jpg",
+        "href": "https://docs.google.com/forms/d/e/1FAIpQLSdYuXDFYBCzIIbNRncTlJULU-HausWMaQB6Niy26TRnzmGKyg/viewform?vc=0&c=0&w=1&flr=0&gxids=7628"
+      }
     }
   ],
   "signature": [
@@ -193,6 +194,8 @@
     "1col",
     "1col"
   ],
-  "notes": [],
+  "notes": [
+    "DP repair 2026-10-05 (Claude): flyer CTA moved to end with its exact google-form link target."
+  ],
   "missing_local_files": []
 }

@@ -1,0 +1,7 @@
+<%# Block: button — external links open in a new tab. L: {b:{label,href,target}} %>
+<% const href = (L.b && L.b.href) || ''; %>
+<% if (href) { %>
+<% const ext = L.h.isExternal(href); %>
+<% const label = (L.b && L.b.label) || href; const mm = label.match(/^(.*?[^\x00-\x7F][^A-Za-z]*?)\s+([A-Za-z].*)$/); %>
+<p class="blk-button"><a class="btn btn-primary btn-lg" href="<%= href %>"<%= ext ? ' target="_blank" rel="noopener"' : '' %>><% if (mm) { %><span><%= mm[1] %></span><span><%= mm[2] %></span><% } else { %><%= label %><% } %></a></p>
+<% } %>

@@ -1,0 +1,185 @@
+{
+  "generated": "2026-10-06T04:56:33.743Z",
+  "pages": {
+    "about": {
+      "from": "about-sdca",
+      "blocks": 9,
+      "images": 12,
+      "files": 0,
+      "dropped": []
+    },
+    "about-board": {
+      "from": "board-of-directors",
+      "blocks": 9,
+      "images": 25,
+      "files": 0,
+      "dropped": []
+    },
+    "about-staff": {
+      "from": "staff",
+      "blocks": 8,
+      "images": 3,
+      "files": 0,
+      "dropped": []
+    },
+    "about-principal": {
+      "from": "words-from-the-principal",
+      "blocks": 2,
+      "images": 0,
+      "files": 0,
+      "dropped": []
+    },
+    "programs-classes": {
+      "from": "class-placement",
+      "blocks": 13,
+      "images": 6,
+      "files": 0,
+      "dropped": []
+    },
+    "programs-tcml": {
+      "from": "tcml",
+      "blocks": 16,
+      "images": 8,
+      "files": 0,
+      "dropped": []
+    },
+    "programs-ta": {
+      "from": "ta-program",
+      "blocks": 5,
+      "images": 1,
+      "files": 0,
+      "dropped": []
+    },
+    "programs-recreational": {
+      "from": "adult-recreational-programs",
+      "blocks": 15,
+      "images": 5,
+      "files": 0,
+      "dropped": []
+    },
+    "parents-volunteer": {
+      "from": "volunteer-opportunity",
+      "blocks": 9,
+      "images": 10,
+      "files": 0,
+      "dropped": []
+    },
+    "parents-handbook": {
+      "from": "handbook-and-policy",
+      "blocks": 4,
+      "images": 0,
+      "files": 0,
+      "dropped": []
+    },
+    "parents-scrip": {
+      "from": "scrip",
+      "blocks": 13,
+      "images": 11,
+      "files": 0,
+      "dropped": []
+    },
+    "support-sponsors": {
+      "from": "sponsors",
+      "blocks": 24,
+      "images": 9,
+      "files": 0,
+      "dropped": []
+    },
+    "education-resource": {
+      "from": "education-resource",
+      "blocks": 3,
+      "images": 0,
+      "files": 0,
+      "dropped": []
+    },
+    "disclaimer": {
+      "from": "disclaimer",
+      "blocks": 2,
+      "images": 0,
+      "files": 0,
+      "dropped": []
+    },
+    "privacy": {
+      "from": "privacy-policy",
+      "blocks": 5,
+      "images": 0,
+      "files": 0,
+      "dropped": []
+    },
+    "media": {
+      "from": "media",
+      "blocks": 152,
+      "images": 208,
+      "files": 0,
+      "dropped": []
+    },
+    "enroll": {
+      "from": "registration",
+      "blocks": 7,
+      "images": 1,
+      "files": 0,
+      "dropped": []
+    },
+    "contact": {
+      "from": "countact-us",
+      "blocks": 1,
+      "images": 0,
+      "files": 0,
+      "dropped": []
+    },
+    "adult": {
+      "from": "adult",
+      "blocks": 2,
+      "images": 1,
+      "files": 0,
+      "dropped": []
+    },
+    "student-store-schedule": {
+      "from": "student-store-schedule",
+      "blocks": 2,
+      "images": 1,
+      "files": 0,
+      "dropped": []
+    },
+    "classroom-map": {
+      "from": "2026_2027_classroom-map",
+      "blocks": 2,
+      "images": 1,
+      "files": 0,
+      "dropped": []
+    },
+    "guitar-poster": {
+      "from": "____",
+      "blocks": 2,
+      "images": 1,
+      "files": 0,
+      "dropped": []
+    },
+    "pre-k-program": {
+      "from": "2018__10__22__pre-k-program",
+      "blocks": 3,
+      "images": 1,
+      "files": 1,
+      "dropped": []
+    },
+    "new-student-ads": {
+      "from": "new-student-advertisments-2026",
+      "blocks": 2,
+      "images": 1,
+      "files": 0,
+      "dropped": []
+    },
+    "yearbook-contest": {
+      "from": "sdca-yearbook-cover-art-contest-guidelines-2025-2026",
+      "blocks": 2,
+      "images": 1,
+      "files": 0,
+      "dropped": []
+    }
+  },
+  "append:sponsors-2": true,
+  "createdDocs": [],
+  "ledger": [],
+  "wrote": 25,
+  "skippedAdmin": 0
+}

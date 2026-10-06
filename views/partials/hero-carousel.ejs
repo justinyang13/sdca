@@ -14,7 +14,7 @@
   const tagline = (L && L.tagline) || (lang === 'zh'
     ? '非營利語言學校，自 1988 年起教授華語和中華文化'
     : 'Non-profit language school teaching Mandarin and Chinese culture since 1988');
-  const portalUrl = (L && L.portalUrl) || 'https://register.sandiegochineseschool.com';
+  const portalUrl = (L && L.portalUrl) || ('/' + lang + '/portal/signin');
   const escapeAttr = (v) => String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
   const imgFor = (name) => {
     const entry = manifest[name];
@@ -51,7 +51,7 @@
         <p class="hero-carousel-tagline"><%= tagline %></p>
         <div class="hero-carousel-cta">
           <a class="btn btn-primary btn-lg" href="/<%= lang %>/programs"><%= lang === 'zh' ? '探索課程' : 'Explore Programs' %> →</a>
-          <a class="btn btn-light btn-lg" href="<%= portalUrl %>" target="_blank" rel="noopener"><%= lang === 'zh' ? '立即報名' : 'Enroll Now' %></a>
+          <a class="btn btn-light btn-lg" href="<%= portalUrl %>"><%= lang === 'zh' ? '立即報名' : 'Enroll Now' %></a>
         </div>
         <% } else if (slide.caption_en || slide.caption_zh) { %>
         <div class="hero-carousel-caption">

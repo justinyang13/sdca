@@ -9,7 +9,7 @@
     },
     {
       "image": {
-        "src": "/img/old/2018/Class-Placement-Image-WP-768x576.gif",
+        "src": "/img/old/misc/Class-Placement-Image-WP-768x576.gif",
         "alt": "",
         "caption": "",
         "width": null,
@@ -27,7 +27,7 @@
     {
       "image_text": {
         "image": {
-          "src": "/img/old/2018/SDCA-Preschool-Program-1-768x552.jpeg",
+          "src": "/img/old/misc/SDCA-Preschool-Program-1-768x552.jpeg",
           "alt": "",
           "caption": "",
           "width": null,
@@ -36,8 +36,14 @@
           "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Preschool-Program-1-768x552.jpeg"
         },
         "title": "",
-        "text": "",
-        "side": "left"
+        "text": "Your preschoolers don't necessarily need to have any Chinese background before participating in this program. By using My First Chinese Words, the young learners will be exposed to the sounds, the Characters, and some basic conversations that occur in our daily lives. Interactive teaching aids such as flash cards, CDs of Chinese songs and videos will also be frequently used in class. More..",
+        "side": "left",
+        "links": [
+          {
+            "t": "Your preschoolers don't necessarily need to have any Chinese background before participating in this program. By using My First Chinese Words, the young learners will be exposed to the sounds, the Characters, and some basic conversations that occur in our daily lives. Interactive teaching aids such as flash cards, CDs of Chinese songs and videos will also be frequently used in class. More..",
+            "href": "/pdf/pre-k-intro"
+          }
+        ]
       }
     },
     {
@@ -46,7 +52,7 @@
     {
       "image_text": {
         "image": {
-          "src": "/img/old/2018/SDCA-Beginner-Class-1.jpeg",
+          "src": "/img/old/misc/SDCA-Beginner-Class-1.jpeg",
           "alt": "",
           "caption": "",
           "width": null,
@@ -55,8 +61,14 @@
           "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Beginner-Class-1.jpeg"
         },
         "title": "",
-        "text": "",
-        "side": "left"
+        "text": "When your children are ready to learn Chinese formally and are over 5-year-old, you can have them start with the Beginner Class, either New-Phonetic Beginner class or Pin-Yin Beginner class. It’s not uncommon to see older kids in our Beginner classes. It’s never too late to learn a language, and we welcome everyone who is interested with open arms! More..",
+        "side": "left",
+        "links": [
+          {
+            "t": "When your children are ready to learn Chinese formally and are over 5-year-old, you can have them start with the Beginner Class, either New-Phonetic Beginner class or Pin-Yin Beginner class. It’s not uncommon to see older kids in our Beginner classes. It’s never too late to learn a language, and we welcome everyone who is interested with open arms! More..",
+            "href": "/pdf/beginner-class"
+          }
+        ]
       }
     },
     {
@@ -65,7 +77,7 @@
     {
       "image_text": {
         "image": {
-          "src": "/img/old/2018/SDCA-Regular-Class-Original.jpeg",
+          "src": "/img/old/misc/SDCA-Regular-Class-Original.jpeg",
           "alt": "",
           "caption": "",
           "width": null,
@@ -74,8 +86,14 @@
           "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Regular-Class-Original.jpeg"
         },
         "title": "",
-        "text": "",
-        "side": "left"
+        "text": "At Level K, the students will learn The New-Phonetic (or Mandarin Phonetic Symbols 注音符號, or Zhu-Yin) and how these symbols work in sounding out Chinese Characters. Many Mandarin-speaking families find Zhu-Yin useful for their young learners who sometimes get confused with Pin-Yin by its own English letter sounds. The sounds of Zhu-Yin perfectly match Mandarin pronunciation so these young students can learn to pronounce Chinese words accurately by sounding out the symbols without trace of English sounds. More..",
+        "side": "left",
+        "links": [
+          {
+            "t": "At Level K, the students will learn The New-Phonetic (or Mandarin Phonetic Symbols 注音符號, or Zhu-Yin) and how these symbols work in sounding out Chinese Characters. Many Mandarin-speaking families find Zhu-Yin useful for their young learners who sometimes get confused with Pin-Yin by its own English letter sounds. The sounds of Zhu-Yin perfectly match Mandarin pronunciation so these young students can learn to pronounce Chinese words accurately by sounding out the symbols without trace of English sounds. More..",
+            "href": "/pdf/regular-class-info"
+          }
+        ]
       }
     },
     {
@@ -84,7 +102,7 @@
     {
       "image_text": {
         "image": {
-          "src": "/img/old/2018/SDCA-Bilingual-Class-1-1.jpeg",
+          "src": "/img/old/misc/SDCA-Bilingual-Class-1-1.jpeg",
           "alt": "",
           "caption": "",
           "width": null,
@@ -93,8 +111,14 @@
           "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Bilingual-Class-1-1.jpeg"
         },
         "title": "",
-        "text": "",
-        "side": "left"
+        "text": "Both English and Mandarin are used in lecturing that covers speaking, listening, reading, and writing. For lower levels, speaking and listening are emphasized for the students to get familiar with the language – its grammar and various phrase applications. For higher levels, the students will be given more writing practices for them to become ready for advanced learning should they decide to continue with High School Credit Class studies. Pin-Yin Fundamentals are taught at Level K. More..",
+        "side": "left",
+        "links": [
+          {
+            "t": "Both English and Mandarin are used in lecturing that covers speaking, listening, reading, and writing. For lower levels, speaking and listening are emphasized for the students to get familiar with the language – its grammar and various phrase applications. For higher levels, the students will be given more writing practices for them to become ready for advanced learning should they decide to continue with High School Credit Class studies. Pin-Yin Fundamentals are taught at Level K. More..",
+            "href": "/pdf/bilingual-class-info"
+          }
+        ]
       }
     },
     {
@@ -103,7 +127,7 @@
     {
       "image_text": {
         "image": {
-          "src": "/img/old/2018/SDCA-Credit-Class-Cultural-Activity-7.jpeg",
+          "src": "/img/old/misc/SDCA-Credit-Class-Cultural-Activity-7.jpeg",
           "alt": "",
           "caption": "",
           "width": null,
@@ -112,8 +136,14 @@
           "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Credit-Class-Cultural-Activity-7.jpeg"
         },
         "title": "",
-        "text": "",
-        "side": "left"
+        "text": "Foreign Language Credits earned at SDCA are recognized by San Diequito Union School District, San Diego Unified School District, Carlsbad Unified School District and Poway Unified School District. Our credit-class teachers are very experienced. All the lessons are planned to meet the most updated 5C standards (National Standards for Foreign Language Education). More..",
+        "side": "left",
+        "links": [
+          {
+            "t": "Foreign Language Credits earned at SDCA are recognized by San Diequito Union School District, San Diego Unified School District, Carlsbad Unified School District and Poway Unified School District. Our credit-class teachers are very experienced. All the lessons are planned to meet the most updated 5C standards (National Standards for Foreign Language Education). More..",
+            "href": "/pdf/credit-class-info"
+          }
+        ]
       }
     }
   ],
@@ -123,6 +153,20 @@
     "1col",
     "1col"
   ],
-  "notes": [],
+  "notes": [
+    "DP repair 2026-10-05 (Claude): level texts + whole-paragraph PDF links restored verbatim from raw DOM.",
+    "DP repair 2026-10-05 (Claude): level texts + whole-paragraph PDF links restored verbatim from raw DOM.",
+    "DP repair 2026-10-05 (Claude): level texts + whole-paragraph PDF links restored verbatim from raw DOM.",
+    "DP repair 2026-10-05 (Claude): level texts + whole-paragraph PDF links restored verbatim from raw DOM.",
+    "DP repair 2026-10-05 (Claude): level texts + whole-paragraph PDF links restored verbatim from raw DOM.",
+    "DP repair 2026-10-05 (Claude): level texts + whole-paragraph PDF links restored verbatim from raw DOM.",
+    "DP repair 2026-10-05 (Claude): level texts + whole-paragraph PDF links restored verbatim from raw DOM.",
+    "DP repair 2026-10-05 (Claude): level texts + whole-paragraph PDF links restored verbatim from raw DOM.",
+    "DP repair 2026-10-05 (Claude): level texts + whole-paragraph PDF links restored verbatim from raw DOM.",
+    "DP repair 2026-10-05 (Claude): level texts + whole-paragraph PDF links restored verbatim from raw DOM.",
+    "DP repair 2026-10-05 (Claude): level texts + whole-paragraph PDF links restored verbatim from raw DOM.",
+    "DP repair 2026-10-05 (Claude): level texts + whole-paragraph PDF links restored verbatim from raw DOM.",
+    "DP repair 2026-10-05 (Claude): level texts + whole-paragraph PDF links restored verbatim from raw DOM."
+  ],
   "missing_local_files": []
 }

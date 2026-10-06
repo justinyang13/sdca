@@ -29,10 +29,26 @@ function collectExternal(db) {
       for (const c of cols) {
         const v = r[c];
         if (typeof v !== 'string') continue;
-        for (const m of v.matchAll(URL_RE)) {
-          const u = m[0].replace(/[),.;]+$/, '');
-          if (!found.has(u)) found.set(u, []);
-          found.get(u).push(`${t}[${r.id}].${c}`);
+        // Phase DP: pages.blocks is a JSON block tree — scan its decoded
+        // string values so JSON escapes (e.g. \n) can't glue onto URLs.
+        let texts = [v];
+        if (t === 'pages' && c === 'blocks') {
+          try {
+            texts = [];
+            const walkJson = (x) => {
+              if (typeof x === 'string') texts.push(x);
+              else if (Array.isArray(x)) x.forEach(walkJson);
+              else if (x && typeof x === 'object') Object.values(x).forEach(walkJson);
+            };
+            walkJson(JSON.parse(v));
+          } catch { texts = [v]; }
+        }
+        for (const text of texts) {
+          for (const m of text.matchAll(URL_RE)) {
+            const u = m[0].replace(/[),.;]+$/, '');
+            if (!found.has(u)) found.set(u, []);
+            found.get(u).push(`${t}[${r.id}].${c}`);
+          }
         }
       }
     }
@@ -50,7 +66,7 @@ function corpusText() {
       try { parts.push(fs.readFileSync(full, 'utf8')); } catch { /* skip */ }
     }
   };
-  for (const d of ['research/wiki', 'research/data']) {
+  for (const d of ['research/wiki', 'research/data', 'research/blocks']) {
     if (fs.existsSync(path.join(root, d))) walk(path.join(root, d));
   }
   return parts.join('\n');

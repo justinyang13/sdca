@@ -28,6 +28,20 @@
           "註冊須知與網路註冊說明",
           "Registration Notice and Online Registration Instructions",
           "義工工作說明 Volunteer Job Descriptions"
+        ],
+        "links": [
+          {
+            "t": "註冊須知與網路註冊說明",
+            "href": "https://register.sandiegochineseschool.com/public/upload/Registration%20Notice%20Chinese.pdf"
+          },
+          {
+            "t": "Registration Notice and Online Registration Instructions",
+            "href": "https://register.sandiegochineseschool.com/public/upload/Registration%20Notice%20English.pdf"
+          },
+          {
+            "t": "義工工作說明 Volunteer Job Descriptions",
+            "href": "/en/parents/volunteer"
+          }
         ]
       }
     },
@@ -46,7 +60,15 @@
       }
     },
     {
-      "richtext": "如果有任何問題, 請\nemail\n或是洽電 (858)205-7322. If you have any questions, please\nemail\nor contact us at (858)205-7322."
+      "richtext": {
+        "text": "如果有任何問題, 請 email 或是洽電 (858)205-7322. If you have any questions, please email or contact us at (858)205-7322.",
+        "links": [
+          {
+            "t": "email",
+            "href": "mailto:office.sdca@gmail.com"
+          }
+        ]
+      }
     }
   ],
   "signature": [
@@ -56,6 +78,9 @@
     "1col",
     "1col"
   ],
-  "notes": [],
+  "notes": [
+    "DP repair 2026-10-05 (Claude): list PDF/volunteer links + email links restored (portal PDFs linked exact, files never captured — ledger).",
+    "DP repair 2026-10-05 (Claude): list PDF/volunteer links + email links restored (portal PDFs linked exact, files never captured — ledger)."
+  ],
   "missing_local_files": []
 }

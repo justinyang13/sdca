@@ -1,0 +1,6 @@
+<%# Block: html — trusted raw HTML (seeded verbatim from research; e.g. PayPal donate form, iGive banner, colored label paragraphs). L: {b:{html}, idx} %>
+<% if (L.b && L.b.html) { %>
+<% if (/<\s*form\b/i.test(L.b.html)) { %><%- L.b.html %><% } else { %>
+<div class="blk-html"><%- L.b.html %></div>
+<% } %>
+<% } %>

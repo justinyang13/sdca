@@ -1,0 +1,13 @@
+<%# Block: file — PDF/doc link, always opens inline in a new tab. L: {b:{label,href}} %>
+<% const href = (L.b && L.b.href) || ''; %>
+<% const label = (L.b && L.b.label) || href; %>
+<% if (href) { %>
+<p class="blk-file">
+  <a href="<%= href %>" target="_blank" rel="noopener">
+    <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 1h8l4 4v10H3z"/><path d="M11 1v4h4"/></svg>
+    <%= label %>
+  </a>
+</p>
+<% } else { %>
+<p class="blk-file blk-file-missing"><%= label %></p>
+<% } %>

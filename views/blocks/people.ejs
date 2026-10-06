@@ -1,0 +1,19 @@
+<%# Block: people — grid of person cards (photo top, title, names), old board layout. L: {b:{cards,cols}, idx} %>
+<% const cards = (L.b && L.b.cards) || []; %>
+<% const cols = (L.b && L.b.cols) || 0; %>
+<% if (cards.length) { %>
+<div class="blk-people<%= cols ? ' pcols-' + cols : '' %>" role="list" aria-label="<%= lang === 'zh' ? '成員' : 'Members' %>">
+  <% cards.forEach(function(cd, i) { %>
+  <% const im = cd && cd.image; %>
+  <figure class="blk-person" role="listitem">
+    <% if (im && im.src) { %>
+    <a class="blk-person-photo" href="<%= (cd && cd.href) || im.src %>"<% if (!(cd && cd.href)) { %> data-lightbox="blk-people-<%= L.idx %>-<%= i %>" data-full="<%= im.src %>" data-caption="<%= L.h.escAttr(im.caption || im.alt || '') %>" aria-label="<%= L.h.escAttr(im.alt || im.caption || 'photo') %>"<% } %>>
+      <img src="<%= im.src %>" alt="<%= L.h.escAttr(im.alt || '') %>" loading="lazy" decoding="async">
+    </a>
+    <% } %>
+    <% if (cd && cd.title) { %><figcaption class="blk-person-title"><% if (cd.href) { %><a href="<%= cd.href %>"><%- L.h.linkifySmart(cd.title, cd.links || []) %></a><% } else { %><%- L.h.linkifySmart(cd.title, cd.links || []) %><% } %></figcaption><% } %>
+    <% if (cd && cd.text) { %><div class="blk-person-names"><%- L.h.parasSmart(cd.text, cd.links || []) %></div><% } %>
+  </figure>
+  <% }) %>
+</div>
+<% } %>

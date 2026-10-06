@@ -12,6 +12,7 @@ import { icsForEvents } from './ics.js';
 import { buildSitemap } from './sitemap.js';
 import { lookupRedirect } from './redirects.js';
 import { bodyFor, setting } from './helpers.js';
+import { portedCtx, usePorted } from './ported.js';
 
 const PER_PAGE = 12;
 const ANN_KINDS = ['all', 'weekly', 'news', 'press', 'notice'];
@@ -223,8 +224,8 @@ export function registerPhase5Routes(app, bridge) {
     const videos = db.prepare(`SELECT * FROM media_items WHERE kind = 'video' AND url != '' ORDER BY id`).all();
     const albums = db.prepare(`SELECT * FROM media_items WHERE kind = 'album' AND url != '' ORDER BY id`).all();
     const heroSlides = db.prepare('SELECT * FROM slides WHERE published = 1 ORDER BY sort, id').all();
-    page(lang, req, res, '/media', 'media.ejs',
-      { photos, videos, albums, heroSlides },
+    page(lang, req, res, '/media', usePorted(db, 'media', 'media.ejs'),
+      { photos, videos, albums, heroSlides, ...portedCtx(db, 'media', lang), _pg: db.prepare('SELECT * FROM pages WHERE slug = ?').get('media') || { title_en: 'Media', title_zh: '影音媒體' } },
       lang === 'zh' ? '照片與影片' : 'Photos & Videos',
       lang === 'zh' ? 'SDCA 課堂、節慶與活動的精彩瞬間。' : 'Moments from SDCA classrooms, festivals and events.',
       {
@@ -285,8 +286,9 @@ export function registerPhase5Routes(app, bridge) {
         href: `/${lang}${l.p}`,
         label: lang === 'zh' ? l.zh : l.en,
       }));
-      page(lang, req, res, r.path, 'parents.ejs',
-        { page: pg, relatedDocs, subLinks, mdBody: bf.html, bodyNote: bf.note },
+      const view = r.slug === 'parents-volunteer' ? 'volunteer.ejs' : 'parents.ejs';
+      page(lang, req, res, r.path, view,
+        { page: pg, relatedDocs, subLinks, mdBody: bf.html, bodyNote: bf.note, ...portedCtx(db, r.slug, lang) },
         pg ? pickTitle(pg, lang) : (lang === 'zh' ? '家長專區' : 'Parents'),
         lang === 'zh' ? 'SDCA 家長專區：手冊、志工、書券與表單。' : 'SDCA parent resources: handbook, volunteer, scrip and forms.');
     });
@@ -437,8 +439,8 @@ export function registerPhase5Routes(app, bridge) {
       if (!SUPPORTED.includes(lang)) return notFound(req, res);
       const pg = db.prepare('SELECT * FROM pages WHERE slug = ?').get(slug);
       const bf = pg ? bodyFor(pg, lang) : { html: '', note: null };
-      page(lang, req, res, `/${slug}`, 'static-page.ejs',
-        { pg, mdBody: bf.html, bodyNote: bf.note },
+      page(lang, req, res, `/${slug}`, usePorted(db, slug, 'static-page.ejs'),
+        { pg, mdBody: bf.html, bodyNote: bf.note, ...portedCtx(db, slug, lang) },
         pg ? pickTitle(pg, lang) : slug,
         lang === 'zh' ? 'SDCA 法律頁面。' : 'SDCA legal page.');
     });

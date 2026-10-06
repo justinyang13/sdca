@@ -1,7 +1,39 @@
 {
-  "slug": "2018__10__22__pre-k-program",
-  "blocks": [],
-  "signature": [],
-  "notes": [],
-  "missing_local_files": []
+  "blocks": [
+    {
+      "heading": {
+        "level": 1,
+        "text": "Pre-K Program"
+      }
+    },
+    {
+      "image": {
+        "alt": "Pre-K Program",
+        "caption": "",
+        "height": null,
+        "local_path": "research/assets/images/Pre-K-Program-5.jpeg",
+        "sha256": "",
+        "src": "/img/old/misc/Pre-K-Program-5.jpeg",
+        "width": null
+      }
+    },
+    {
+      "file": {
+        "href": "__OLD_PDF__/2018/Pre-K-Intro-2016.pdf",
+        "label": "Pre-K Intro 2016 (PDF)",
+        "local_path": "research/assets/pdf/Pre-K-Intro-2016.pdf",
+        "sha256": ""
+      }
+    }
+  ],
+  "missing_local_files": [],
+  "notes": [
+    "DP hand-written 2026-10-05: old post body is the title + Pre-K-Intro-2016.pdf attachment link; 3,791 spam comments dropped per DP scope."
+  ],
+  "signature": [
+    "heading",
+    "image",
+    "file"
+  ],
+  "slug": "2018__10__22__pre-k-program"
 }

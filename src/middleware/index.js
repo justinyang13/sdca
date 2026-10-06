@@ -76,7 +76,9 @@ export function applyBaseMiddleware(app) {
   app.disable('x-powered-by');
   app.use(buildHelmet());
   app.use(compression());
-  app.use(generalLimiter);
+  // General page/asset limiter is OFF by default (a photo page loads 200+ images and
+  // tripped it, breaking images). Set RATE_LIMIT=<n> to enable. Form/login limiters stay on.
+  if (process.env.RATE_LIMIT) app.use(generalLimiter);
 
   // simple cookie parser (no deps)
   app.use((req, res, next) => {

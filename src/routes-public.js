@@ -9,6 +9,7 @@ import path from 'node:path';
 import ejs from 'ejs';
 import { config } from './config.js';
 import { imgUrl } from './helpers.js';
+import { portedCtx, usePorted } from './ported.js';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const PHONE_RE = /^[0-9+()\s.-]{7,20}$/;
@@ -189,7 +190,7 @@ export function registerPublicRoutes(app, bridge) {
   for (const r of aboutRoutes) {
     app.get(`/:lang${r.path}`, makePage({
       path: `/:lang${r.path}`,
-      viewFile: r.view,
+      viewFile: usePorted(db, r.slug, r.view),
       ctx: (req, lang) => {
         const page = pageBySlug(db, r.slug);
         const board = db.prepare('SELECT * FROM people WHERE "group" = ? ORDER BY sort, name_en').all('board');
@@ -197,6 +198,7 @@ export function registerPublicRoutes(app, bridge) {
         const principal = db.prepare('SELECT * FROM people WHERE name_en LIKE ? ORDER BY sort LIMIT 1').get('%Principal%');
         return {
           _pg: page || { title_en: r.t('en'), title_zh: r.t('zh'), body_en: '', body_zh: '' },
+          ...portedCtx(db, r.slug, lang),
           _board: board, _staff: staff, principal,
           heroImg: page?.hero_image ? page.hero_image.replace(/^img\//, '').replace(/-\d+\.jpg$/, '').replace(/\.jpg$/, '') : 'classroom-bilingual',
           _settings: {
@@ -241,12 +243,13 @@ export function registerPublicRoutes(app, bridge) {
   for (const r of programRoutes) {
     app.get(`/:lang${r.path}`, makePage({
       path: `/:lang${r.path}`,
-      viewFile: r.view,
+      viewFile: usePorted(db, r.slug, r.view),
       ctx: (req, lang) => {
         const page = pageBySlug(db, r.slug);
         const programs = db.prepare('SELECT * FROM programs ORDER BY sort, name_en').all();
         return {
           _pg: page || { title_en: r.t('en'), title_zh: r.t('zh'), body_en: '', body_zh: '' },
+          ...portedCtx(db, r.slug, lang),
           _programs: programs,
           heroImg: page?.hero_image ? page.hero_image.replace(/^img\//, '').replace(/-\d+\.jpg$/, '').replace(/\.jpg$/, '') : 'classroom-bilingual',
           _settings: {
@@ -268,14 +271,40 @@ export function registerPublicRoutes(app, bridge) {
     }));
   }
 
+  // ---------- Registration portal (static copies of the old register.sandiegochineseschool.com pages) ----------
+  const PORTAL_PAGES = {
+    'signin': { en: 'Portal Sign In', zh: '登入 Portal' },
+    'register': { en: 'New Family Sign Up', zh: '新家庭註冊' },
+    'forgot-username': { en: 'Search for Username', zh: '查詢用戶名稱' },
+    'forgot-password': { en: 'Request Password Reset', zh: '重建密碼' },
+    'privacy': { en: 'Privacy Policy', zh: '隱私權須知' },
+  };
+  app.get('/:lang/portal', (req, res) => res.redirect(301, `/${req.params.lang}/portal/signin`));
+  app.get('/:lang/portal/:page', (req, res, next) => {
+    const meta = PORTAL_PAGES[req.params.page];
+    if (!meta || !SUPPORTED.includes(req.params.lang)) return next();
+    const file = path.join(config.viewsDir, 'portal', `${req.params.page}.html`);
+    if (!fs.existsSync(file)) return next();
+    const L = req.params.lang;
+    const portalHtml = fs.readFileSync(file, 'utf8').replace(/\{\{L\}\}/g, L);
+    return makePage({
+      path: `/:lang/portal/${req.params.page}`,
+      viewFile: 'portal.ejs',
+      ctx: () => ({ portalHtml, portalTitle: meta[L] || meta.en, portalName: req.params.page }),
+      title: () => `${meta[L] || meta.en} — SDCA`,
+      desc: () => (L === 'zh' ? '聖地牙哥中華學苑網上註冊。' : 'SDCA online registration portal (static preview).'),
+    })(req, res);
+  });
+
   // ---------- Enroll ----------
   app.get('/:lang/enroll', makePage({
     path: '/:lang/enroll',
-    viewFile: 'enroll.ejs',
+    viewFile: usePorted(db, 'enroll', 'enroll.ejs'),
     ctx: (req, lang) => {
       const page = pageBySlug(db, 'enroll');
       return {
         _pg: page || { title_en: 'Enrollment', title_zh: '報名註冊', body_en: '', body_zh: '' },
+        ...portedCtx(db, 'enroll', lang),
         heroImg: 'classroom-bilingual',
         _settings: {
           registration_portal: setting(db, 'registration_portal', lang),
@@ -302,6 +331,7 @@ export function registerPublicRoutes(app, bridge) {
       _errors: {},
       _submitted: false, success: false,
       _form: {},
+      ...portedCtx(db, 'contact', lang),
       _settings: contactSettings(db, lang),
     }),
     title: (lang) => lang === 'zh' ? 'SDCA 聯絡我們' : 'Contact SDCA',
@@ -399,6 +429,7 @@ export function registerPublicRoutes(app, bridge) {
       const sponsors = db.prepare('SELECT * FROM sponsors ORDER BY sort, name').all();
       return {
         _pg: page || { title_en: 'Our Sponsors', title_zh: '贊助商', body_en: '', body_zh: '' },
+        ...portedCtx(db, 'support-sponsors', lang),
         _sponsors: sponsors,
         _settings: { email_vp: setting(db, 'email_vp', lang) },
       };

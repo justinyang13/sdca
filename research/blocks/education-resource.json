@@ -25,6 +25,40 @@
           "國語日報社網站 Mandarin Daily News",
           "南加州中文學校聯合會 Southern California Council of Chinese Schools",
           "林語堂 當代漢英字典 Chinese-English Dictionary"
+        ],
+        "links": [
+          {
+            "t": "中文聽說讀寫 Integrated Chinese",
+            "href": "http://ic.cheng-tsui.com/"
+          },
+          {
+            "t": "美洲華語 MeiZhou Chinese",
+            "href": "http://www.mzchinese.net/"
+          },
+          {
+            "t": "Better Chinese",
+            "href": "https://www.betterchinese.com/"
+          },
+          {
+            "t": "學華語開步走",
+            "href": "https://www.huayuworld.org/oldindex/edu_in_huayu/learn_huayu_start_run/default.htm"
+          },
+          {
+            "t": "全球華文網 E-learning Huayu of Taiwan",
+            "href": "https://www.huayuworld.org/"
+          },
+          {
+            "t": "國語日報社網站 Mandarin Daily News",
+            "href": "https://www.mdnkids.com/"
+          },
+          {
+            "t": "南加州中文學校聯合會 Southern California Council of Chinese Schools",
+            "href": "http://www.scccs.net/"
+          },
+          {
+            "t": "林語堂 當代漢英字典 Chinese-English Dictionary",
+            "href": "http://humanum.arts.cuhk.edu.hk/Lexis/Lindict/"
+          }
         ]
       }
     }
@@ -34,6 +68,19 @@
     "1col",
     "1col"
   ],
-  "notes": [],
+  "notes": [
+    "DP repair 2026-10-05 (Claude): resource list links restored (exact old URLs).",
+    "DP repair 2026-10-05 (Claude): resource list links restored (exact old URLs).",
+    "DP repair 2026-10-05 (Claude): resource list links restored (exact old URLs).",
+    "DP repair 2026-10-05 (Claude): resource list links restored (exact old URLs).",
+    "DP repair 2026-10-05 (Claude): resource list links restored (exact old URLs).",
+    "DP repair 2026-10-05 (Claude): resource list links restored (exact old URLs).",
+    "DP repair 2026-10-05 (Claude): resource list links restored (exact old URLs).",
+    "DP repair 2026-10-05 (Claude): resource list links restored (exact old URLs).",
+    "DP repair 2026-10-05 (Claude): resource list links restored (exact old URLs).",
+    "DP repair 2026-10-05 (Claude): resource list links restored (exact old URLs).",
+    "DP repair 2026-10-05 (Claude): resource list links restored (exact old URLs).",
+    "DP repair 2026-10-05 (Claude): resource list links restored (exact old URLs)."
+  ],
   "missing_local_files": []
 }

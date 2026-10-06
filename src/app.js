@@ -9,10 +9,12 @@ import { applyBaseMiddleware } from './middleware/index.js';
 import { openDb } from './db/open.js';
 import * as H from './helpers.js';
 import { imageManifest, withPdfTargets, assetUrl, withAssetUrls } from './helpers.js';
+import { blockHelpers } from './block-helpers.js';
 import { registerPublicRoutes } from './routes-public.js';
 import { registerPhase5Routes } from './routes-phase5.js';
 import { registerAdminRoutes } from './admin/routes.js';
 import { lookupRedirect } from './redirects.js';
+import { portedCtx } from './ported.js';
 import { buildSitemap } from './sitemap.js';
 import { marked } from 'marked';
 import sanitizeHtml from 'sanitize-html';
@@ -42,7 +44,10 @@ export function createApp({ db = openDb() } = {}) {
     function renderPart(file, locals) {
       const full = path.join(config.viewsDir, file);
       const src = fs.readFileSync(full, 'utf8');
-      return ejs.render(src, { lang, t: tFn, renderPart, L: locals || {}, imageManifest, assetUrl });
+      // Block renderer partials (views/blocks/*.ejs) get the DP text helpers as L.h.
+      const L = locals || {};
+      if (file.startsWith('blocks/')) L.h = blockHelpers;
+      return ejs.render(src, { lang, t: tFn, renderPart, L, imageManifest, assetUrl });
     }
     return renderPart;
   }
@@ -156,6 +161,28 @@ export function createApp({ db = openDb() } = {}) {
 
   // ---------- Phase 5 public pages + platform features ----------
   registerPhase5Routes(app, { makeRenderPart, renderShell, pageView, renderMarkdown, t, db, SUPPORTED });
+
+  // ---------- Phase DP fallback: serve any pages row that has an imported block
+  // tree but no dedicated route (e.g. /en/classroom-map). Runs last, 404s otherwise.
+  app.get('/:lang/:slug', function (req, res, next) {
+    const lang = req.params.lang;
+    if (!SUPPORTED.includes(lang)) return next();
+    const { pg, blocks, useBlocks, adminHtml, bodyNote } = portedCtx(db, req.params.slug, lang);
+    if (!pg || !useBlocks) return next();
+    const tFn = (k) => t(lang, k);
+    const renderPart = makeRenderPart(lang);
+    const title = lang === 'zh' ? (pg.title_zh || pg.title_en) : (pg.title_en || pg.title_zh);
+    const body = pageView('ported.ejs', { lang, t: tFn, renderPart, db, pg, blocks, useBlocks, adminHtml, bodyNote });
+    res.render('layouts/main.ejs', {
+      lang, t: tFn, renderPart,
+      title, description: title,
+      canonical: `/${lang}/${req.params.slug}`,
+      enUrl: `/en/${req.params.slug}`, zhUrl: `/zh/${req.params.slug}`,
+      jsonLd: null,
+      body,
+      ...renderShell(lang, { langPath: `/${req.params.slug}` }),
+    });
+  });
 
   // 404
   app.use((req, res) => renderError(app, res, 404, req.lang || 'en', {

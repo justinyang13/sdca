@@ -1,0 +1,24 @@
+<%# Block: gallery — grid or scroll-snap slider, lightbox on click. L: {b:{mode,items}, idx} %>
+<% const items = (L.b && L.b.items) || []; %>
+<% if (items.length) { %>
+<% const mode = L.b.mode === 'slider' ? 'slider' : 'grid'; %>
+<div class="blk-gallery blk-gallery-<%= mode %><%= L.b.cols ? ' blk-gallery-cols blk-gallery-c' + L.b.cols : '' %>" role="group" aria-label="<%= lang === 'zh' ? '照片集' : 'Photo gallery' %>">
+  <% items.forEach(function(it, i) { %>
+    <% if (it && it.src) { %>
+    <figure class="blk-gallery-item">
+      <a href="<%= it.src %>" data-lightbox="blk-<%= L.idx %>" data-full="<%= it.src %>" data-caption="<%= L.h.escAttr(it.caption || it.alt || '') %>" aria-label="<%= L.h.escAttr(it.alt || it.caption || ('photo ' + (i + 1))) %>">
+        <img src="<%= it.src %>" alt="<%= L.h.escAttr(it.alt || it.caption || '') %>"<% if (L.b.cols && it.caption) { %> title="<%= L.h.escAttr(it.caption) %>"<% } %> loading="lazy" decoding="async">
+      </a>
+      <% if (it.caption && !L.b.cols) { %><figcaption><%- L.h.linkify(it.caption) %></figcaption><% } %>
+    </figure>
+    <% } %>
+  <% }) %>
+</div>
+<div class="lightbox" role="dialog" aria-modal="true" aria-label="<%= lang === 'zh' ? '圖片檢視' : 'Image viewer' %>" hidden>
+  <button class="lb-close" aria-label="<%= t('button.close') %>" data-lb-close>&times;</button>
+  <button class="lb-prev" aria-label="Previous" data-lb-prev>‹</button>
+  <img class="lb-img" src="" alt="">
+  <div class="lb-caption"></div>
+  <button class="lb-next" aria-label="Next" data-lb-next>›</button>
+</div>
+<% } %>

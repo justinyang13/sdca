@@ -29,9 +29,9 @@ const SETTINGS = [
   { key: 'website',         value_en: 'https://sandiegochineseschool.com',   value_zh: 'https://sandiegochineseschool.com' },
 
   // Registration
-  { key: 'registration_portal',  value_en: 'https://register.sandiegochineseschool.com', value_zh: 'https://register.sandiegochineseschool.com' },
-  { key: 'registration_new',     value_en: 'https://register.sandiegochineseschool.com/signin/register', value_zh: 'https://register.sandiegochineseschool.com/signin/register' },
-  { key: 'registration_returning', value_en: 'https://register.sandiegochineseschool.com/signin', value_zh: 'https://register.sandiegochineseschool.com/signin' },
+  { key: 'registration_portal',  value_en: '/en/portal/signin', value_zh: '/zh/portal/signin' },
+  { key: 'registration_new',     value_en: '/en/portal/register', value_zh: '/zh/portal/register' },
+  { key: 'registration_returning', value_en: '/en/portal/signin', value_zh: '/zh/portal/signin' },
   { key: 'first_day_2026_27',    value_en: 'September 13, 2026',             value_zh: '2026年9月13日' },
   { key: 'mail_registration',    value_en: 'No longer accepted (2026-27)',   value_zh: '2026-27學年度不再接受郵寄註冊' },
 

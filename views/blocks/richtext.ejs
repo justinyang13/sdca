@@ -1,8 +1,4 @@
-<%# Block: richtext — verbatim text, line breaks preserved %>
+<%# Block: richtext — verbatim text, paragraphs + inline links. L: {b:string|{text,links}} %>
 <div class="blk-richtext">
-  <% b.split('\n').forEach(function(line) { %>
-    <% if (line.trim()) { %>
-    <p><%= line %></p>
-    <% } %>
-  <% }) %>
+  <%- L.h.parasSmart(typeof L.b === 'string' ? L.b : ((L.b && L.b.text) || ''), (L.b && L.b.links) || []) %>
 </div>

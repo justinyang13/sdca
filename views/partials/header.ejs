@@ -7,49 +7,39 @@
   const href = (p) => `/${L}${p}`;
   const hrefAlt = (p) => `/${alt}${p}`;
 
+  // Menu structure mirrors the original site (research/wiki/navigation.md):
+  // About | Class | Parent Info | Enroll. PDF items (Bell, Textbooks, School
+  // Calendar) are direct links — no dropdown of their own.
   const NAV = [
     {
-      id: 'about', label: t('nav.about'), items: [
+      id: 'about', label: t('nav.about'), p: '/about', items: [
         { p: '/about', l: t('nav.about_about') },
         { p: '/about/board', l: t('nav.about_board') },
         { p: '/about/staff', l: t('nav.about_staff') },
-        { p: '/about/principal', l: t('nav.about_principal') },
+        { p: '/news?kind=weekly', l: t('nav.about_weekly') },
+        { p: '/contact', l: t('nav.about_contact') },
       ],
     },
     {
-      id: 'programs', label: t('nav.programs'), items: [
+      id: 'class', label: t('nav.programs'), p: '/programs/classes', items: [
         { p: '/programs/classes', l: t('nav.programs_classes') },
         { p: '/programs/tcml', l: t('nav.programs_tcml') },
-        { p: '/programs/recreational', l: t('nav.programs_recreational') },
+        { href: '/pdf/class-schedule', l: t('nav.programs_bell') },
+        { href: '/pdf/2018-2019-textbook-list', l: t('nav.programs_textbooks') },
         { p: '/programs/ta', l: t('nav.programs_ta') },
-        { p: '/programs/bell', l: t('nav.programs_bell') },
-      ],
-    },
-    { id: 'enroll', label: t('nav.enroll'), href: 'https://register.sandiegochineseschool.com' },
-    {
-      id: 'news', label: t('nav.news'), items: [
-        { p: '/news', l: t('nav.news_announcements') },
-        { p: '/events', l: t('nav.news_events') },
-        { p: '/news?kind=press', l: t('nav.news_press') },
-        { p: '/media', l: t('nav.news_media') },
+        { p: '/media', l: t('nav.programs_media') },
       ],
     },
     {
-      id: 'parents', label: t('nav.parents'), items: [
-        { p: '/parents/handbook', l: t('nav.parents_handbook') },
+      id: 'parents', label: t('nav.parents'), p: '/parents/volunteer', items: [
         { p: '/parents/volunteer', l: t('nav.parents_volunteer') },
-        { p: '/parents/scrip', l: t('nav.parents_scrip') },
-        { p: '/documents', l: t('nav.parents_docs') },
-      ],
-    },
-    {
-      id: 'support', label: t('nav.support'), items: [
-        { p: '/support', l: t('nav.support_donate') },
+        { href: '/pdf/2026-27-school-calendar', l: t('nav.parents_calendar') },
+        { p: '/parents/handbook', l: t('nav.parents_handbook') },
+        { p: '/programs/recreational', l: t('nav.programs_recreational') },
         { p: '/support/sponsors', l: t('nav.support_sponsors') },
-        { p: '/parents/scrip', l: t('nav.support_scrip') },
       ],
     },
-    { id: 'contact', label: t('nav.contact'), p: '/contact' },
+    { id: 'enroll', label: t('nav.enroll'), p: '/enroll' },
   ];
 %>
 <header class="site-header" role="banner">
@@ -68,17 +58,22 @@
             <a href="<%= item.href %>" target="_blank" rel="noopener"><%= item.label %> <svg class="caret" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg></a>
           </li>
           <% } else if (item.items) { %>
-          <li>
+          <li class="has-sub">
+            <a class="nav-top" href="<%= href(item.p) %>"><%= item.label %></a>
             <button type="button" class="nav-trigger"
                     data-dropdown="<%= item.id %>"
                     aria-expanded="false"
-                    aria-controls="menu-<%= item.id %>">
-              <%= item.label %>
+                    aria-controls="menu-<%= item.id %>"
+                    aria-label="<%= item.label %>">
               <svg class="caret" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg>
             </button>
             <div class="dropdown" id="menu-<%= item.id %>">
               <% item.items.forEach(function(s) { %>
+                <% if (s.href) { %>
+                <a href="<%= s.href %>" target="_blank" rel="noopener"><%= s.l %> <span class="sr-only">(PDF)</span></a>
+                <% } else { %>
                 <a href="<%= href(s.p) %>" <%= isActive(s.p) ? 'aria-current="page"' : '' %>><%= s.l %></a>
+                <% } %>
               <% }) %>
             </div>
           </li>
@@ -120,15 +115,20 @@
         <a href="<%= item.href %>" target="_blank" rel="noopener"><%= item.label %></a>
       </li>
       <% } else if (item.items) { %>
-      <li>
-        <button type="button" class="nav-trigger" aria-expanded="false" aria-controls="dsub-<%= item.id %>">
-          <%= item.label %> <svg class="caret" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg>
+      <li class="has-sub">
+        <a class="nav-top" href="<%= href(item.p) %>"><%= item.label %></a>
+        <button type="button" class="nav-trigger" aria-expanded="false" aria-controls="dsub-<%= item.id %>" aria-label="<%= item.label %>">
+          <svg class="caret" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg>
         </button>
-        <ul class="sublist" id="dsub-<%= item.id %>" hidden>
-          <% item.items.forEach(function(s) { %>
-            <li><a href="<%= href(s.p) %>" <%= isActive(s.p) ? 'aria-current="page"' : '' %>><%= s.l %></a></li>
-          <% }) %>
-        </ul>
+          <ul class="sublist" id="dsub-<%= item.id %>" hidden>
+            <% item.items.forEach(function(s) { %>
+              <% if (s.href) { %>
+              <li><a href="<%= s.href %>" target="_blank" rel="noopener"><%= s.l %></a></li>
+              <% } else { %>
+              <li><a href="<%= href(s.p) %>" <%= isActive(s.p) ? 'aria-current="page"' : '' %>><%= s.l %></a></li>
+              <% } %>
+            <% }) %>
+          </ul>
       </li>
       <% } else { %>
       <li>

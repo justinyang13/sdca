@@ -17,10 +17,16 @@
 
 <section class="section" aria-labelledby="parents-h">
   <div class="container grid-2-col">
+    <% if (typeof useBlocks !== 'undefined' && useBlocks && typeof blocks !== 'undefined' && blocks.length) { %>
+    <div class="blocks">
+      <%- renderPart('partials/blocks.ejs', { blocks: blocks }) %>
+    </div>
+    <% } else { %>
     <div class="detail-body markdown">
       <%- mdBody %><% if (!mdBody) { %><p><%= L === 'zh' ? '（內容略）' : '(Content omitted.)' %></p><% } %>
       <% if (bodyNote) { %><p class="lang-note"><%= t(bodyNote) %></p><% } %>
     </div>
+    <% } %>
 
     <aside>
       <% if (linksArr.length) { %>

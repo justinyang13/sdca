@@ -1,0 +1,13 @@
+<%
+  // portal.ejs — static copy of a page of the old registration portal. ctx: { portalHtml, portalTitle, portalName }
+  const L = lang;
+%>
+<%- renderPart('partials/hero.ejs', { heroTitle: portalTitle, heroVariant: 'slim' }) %>
+
+<section class="section">
+  <div class="container">
+    <div class="portal-wrap portal-<%= portalName %>-wrap">
+      <%- portalHtml %>
+    </div>
+  </div>
+</section>

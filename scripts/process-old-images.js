@@ -33,12 +33,19 @@ function sipsResize(src, dst, maxW) {
   return out.status === 0;
 }
 
+function imgWidth(src) {
+  const out = spawnSync('sips', ['-g', 'pixelWidth', src], { encoding: 'utf8' });
+  const m = String(out.stdout || '').match(/pixelWidth:\s*(\d+)/);
+  return m ? Number(m[1]) : 0;
+}
+
 function sipsCopy(src, dst) {
   fs.mkdirSync(path.dirname(dst), { recursive: true });
-  if (dst.endsWith('.jpg') || dst.endsWith('.jpeg')) {
+  const ext = dst.toLowerCase();
+  if ((ext.endsWith('.jpg') || ext.endsWith('.jpeg')) && imgWidth(src) > MAX_W) {
     return sipsResize(src, dst, MAX_W);
   }
-  // PNG/GIF: just copy (preserve transparency/animation)
+  // PNG/GIF/small JPEGs: copy as-is (never upscale thumbnails; keep bytes small)
   fs.copyFileSync(src, dst);
   return true;
 }
@@ -76,12 +83,24 @@ function main() {
         failures.push(`unsupported image type: ${lp}`);
         return;
       }
-      // Determine year + name from placeholder src: __OLD_IMG__/<year>/<name>
+      // Determine year + name from placeholder src: __OLD_IMG__/<year>/<name>.
+      // Already-resolved /img/old/... srcs are left untouched (never rewrite years).
       const srcMatch = (img.src || '').match(/^__OLD_IMG__\/([^/]+)\/(.+)$/);
-      const year = srcMatch ? srcMatch[1] : 'misc';
-      const name = srcMatch ? srcMatch[2] : path.basename(lp);
-      const dest = path.join(OUT_DIR, year, name);
-      const rel = `/img/old/${year}/${name}`;
+      let year, name, dest, rel;
+      if (srcMatch) {
+        year = srcMatch[1];
+        name = srcMatch[2];
+        dest = path.join(OUT_DIR, year, name);
+        rel = `/img/old/${year}/${name}`;
+        img.src = rel;
+      } else if ((img.src || '').startsWith('/img/old/')) {
+        rel = img.src;
+        dest = path.join(ROOT, 'public', img.src.slice(1));
+      } else {
+        imgStats.failed++;
+        failures.push(`unexpected image src (not __OLD_IMG__ or /img/old/): ${img.src} (in ${f})`);
+        return;
+      }
 
       if (imgPlan.has(lp) && imgPlan.get(lp).rel === rel) {
         img.src = rel;
@@ -114,6 +133,7 @@ function main() {
         const v = b[key];
         if (key === 'image') planImage(v);
         if (key === 'image_text') { planImage(v.image); (v.extra || []).forEach((e) => { if (e.file) planFile(e.file); if (e.image) planImage(e.image); }); }
+        if (key === 'people') (v.cards || []).forEach((c) => { if (c.image) planImage(c.image); });
         if (key === 'file') planFile(v);
         if (key === 'gallery') v.items.forEach((i) => planImage(i));
         if (key === 'columns') v.cols.forEach((cb) => walkBlocks(cb));

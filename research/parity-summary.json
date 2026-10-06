@@ -1,0 +1,914 @@
+{
+  "generated": "2026-10-06T04:51:35.766Z",
+  "base": "http://localhost:3100",
+  "pages": {
+    "about": {
+      "route": "/about",
+      "units": 20,
+      "missing": [],
+      "images": {
+        "old": 12,
+        "missing": [],
+        "orderOk": true
+      },
+      "links": {
+        "old": 1,
+        "missing": []
+      },
+      "layout": {
+        "expected": "blk-richtext,blk-image,blk-richtext,blk-image,blk-richtext,blk-gallery,blk-heading,blk-list,blk-gallery",
+        "actual": "blk-richtext,blk-image,blk-richtext,blk-image,blk-richtext,blk-gallery,blk-heading,blk-list,blk-gallery",
+        "ok": true
+      },
+      "en": {
+        "coverage": 1,
+        "found": 20,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "127/127"
+      },
+      "zh": {
+        "coverage": 1,
+        "found": 20,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "127/127"
+      },
+      "verdict": "PASS"
+    },
+    "about-board": {
+      "route": "/about/board",
+      "units": 8,
+      "missing": [],
+      "images": {
+        "old": 26,
+        "missing": [
+          "bodjpg"
+        ],
+        "orderOk": true
+      },
+      "links": {
+        "old": 20,
+        "missing": [
+          "/wp-content/uploads/2019/07/Peggy-Han.jpeg"
+        ]
+      },
+      "layout": {
+        "expected": "blk-gallery,blk-richtext,blk-image,blk-richtext,blk-heading,blk-people,blk-divider,blk-people,blk-image",
+        "actual": "blk-gallery,blk-richtext,blk-image,blk-richtext,blk-heading,blk-people,blk-divider,blk-people,blk-image",
+        "ok": true
+      },
+      "en": {
+        "coverage": 1,
+        "found": 8,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "103/103"
+      },
+      "zh": {
+        "coverage": 1,
+        "found": 8,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "103/103"
+      },
+      "verdict": "FAIL: images missing: bodjpg"
+    },
+    "about-staff": {
+      "route": "/about/staff",
+      "units": 20,
+      "missing": [],
+      "images": {
+        "old": 3,
+        "missing": [],
+        "orderOk": true
+      },
+      "links": {
+        "old": 3,
+        "missing": []
+      },
+      "layout": {
+        "expected": "blk-image,blk-heading,blk-richtext,blk-image,blk-richtext,blk-heading,blk-richtext,blk-image",
+        "actual": "blk-image,blk-heading,blk-richtext,blk-image,blk-richtext,blk-heading,blk-richtext,blk-image",
+        "ok": true
+      },
+      "en": {
+        "coverage": 1,
+        "found": 20,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "196/196"
+      },
+      "zh": {
+        "coverage": 1,
+        "found": 20,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "196/196"
+      },
+      "verdict": "PASS"
+    },
+    "about-principal": {
+      "route": "/about/principal",
+      "units": 41,
+      "missing": [],
+      "images": {
+        "old": 0,
+        "missing": [],
+        "orderOk": true
+      },
+      "links": {
+        "old": 0,
+        "missing": []
+      },
+      "layout": {
+        "expected": "blk-heading,blk-richtext",
+        "actual": "blk-heading,blk-richtext",
+        "ok": true
+      },
+      "en": {
+        "coverage": 1,
+        "found": 41,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "210/210"
+      },
+      "zh": {
+        "coverage": 1,
+        "found": 41,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "210/210"
+      },
+      "verdict": "PASS"
+    },
+    "programs-classes": {
+      "route": "/programs/classes",
+      "units": 17,
+      "missing": [],
+      "images": {
+        "old": 6,
+        "missing": [],
+        "orderOk": true
+      },
+      "links": {
+        "old": 10,
+        "missing": []
+      },
+      "layout": {
+        "expected": "blk-heading,blk-image,blk-richtext,blk-divider,blk-image-text,blk-divider,blk-image-text,blk-divider,blk-image-text,blk-divider,blk-image-text,blk-divider,blk-image-text",
+        "actual": "blk-heading,blk-image,blk-richtext,blk-divider,blk-image-text,blk-divider,blk-image-text,blk-divider,blk-image-text,blk-divider,blk-image-text,blk-divider,blk-image-text",
+        "ok": true
+      },
+      "en": {
+        "coverage": 1,
+        "found": 17,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "127/127"
+      },
+      "zh": {
+        "coverage": 1,
+        "found": 17,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "127/127"
+      },
+      "verdict": "PASS"
+    },
+    "programs-tcml": {
+      "route": "/programs/tcml",
+      "units": 14,
+      "missing": [],
+      "images": {
+        "old": 9,
+        "missing": [
+          "img3218jpg"
+        ],
+        "orderOk": true
+      },
+      "links": {
+        "old": 10,
+        "missing": [
+          "/wp-content/uploads/2025/12/IMG_3218.jpg",
+          "/wp-content/uploads/2024/10/IMG_9001-scaled.jpg",
+          "/wp-content/uploads/2024/10/IMG_9002-scaled.jpg",
+          "/wp-content/uploads/2024/10/IMG_9003-scaled.jpg"
+        ]
+      },
+      "layout": {
+        "expected": "blk-heading,blk-richtext,blk-divider,blk-image,blk-heading,blk-divider,blk-heading,blk-image,blk-image,blk-image,blk-image,blk-divider,blk-heading,blk-image,blk-image,blk-image",
+        "actual": "blk-heading,blk-richtext,blk-divider,blk-image,blk-heading,blk-divider,blk-heading,blk-image,blk-image,blk-image,blk-image,blk-divider,blk-heading,blk-image,blk-image,blk-image",
+        "ok": true
+      },
+      "en": {
+        "coverage": 1,
+        "found": 14,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "219/219"
+      },
+      "zh": {
+        "coverage": 1,
+        "found": 14,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "219/219"
+      },
+      "verdict": "PASS"
+    },
+    "programs-ta": {
+      "route": "/programs/ta",
+      "units": 7,
+      "missing": [],
+      "images": {
+        "old": 1,
+        "missing": [],
+        "orderOk": true
+      },
+      "links": {
+        "old": 2,
+        "missing": []
+      },
+      "layout": {
+        "expected": "blk-heading,blk-richtext,blk-image,blk-richtext,blk-button",
+        "actual": "blk-heading,blk-richtext,blk-image,blk-richtext,blk-button",
+        "ok": true
+      },
+      "en": {
+        "coverage": 1,
+        "found": 7,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "59/59"
+      },
+      "zh": {
+        "coverage": 1,
+        "found": 7,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "59/59"
+      },
+      "verdict": "PASS"
+    },
+    "programs-recreational": {
+      "route": "/programs/recreational",
+      "units": 10,
+      "missing": [],
+      "images": {
+        "old": 5,
+        "missing": [],
+        "orderOk": true
+      },
+      "links": {
+        "old": 6,
+        "missing": []
+      },
+      "layout": {
+        "expected": "blk-heading,blk-heading,blk-image,blk-embed,blk-image,blk-richtext,blk-divider,blk-heading,blk-richtext,blk-image,blk-image,blk-divider,blk-heading,blk-richtext,blk-image",
+        "actual": "blk-heading,blk-heading,blk-image,blk-embed,blk-image,blk-richtext,blk-divider,blk-heading,blk-richtext,blk-image,blk-image,blk-divider,blk-heading,blk-richtext,blk-image",
+        "ok": true
+      },
+      "en": {
+        "coverage": 1,
+        "found": 10,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "85/85"
+      },
+      "zh": {
+        "coverage": 1,
+        "found": 10,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "85/85"
+      },
+      "verdict": "PASS"
+    },
+    "parents-volunteer": {
+      "route": "/parents/volunteer",
+      "units": 28,
+      "missing": [],
+      "images": {
+        "old": 10,
+        "missing": [],
+        "orderOk": true
+      },
+      "links": {
+        "old": 14,
+        "missing": []
+      },
+      "layout": {
+        "expected": "blk-heading,blk-image,blk-gallery,blk-richtext,blk-richtext,blk-richtext,blk-image,blk-heading,blk-richtext",
+        "actual": "",
+        "ok": false
+      },
+      "en": {
+        "coverage": 0.75,
+        "found": 21,
+        "inversions": 0,
+        "missing": [
+          "義工服務 Volunteer Opportunity 聖地牙哥中華學苑 需要您報名義工。",
+          "但只要家長參與校內服務達一定時數， 此項訂金即可退還。",
+          "參與的家長人數越多， 每人分擔的工作就越少。",
+          "(Serve for the entire school year) 班媽 / 班爸 – 做為學校 / 老師 / 家長會與家長之間的溝通橋梁 , 協助老師安排班級和學校的活動 , ",
+          "(Serve for 5 weeks) 辦公室職勤 – 在 1:30 pm 和 4:30 pm 的時候敲鐘 , 幫教職及行政人員準備咖啡 / 茶 , 協助家長會和行政人員處理瑣事 ",
+          "( 服務一學年 ) *Need _ Volunteer* School Contest Assistance – To help with the setup and assist",
+          "Teacher’s Snack Duty – To purchase snacks for the staff and TAs (work 5 weeks for full ref"
+        ],
+        "wordRecall": 1,
+        "words": "347/347"
+      },
+      "zh": {
+        "coverage": 0.75,
+        "found": 21,
+        "inversions": 0,
+        "missing": [
+          "義工服務 Volunteer Opportunity 聖地牙哥中華學苑 需要您報名義工。",
+          "但只要家長參與校內服務達一定時數， 此項訂金即可退還。",
+          "參與的家長人數越多， 每人分擔的工作就越少。",
+          "(Serve for the entire school year) 班媽 / 班爸 – 做為學校 / 老師 / 家長會與家長之間的溝通橋梁 , 協助老師安排班級和學校的活動 , ",
+          "(Serve for 5 weeks) 辦公室職勤 – 在 1:30 pm 和 4:30 pm 的時候敲鐘 , 幫教職及行政人員準備咖啡 / 茶 , 協助家長會和行政人員處理瑣事 ",
+          "( 服務一學年 ) *Need _ Volunteer* School Contest Assistance – To help with the setup and assist",
+          "Teacher’s Snack Duty – To purchase snacks for the staff and TAs (work 5 weeks for full ref"
+        ],
+        "wordRecall": 0.9971181556195965,
+        "words": "346/347"
+      },
+      "verdict": "FAIL: en: text coverage 75.0%; zh: text coverage 75.0%; layout signature differs"
+    },
+    "parents-handbook": {
+      "route": "/parents/handbook",
+      "units": 1,
+      "missing": [],
+      "images": {
+        "old": 0,
+        "missing": [],
+        "orderOk": true
+      },
+      "links": {
+        "old": 7,
+        "missing": []
+      },
+      "layout": {
+        "expected": "blk-heading,blk-list,blk-heading,blk-list",
+        "actual": "blk-heading,blk-list,blk-heading,blk-list",
+        "ok": true
+      },
+      "en": {
+        "coverage": 1,
+        "found": 1,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "49/49"
+      },
+      "zh": {
+        "coverage": 1,
+        "found": 1,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "49/49"
+      },
+      "verdict": "PASS"
+    },
+    "parents-scrip": {
+      "route": "/parents/scrip",
+      "units": 1,
+      "missing": [],
+      "images": {
+        "old": 5,
+        "missing": [],
+        "orderOk": true
+      },
+      "links": {
+        "old": 5,
+        "missing": [
+          "/wp-content/uploads/2020/Scrip%20Order%20Form.jpg"
+        ]
+      },
+      "layout": {
+        "expected": "blk-image,blk-image,blk-image,blk-image,blk-image,blk-richtext,blk-image-text,blk-image-text,blk-image-text,blk-image-text,blk-image-text,blk-richtext,blk-image",
+        "actual": "blk-image,blk-image,blk-image,blk-image,blk-image,blk-richtext,blk-image-text,blk-image-text,blk-image-text,blk-image-text,blk-image-text,blk-richtext,blk-image",
+        "ok": true
+      },
+      "en": {
+        "coverage": 1,
+        "found": 1,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "5/5"
+      },
+      "zh": {
+        "coverage": 1,
+        "found": 1,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "5/5"
+      },
+      "verdict": "PASS"
+    },
+    "support-sponsors": {
+      "route": "/support/sponsors",
+      "units": 29,
+      "missing": [],
+      "images": {
+        "old": 9,
+        "missing": [],
+        "orderOk": true
+      },
+      "links": {
+        "old": 21,
+        "missing": [
+          "/SDCA_Donation_Form%20-%202008.pdf",
+          "/wp-content/uploads/2022/02/Dr.-Liu-ad-half-page.png"
+        ]
+      },
+      "layout": {
+        "expected": "blk-heading,blk-heading,blk-richtext,blk-divider,blk-richtext,blk-divider,blk-richtext,blk-image,blk-divider,blk-richtext,blk-image,blk-divider,blk-richtext,blk-divider,blk-richtext,blk-divider,blk-heading,blk-image,blk-image,blk-image,blk-image,blk-image,blk-image,blk-image",
+        "actual": "blk-heading,blk-heading,blk-richtext,blk-divider,blk-richtext,blk-divider,blk-richtext,blk-image,blk-divider,blk-richtext,blk-image,blk-divider,blk-richtext,blk-divider,blk-richtext,blk-divider,blk-heading,blk-image,blk-image,blk-image,blk-image,blk-image,blk-image,blk-image",
+        "ok": true
+      },
+      "en": {
+        "coverage": 1,
+        "found": 29,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "117/117"
+      },
+      "zh": {
+        "coverage": 1,
+        "found": 29,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "117/117"
+      },
+      "verdict": "PASS"
+    },
+    "education-resource": {
+      "route": "/education-resource",
+      "units": 1,
+      "missing": [],
+      "images": {
+        "old": 0,
+        "missing": [],
+        "orderOk": true
+      },
+      "links": {
+        "old": 8,
+        "missing": []
+      },
+      "layout": {
+        "expected": "blk-heading,blk-heading,blk-list",
+        "actual": "blk-heading,blk-heading,blk-list",
+        "ok": true
+      },
+      "en": {
+        "coverage": 1,
+        "found": 1,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "58/58"
+      },
+      "zh": {
+        "coverage": 1,
+        "found": 1,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "58/58"
+      },
+      "verdict": "PASS"
+    },
+    "disclaimer": {
+      "route": "/disclaimer",
+      "units": 3,
+      "missing": [],
+      "images": {
+        "old": 0,
+        "missing": [],
+        "orderOk": true
+      },
+      "links": {
+        "old": 0,
+        "missing": []
+      },
+      "layout": {
+        "expected": "blk-heading,blk-richtext",
+        "actual": "blk-heading,blk-richtext",
+        "ok": true
+      },
+      "en": {
+        "coverage": 1,
+        "found": 3,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "23/23"
+      },
+      "zh": {
+        "coverage": 1,
+        "found": 3,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "23/23"
+      },
+      "verdict": "PASS"
+    },
+    "privacy": {
+      "route": "/privacy",
+      "units": 15,
+      "missing": [],
+      "images": {
+        "old": 0,
+        "missing": [],
+        "orderOk": true
+      },
+      "links": {
+        "old": 0,
+        "missing": []
+      },
+      "layout": {
+        "expected": "blk-heading,blk-richtext,blk-list,blk-richtext,blk-list",
+        "actual": "blk-heading,blk-richtext,blk-list,blk-richtext,blk-list",
+        "ok": true
+      },
+      "en": {
+        "coverage": 1,
+        "found": 15,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "78/78"
+      },
+      "zh": {
+        "coverage": 1,
+        "found": 15,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "78/78"
+      },
+      "verdict": "PASS"
+    },
+    "enroll": {
+      "route": "/enroll",
+      "units": 6,
+      "missing": [],
+      "images": {
+        "old": 1,
+        "missing": [],
+        "orderOk": true
+      },
+      "links": {
+        "old": 8,
+        "missing": []
+      },
+      "layout": {
+        "expected": "blk-image,blk-heading,blk-richtext,blk-list,blk-button,blk-button,blk-richtext",
+        "actual": "blk-image,blk-heading,blk-richtext,blk-list,blk-button,blk-button,blk-richtext",
+        "ok": true
+      },
+      "en": {
+        "coverage": 1,
+        "found": 6,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "74/74"
+      },
+      "zh": {
+        "coverage": 1,
+        "found": 6,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "74/74"
+      },
+      "verdict": "PASS"
+    },
+    "contact": {
+      "route": "/contact",
+      "units": 4,
+      "missing": [],
+      "images": {
+        "old": 0,
+        "missing": [],
+        "orderOk": true
+      },
+      "links": {
+        "old": 2,
+        "missing": []
+      },
+      "layout": {
+        "expected": "blk-tabs,blk-richtext,blk-richtext,blk-richtext,blk-richtext",
+        "actual": "blk-tabs,blk-richtext,blk-richtext,blk-richtext,blk-richtext",
+        "ok": true
+      },
+      "en": {
+        "coverage": 0.25,
+        "found": 1,
+        "inversions": 0,
+        "missing": [
+          "學校電話 School Phone 通訊地址 Mailing Address 網址與電子信箱 Website and Email 簡訊發送 Text Message 學校電話 Sc",
+          "Box 910093 San Diego, CA 92191-0093 網址與電子信箱 Website and Email 學校網址 School Website https://",
+          "com 簡訊發送 Text Message Text to join SDCA Text Message Text @sdcaparent to the number 81010"
+        ],
+        "wordRecall": 1,
+        "words": "36/36",
+        "verdictNote": "en: sentence-glue exception, word recall 100.0%"
+      },
+      "zh": {
+        "coverage": 0.25,
+        "found": 1,
+        "inversions": 0,
+        "missing": [
+          "學校電話 School Phone 通訊地址 Mailing Address 網址與電子信箱 Website and Email 簡訊發送 Text Message 學校電話 Sc",
+          "Box 910093 San Diego, CA 92191-0093 網址與電子信箱 Website and Email 學校網址 School Website https://",
+          "com 簡訊發送 Text Message Text to join SDCA Text Message Text @sdcaparent to the number 81010"
+        ],
+        "wordRecall": 1,
+        "words": "36/36",
+        "verdictNote": "zh: sentence-glue exception, word recall 100.0%"
+      },
+      "verdict": "PASS"
+    },
+    "adult": {
+      "route": "/adult",
+      "units": 0,
+      "missing": [],
+      "images": {
+        "old": 1,
+        "missing": [],
+        "orderOk": true
+      },
+      "links": {
+        "old": 0,
+        "missing": []
+      },
+      "layout": {
+        "expected": "blk-heading,blk-image",
+        "actual": "blk-heading,blk-image",
+        "ok": true
+      },
+      "en": {
+        "coverage": 1,
+        "found": 0,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "0/0"
+      },
+      "zh": {
+        "coverage": 1,
+        "found": 0,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "0/0"
+      },
+      "verdict": "PASS"
+    },
+    "student-store-schedule": {
+      "route": "/student-store-schedule",
+      "units": 0,
+      "missing": [],
+      "images": {
+        "old": 1,
+        "missing": [],
+        "orderOk": true
+      },
+      "links": {
+        "old": 1,
+        "missing": []
+      },
+      "layout": {
+        "expected": "blk-heading,blk-image",
+        "actual": "blk-heading,blk-image",
+        "ok": true
+      },
+      "en": {
+        "coverage": 1,
+        "found": 0,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "0/0"
+      },
+      "zh": {
+        "coverage": 1,
+        "found": 0,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "0/0"
+      },
+      "verdict": "PASS"
+    },
+    "classroom-map": {
+      "route": "/classroom-map",
+      "units": 0,
+      "missing": [],
+      "images": {
+        "old": 1,
+        "missing": [],
+        "orderOk": true
+      },
+      "links": {
+        "old": 1,
+        "missing": []
+      },
+      "layout": {
+        "expected": "blk-heading,blk-image",
+        "actual": "blk-heading,blk-image",
+        "ok": true
+      },
+      "en": {
+        "coverage": 1,
+        "found": 0,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "0/0"
+      },
+      "zh": {
+        "coverage": 1,
+        "found": 0,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "0/0"
+      },
+      "verdict": "PASS"
+    },
+    "guitar-poster": {
+      "route": "/guitar-poster",
+      "units": 0,
+      "missing": [],
+      "images": {
+        "old": 1,
+        "missing": [],
+        "orderOk": true
+      },
+      "links": {
+        "old": 1,
+        "missing": [
+          "/wp-content/uploads/2026/01/%E5%90%89%E4%BB%96%E6%B5%B7%E5%A0%B1.pdf"
+        ]
+      },
+      "layout": {
+        "expected": "blk-heading,blk-image",
+        "actual": "blk-heading,blk-image",
+        "ok": true
+      },
+      "en": {
+        "coverage": 1,
+        "found": 0,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "0/0"
+      },
+      "zh": {
+        "coverage": 1,
+        "found": 0,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "0/0"
+      },
+      "verdict": "PASS"
+    },
+    "pre-k-program": {
+      "route": "/pre-k-program",
+      "units": 0,
+      "missing": [],
+      "images": {
+        "old": 0,
+        "missing": [],
+        "orderOk": true
+      },
+      "links": {
+        "old": 1,
+        "missing": []
+      },
+      "layout": {
+        "expected": "blk-heading,blk-image,blk-file",
+        "actual": "blk-heading,blk-image,blk-file",
+        "ok": true
+      },
+      "en": {
+        "coverage": 1,
+        "found": 0,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "1/1"
+      },
+      "zh": {
+        "coverage": 1,
+        "found": 0,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "1/1"
+      },
+      "verdict": "PASS"
+    },
+    "new-student-ads": {
+      "route": "/new-student-ads",
+      "units": 0,
+      "missing": [],
+      "images": {
+        "old": 1,
+        "missing": [],
+        "orderOk": true
+      },
+      "links": {
+        "old": 0,
+        "missing": []
+      },
+      "layout": {
+        "expected": "blk-heading,blk-image",
+        "actual": "blk-heading,blk-image",
+        "ok": true
+      },
+      "en": {
+        "coverage": 1,
+        "found": 0,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "0/0"
+      },
+      "zh": {
+        "coverage": 1,
+        "found": 0,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "0/0"
+      },
+      "verdict": "PASS"
+    },
+    "yearbook-contest": {
+      "route": "/yearbook-contest",
+      "units": 0,
+      "missing": [],
+      "images": {
+        "old": 1,
+        "missing": [],
+        "orderOk": true
+      },
+      "links": {
+        "old": 1,
+        "missing": []
+      },
+      "layout": {
+        "expected": "blk-heading,blk-image",
+        "actual": "blk-heading,blk-image",
+        "ok": true
+      },
+      "en": {
+        "coverage": 1,
+        "found": 0,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "0/0"
+      },
+      "zh": {
+        "coverage": 1,
+        "found": 0,
+        "inversions": 0,
+        "missing": [],
+        "wordRecall": 1,
+        "words": "0/0"
+      },
+      "verdict": "PASS"
+    }
+  }
+}

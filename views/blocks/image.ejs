@@ -1,0 +1,12 @@
+<%# Block: image — L: {b:{src,alt,caption,width,height,href}, idx}. href overrides the lightbox link (PDF thumbs, banner ads). %>
+<% if (L.b && L.b.src) { %>
+<% const link = (L.b && L.b.href) || L.b.src; %>
+<% const isPdf = /\.pdf(\?|#|$)/i.test(link); %>
+<% const isExt = !isPdf && L.h.isExternal(link) && !link.startsWith('/'); %>
+<figure class="blk-image">
+  <a href="<%= link %>"<%= (isPdf || isExt) ? ' target="_blank" rel="noopener"' : '' %><% if (!L.b.href) { %> data-lightbox="blk-<%= L.idx %>" data-full="<%= L.b.src %>" data-caption="<%= L.h.escAttr(L.b.caption || L.b.alt || '') %>" aria-label="<%= L.h.escAttr(L.b.alt || L.b.caption || 'photo') %>"<% } %>>
+    <img src="<%= L.b.src %>" alt="<%= L.h.escAttr(L.b.alt || '') %>" loading="lazy" decoding="async"<% if (L.b.width) { %> width="<%= L.b.width %>"<% } %><% if (L.b.height) { %> height="<%= L.b.height %>"<% } %>>
+  </a>
+  <% if (L.b.caption) { %><figcaption><%- L.h.linkify(L.b.caption) %></figcaption><% } %>
+</figure>
+<% } %>

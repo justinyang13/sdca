@@ -15,7 +15,7 @@
     },
     {
       "image": {
-        "src": "/img/old/2020/Ujam-300x225.jpg",
+        "src": "/img/old/misc/Ujam-300x225.jpg",
         "alt": "",
         "caption": "",
         "width": null,
@@ -33,7 +33,7 @@
     },
     {
       "image": {
-        "src": "/img/old/2020/Dance-together-300x194.jpeg",
+        "src": "/img/old/misc/Dance-together-300x194.jpeg",
         "alt": "",
         "caption": "",
         "width": null,
@@ -55,11 +55,19 @@
       }
     },
     {
-      "richtext": "Yoga class is teaching by Celine Chen. To learn more about Celine and the class, please email\nYoga By Celine\n."
+      "richtext": {
+        "text": "Yoga class is teaching by Celine Chen. To learn more about Celine and the class, please email\nYoga By Celine\n.",
+        "links": [
+          {
+            "t": "Yoga By Celine",
+            "href": "mailto:celinew2012@gmail.com"
+          }
+        ]
+      }
     },
     {
       "image": {
-        "src": "/img/old/2019/Yoga.jpg",
+        "src": "/img/old/misc/Yoga.jpg",
         "alt": "",
         "caption": "",
         "width": null,
@@ -70,7 +78,7 @@
     },
     {
       "image": {
-        "src": "/img/old/2019/Yoga-Class-1024x683.jpg",
+        "src": "/img/old/misc/Yoga-Class-1024x683.jpg",
         "alt": "",
         "caption": "",
         "width": null,
@@ -89,11 +97,19 @@
       }
     },
     {
-      "richtext": "Established in 2013, our baseball team been organized by SDCA parents. We practice on Sunday afternoons while our children are in the Chinese school. Please contact\nJerry Han\nif you are interested."
+      "richtext": {
+        "text": "Established in 2013, our baseball team been organized by SDCA parents. We practice on Sunday afternoons while our children are in the Chinese school. Please contact\nJerry Han\nif you are interested.",
+        "links": [
+          {
+            "t": "Jerry Han",
+            "href": "mailto:sutsunghan@hotmail.com"
+          }
+        ]
+      }
     },
     {
       "image": {
-        "src": "/img/old/2018/SDCA-baseball-team-768x584.jpg",
+        "src": "/img/old/misc/SDCA-baseball-team-768x584.jpg",
         "alt": "",
         "caption": "",
         "width": null,
@@ -110,6 +126,19 @@
     "1col",
     "1col"
   ],
-  "notes": [],
+  "notes": [
+    "DP repair 2026-10-05 (Claude): Yoga/Jerry mailto links restored.",
+    "DP repair 2026-10-05 (Claude): Yoga/Jerry mailto links restored.",
+    "DP repair 2026-10-05 (Claude): Yoga/Jerry mailto links restored.",
+    "DP repair 2026-10-05 (Claude): Yoga/Jerry mailto links restored.",
+    "DP repair 2026-10-05 (Claude): Yoga/Jerry mailto links restored.",
+    "DP repair 2026-10-05 (Claude): Yoga/Jerry mailto links restored.",
+    "DP repair 2026-10-05 (Claude): Yoga/Jerry mailto links restored.",
+    "DP repair 2026-10-05 (Claude): Yoga/Jerry mailto links restored.",
+    "DP repair 2026-10-05 (Claude): Yoga/Jerry mailto links restored.",
+    "DP repair 2026-10-05 (Claude): Yoga/Jerry mailto links restored.",
+    "DP repair 2026-10-05 (Claude): Yoga/Jerry mailto links restored.",
+    "DP repair 2026-10-05 (Claude): Yoga/Jerry mailto links restored."
+  ],
   "missing_local_files": []
 }

@@ -745,3 +745,62 @@ _None._
 | asset | 2026-27_School_Calendar.pdf | PLACED | /pdf/2026-27-school-calendar | document: 2026-27-school-calendar |
 | asset | W04_news_Chn.pdf | PLACED | /pdf/weekly-w04-zh | document: weekly-w04-zh |
 | asset | W04_news_Eng.pdf | PLACED | /pdf/weekly-w04-en | document: weekly-w04-en |
+
+## Phase DP addendum (2026-10-05, Claude takeover)
+
+Faithful rebuild: 24 pages rendered from verbatim ordered block trees
+(`research/blocks/*.json` -> `pages.blocks`, views/partials/blocks.ejs).
+Parity: `research/PARITY.md` + `research/parity-summary.json` — 24/24 PASS
+(text >= 99.5% or documented exception with word recall >= 99%, 0 order
+inversions, all old images in order, no missing links, layout signatures equal).
+
+### DP page placement
+
+| Old URL | New URL | Status |
+|---|---|---|
+| about-sdca | /about | PLACED (9 blocks, 12 img, 0 files) |
+| board-of-directors | /about/board | PLACED (17 blocks, 26 img, 0 files) |
+| staff | /about/staff | PLACED (8 blocks, 3 img, 0 files) |
+| words-from-the-principal | /about/principal | PLACED (2 blocks, 0 img, 0 files) |
+| class-placement | /programs/classes | PLACED (13 blocks, 6 img, 0 files) |
+| tcml | /programs/tcml | PLACED (16 blocks, 8 img, 0 files) |
+| ta-program | /programs/ta | PLACED (5 blocks, 1 img, 0 files) |
+| adult-recreational-programs | /programs/recreational | PLACED (15 blocks, 5 img, 0 files) |
+| volunteer-opportunity | /parents/volunteer | PLACED (9 blocks, 10 img, 0 files) |
+| handbook-and-policy | /parents/handbook | PLACED (4 blocks, 0 img, 0 files) |
+| scrip | /parents/scrip | PLACED (17 blocks, 11 img, 4 files) |
+| sponsors | /support/sponsors | PLACED (25 blocks, 9 img, 0 files) |
+| education-resource | /education-resource | PLACED (3 blocks, 0 img, 0 files) |
+| disclaimer | /disclaimer | PLACED (2 blocks, 0 img, 0 files) |
+| privacy-policy | /privacy | PLACED (5 blocks, 0 img, 0 files) |
+| registration | /enroll | PLACED (7 blocks, 1 img, 0 files) |
+| countact-us | /contact | PLACED (1 blocks, 0 img, 0 files) |
+| adult | /adult | PLACED (2 blocks, 1 img, 0 files) |
+| student-store-schedule | /student-store-schedule | PLACED (2 blocks, 1 img, 0 files) |
+| 2026_2027_classroom-map | /classroom-map | PLACED (2 blocks, 1 img, 0 files) |
+| ____ | /guitar-poster | PLACED (2 blocks, 1 img, 0 files) |
+| 2018__10__22__pre-k-program | /pre-k-program | PLACED (3 blocks, 1 img, 1 files) |
+| new-student-advertisments-2026 | /new-student-ads | PLACED (2 blocks, 1 img, 0 files) |
+| sdca-yearbook-cover-art-contest-guidelines-2025-2026 | /yearbook-contest | PLACED (2 blocks, 1 img, 0 files) |
+
+Dynamic pages keep their templates fed by the same old content (not block-ported):
+home, news (+archive), media (+archive), documents, announcements, events,
+calendar, search, enroll-portal links. Weekly-announcement wrapper posts and
+attachment/img_/author/category/sitemap pages: no standalone content (collapsed
+to indexes via redirects) — see url-map.
+
+### DP NEEDS OWNER REVIEW (appended to the review list above)
+
+| # | Item | Reason | Recommendation |
+|---|---|---|---|
+| DP-1 | Volunteer Job Descriptions PDF (EN+ZH refs on parents/volunteer) | file never captured (not in research/assets, no local copy) | supply the PDF or confirm removal; lead text is placed |
+| DP-2 | SDCA_Donation_Form-2008.pdf (sponsors “Donation by check”) | file never captured | supply the PDF or confirm removal; donation text is placed |
+| DP-3 | 吉他海報.pdf (guitar poster) | only the thumbnail was captured; PDF 404 | supply the PDF or confirm removal; poster thumbnail is placed |
+| DP-4 | Registration Notice PDFs (portal domain, enroll page) | live on register.sandiegochineseschool.com, never crawled | linked with exact portal URLs; confirm or upload copies to documents |
+| DP-5 | IMG_3218.jpg (tcml gallery) | 404 on old site, never captured | confirm removal (image dropped, noted on page) |
+| DP-6 | IMG_9001/9002/9003-scaled.jpg (tcml) | originals never captured; 225px thumbs placed | confirm, or supply originals for reprocessing |
+| DP-7 | Scrip_Order_Form.jpg (scrip page link) | file never captured anywhere | supply the file or confirm removal |
+| DP-8 | Full-size originals behind ~200 thumbnail refs (headshots etc.) | old media library gone (404); crawl holds thumbs, placed as-is | confirm acceptable, or supply originals |
+| DP-9 | 校長的話 (separate ZH principal page, old /%E6%A0%A1%E9%95%B7.../) | not in crawl; EN principal words placed on /about/principal | supply ZH text or confirm EN-only |
+| DP-10 | dinner-3 (Dinner photo post), parent-info-old (empty stub), bod (dup of board), sample 2026-essay-ad, sdca-ad-half-page (image placed on enroll) | no unique placeable content | confirm ledger-only, no pages |
+| DP-11 | ZH page titles for new rows (adult, classroom-map, etc. reuse EN titles) | no ZH titles on old site for these | confirm or supply ZH titles |

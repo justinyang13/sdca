@@ -1,0 +1,10 @@
+<%# Block: columns — side-by-side groups, each an ordered block list. L: {b:{count,cols:[[block,...],...]}} %>
+<% const cols = (L.b && L.b.cols) || []; %>
+<% const onlyImgs = cols.length > 1 && cols.every(function(c){ return c.length === 1 && c[0].image; }); %>
+<div class="blk-columns blk-cols-<%= cols.length %><%= onlyImgs ? ' blk-cols-imgs' : '' %>">
+  <% cols.forEach(function(col, ci) { %>
+  <div class="blk-col">
+    <%- renderPart('partials/blocks.ejs', { blocks: col }) %>
+  </div>
+  <% }) %>
+</div>
