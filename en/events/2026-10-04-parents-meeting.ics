@@ -1,0 +1,16 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//SDCA//Website//EN
+CALSCALE:GREGORIAN
+X-WR-CALNAME:SDCA events
+BEGIN:VEVENT
+UID:2026-10-04-parents-meeting@sdca
+DTSTAMP:20261006T054636Z
+DTSTART;VALUE=DATE:20261004
+DTEND;VALUE=DATE:20261005
+SUMMARY:Teachers/Parents Meeting\, Room Parents Meeting (1)
+DESCRIPTION:Class teachers' and parents' meeting\, plus the first Room Pare
+ nts Meeting.
+LOCATION:La Jolla Country Day School
+END:VEVENT
+END:VCALENDAR
