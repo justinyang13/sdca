@@ -15,60 +15,20 @@
 
 const SLIDES = [
   {
-    image: 'classroom-bilingual',
-    caption_en: 'SDCA Bilingual Class — real classroom learning every Sunday',
-    caption_zh: 'SDCA 雙語班 — 每個週日真實的課堂學習',
-    link_url: '/programs/classes',
-    sort: 1,
-  },
-  {
-    image: 'preschool-class',
-    caption_en: 'Pre-K Program — our youngest learners',
-    caption_zh: '學前班 — 我們最年幼的學童',
-    link_url: '/programs/classes',
-    sort: 2,
-  },
-  {
-    image: 'regular-class',
-    caption_en: 'Fundamental & Regular classes, Grades 1–6',
-    caption_zh: '基礎班與普通班，1–6 年級',
-    link_url: '/programs/classes',
-    sort: 3,
-  },
-  {
-    image: 'graduation-2023',
-    caption_en: 'Class of 2023 — graduation ceremony',
-    caption_zh: '2023 屆畢業典禮',
-    link_url: '/media',
-    sort: 4,
-  },
-  {
-    image: 'poetry-award',
-    caption_en: 'Poetry Recitation Contest winners',
-    caption_zh: '朗誦比賽得獎者',
-    link_url: '/media',
-    sort: 5,
-  },
-  {
-    image: 'cultural-day',
-    caption_en: 'Cultural Day — students show off what they learn',
-    caption_zh: '文化日 — 學生展示所學',
-    link_url: '/media',
-    sort: 6,
-  },
-  {
-    image: 'stage-performance',
-    caption_en: 'Spring ceremony performances',
-    caption_zh: '春季典禮表演',
-    link_url: '/media',
-    sort: 7,
-  },
-  {
     image: 'anniversary-30th',
     caption_en: 'Celebrating our 30th anniversary',
     caption_zh: '慶祝 30 週年',
     link_url: '/about',
-    sort: 8,
+    sort: 1,
+  },
+  {
+    // Enroll slide: generated background (design/generated/enroll-bg.png); the template shows the
+    // tagline + Explore Programs / Enroll Now buttons for image 'enroll-bg'.
+    image: 'enroll-bg',
+    caption_en: 'Enroll now — Mandarin and Chinese culture since 1988',
+    caption_zh: '立即報名 — 自 1988 年起教授華語和中華文化',
+    link_url: '/enroll',
+    sort: 2,
   },
 ];
 

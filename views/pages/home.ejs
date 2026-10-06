@@ -23,116 +23,61 @@
   };
 %>
 
+<% const __all = (typeof blocks !== 'undefined' && blocks) ? blocks : []; %>
+<% const __introFirst = __all.length && __all[0].columns; %>
 <%- renderPart('partials/hero-carousel.ejs', {
+  introHtml: __introFirst ? renderPart('partials/blocks.ejs', { blocks: [__all[0]] }).replace(/href="\/en\//g, 'href="/' + L + '/') : '',
   slides: slides,
   schoolName: schoolName,
   tagline: tagline,
   portalUrl: portalUrl,
 }) %>
 
-<section class="section" aria-labelledby="home-tiles-h">
+<% const list = __introFirst ? __all.slice(1) : __all; %>
+<%
+  // Upcoming Event: heading + its list block go left, a small month calendar sits right next to it.
+  const __ui = list.findIndex(function(b){ return b.heading && /Upcoming Event/i.test(b.heading.text || ''); });
+  const __hasUp = __ui > -1 && list[__ui + 1];
+  const __before = __hasUp ? list.slice(0, __ui) : list;
+  const __up = __hasUp ? JSON.parse(JSON.stringify(list.slice(__ui, __ui + 2))) : [];
+  const __calFiles = [];
+  if (__hasUp && __up[1] && __up[1].columns) {
+    __up[1].columns.cols = __up[1].columns.cols.map(function(col){
+      return col.filter(function(b){ if (b.file) { __calFiles.push(b); return false; } return true; });
+    });
+  }
+  const __after = __hasUp ? list.slice(__ui + 2) : [];
+  const __events = [];
+  (function walk(x){
+    if (Array.isArray(x)) return x.forEach(walk);
+    if (x && typeof x === 'object') {
+      if (x.list && Array.isArray(x.list.items)) x.list.items.forEach(function(it){
+        const m = /^\s*(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(.*)$/s.exec(it);
+        if (m) __events.push({ date: m[3] + '-' + m[1].padStart(2, '0') + '-' + m[2].padStart(2, '0'), title: m[4].replace(/\s+/g, ' ').trim() });
+      });
+      Object.values(x).forEach(walk);
+    }
+  })(__up);
+  const __fix = function(h){ return h.replace(/href="\/en\//g, 'href="/' + L + '/'); };
+%>
+<section class="section home-blocks" aria-label="<%= L === 'zh' ? '首頁內容' : 'Home page content' %>" data-page="home">
   <div class="container">
-    <h2 id="home-tiles-h" class="sr-only"><%= L === 'zh' ? '為什麼選擇 SDCA' : 'Why Choose SDCA' %></h2>
-    <div class="grid grid-4 value-tiles">
-      <% tiles.forEach(function(tl) { %>
-      <%- renderPart('partials/icon-tile.ejs', {
-        tileIcon: tl.icon,
-        tileTitle: L === 'zh' ? tl.titleZh : tl.titleEn,
-        tileDesc: L === 'zh' ? tl.descZh : tl.descEn,
-      }) %>
-      <% }) %>
-    </div>
-  </div>
-</section>
-
-<section class="section" aria-labelledby="home-news-h">
-  <div class="container grid-2-col">
-    <div>
-      <h2 id="home-news-h" class="section-h2"><%= L === 'zh' ? '最新公告' : 'Latest Announcements' %></h2>
-      <div class="announcement-list">
-        <% announcements.forEach(function(a) { %>
-        <div class="ann-row">
-          <div class="ann-date"><%= dateFmt(a.published_at) %></div>
-          <div class="ann-body">
-            <h3><%= pick(a, 'title') %></h3>
-            <% const note = pickNote(a, 'title'); if (note) { %><span class="lang-note">(<%= t(note) %>)</span><% } %>
-          </div>
+    <div class="blocks">
+      <%- __fix(renderPart('partials/blocks.ejs', { blocks: __before })) %>
+      <% if (__hasUp) { %>
+      <div class="home-upcoming">
+        <div class="home-upcoming-list blocks">
+          <%- __fix(renderPart('partials/blocks.ejs', { blocks: __up })) %>
         </div>
-        <% }) %>
-      </div>
-      <a class="btn btn-ghost" href="/<%= L %>/news"><%= L === 'zh' ? '查看全部公告' : 'View All Announcements' %> →</a>
-    </div>
-    <div>
-      <h2 class="section-h2"><%= L === 'zh' ? '即將舉行的活動' : 'Upcoming Events' %></h2>
-      <div class="events-list">
-        <% events.forEach(function(ev) { %>
-        <%- renderPart('partials/event-row.ejs', {
-          evDate: new Date(ev.starts_at),
-          evTitle: pick(ev, 'title'),
-          evHref: `/${L}/events/${ev.slug}`,
-          evLocation: ev.location || '',
-        }) %>
-        <% }) %>
-      </div>
-      <a class="btn btn-ghost" href="/<%= L %>/events"><%= L === 'zh' ? '查看全部活動' : 'View All Events' %> →</a>
-    </div>
-  </div>
-</section>
-
-<section class="section section-alt" aria-labelledby="home-programs-h">
-  <div class="container">
-    <div class="section-head">
-      <h2 id="home-programs-h"><%= L === 'zh' ? '我們的課程' : 'Our Programs' %></h2>
-      <p class="section-lead"><%= L === 'zh' ? '從學前班到 12 年級，加上成人與休閒課程。'
-                                              : 'From Pre-K through Grade 12, plus adult and recreational programs.' %></p>
-    </div>
-    <div class="grid grid-3 programs-strip">
-      <% programs.forEach(function(p) { %>
-      <article class="program-card card">
-        <% if (p.image) { %>
-        <div class="card-media"><img src="<%= imgUrl(p.image) %>" alt="<%= pick(p, 'name') %>" loading="lazy" width="480" height="320"></div>
-        <% } %>
-        <div class="card-body">
-          <h3 class="card-title"><a href="/<%= L %>/programs"><%= pick(p, 'name') %></a></h3>
-          <% const grades = L === 'zh' ? (p.grades_zh || p.grades_en) : (p.grades_en || p.grades_zh); %>
-          <% if (grades) { %><p class="card-desc"><%= grades %></p><% } %>
+        <div class="home-upcoming-side">
+          <aside class="mini-cal" data-mini-cal data-lang="<%= L %>" data-events="<%- JSON.stringify(__events).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;') %>" aria-label="<%= L === 'zh' ? '月曆' : 'Monthly calendar' %>"></aside>
+          <% if (__calFiles.length) { %>
+          <div class="home-upcoming-cal-btn"><%- __fix(renderPart('partials/blocks.ejs', { blocks: __calFiles })) %></div>
+          <% } %>
         </div>
-      </article>
-      <% }) %>
-    </div>
-    <div class="section-cta">
-      <a class="btn btn-navy" href="/<%= L %>/programs"><%= L === 'zh' ? '查看全部課程' : 'View All Programs' %> →</a>
-    </div>
-  </div>
-</section>
-
-<section class="support-band" role="region" aria-labelledby="support-band-h">
-  <div class="container">
-    <h2 id="support-band-h" class="sr-only"><%= L === 'zh' ? '支持中華學苑' : 'Support SDCA' %></h2>
-    <div class="support-band-inner">
-      <div>
-        <h3><%= L === 'zh' ? '支持我們的使命' : 'Support Our Mission' %></h3>
-        <p><%= L === 'zh'
-             ? '聖地牙哥中華學苑是一家非營利機構，依靠家長、贊助商和禮券收入運作。您的捐款可以報稅。'
-             : 'SDCA is a non-profit, funded by families, sponsors and Scrip sales. Your donation is tax-deductible.' %></p>
       </div>
-      <a class="btn btn-primary btn-lg" href="/<%= L %>/support"><%= L === 'zh' ? '立即捐款' : 'Donate Now' %></a>
-    </div>
-  </div>
-</section>
-
-<section class="section" aria-labelledby="sponsors-h">
-  <div class="container">
-    <h2 id="sponsors-h" class="section-h2 section-h2-center"><%= L === 'zh' ? '感謝我們的贊助商' : 'Our Sponsors' %></h2>
-    <div class="sponsor-grid" role="list">
-      <% sponsors.forEach(function(s) { %>
-      <div class="sponsor-card" role="listitem">
-        <img src="<%= assetUrl(s.logo) %>" alt="<%= s.name %>" loading="lazy">
-      </div>
-      <% }) %>
-    </div>
-    <div class="section-cta">
-      <a class="btn btn-outline" href="/<%= L %>/support/sponsors"><%= L === 'zh' ? '成為贊助商' : 'Become a Sponsor' %> →</a>
+      <% } %>
+      <%- __fix(renderPart('partials/blocks.ejs', { blocks: __after })) %>
     </div>
   </div>
 </section>

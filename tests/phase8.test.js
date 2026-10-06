@@ -46,7 +46,7 @@ before(async () => {
               VALUES ('test-doc','Test Doc','測試文件','form','test-pdf-tmp/test.pdf','application/pdf',100,'2026',1)`)
     .run();
   global.__pdfTmpDir = pdfDir; // cleaned in after()
-  // 8 slides
+  // seeded slides
   seedSlides(db, [], []);
 
   const app = createApp({ db });
@@ -99,43 +99,32 @@ test('mdToHtml adds target=_blank to markdown pdf links', () => {
   assert.match(out, /rel="noopener"/);
 });
 
-test('Home section order: news+events BEFORE programs', async () => {
+test('Home layout: hero carousel first, then the old-site content blocks', async () => {
   const r = await get('/en/');
   assert.equal(r.status, 200);
   const html = await r.text();
-  const iNews = html.indexOf('home-news-h');
-  const iPrograms = html.indexOf('home-programs-h');
-  const iTiles = html.indexOf('home-tiles-h');
-  assert.ok(iNews > -1, 'news section present');
-  assert.ok(iPrograms > -1, 'programs section present');
-  assert.ok(iTiles > -1, 'tiles section present');
-  assert.ok(iTiles < iNews, 'tiles before news');
-  assert.ok(iNews < iPrograms, 'news before programs');
+  const iHero = html.indexOf('hero-carousel');
+  const iBlocks = html.indexOf('home-blocks');
+  assert.ok(iHero > -1, 'hero carousel present');
+  assert.ok(iBlocks > -1, 'home content section present');
+  assert.ok(iHero < iBlocks, 'hero before content');
 });
 
-test('Carousel markup: roledescription=carousel, ≥8 slides, first slide has H1+2 CTAs', async () => {
+test('Carousel markup: roledescription=carousel, slides, prev/next + dots', async () => {
   const r = await get('/en/');
   const html = await r.text();
   assert.match(html, /aria-roledescription="carousel"/);
-  const slideCount = (html.match(/hero-carousel-slide/g) || []).length;
-  assert.ok(slideCount >= 8, `expected ≥8 slides, got ${slideCount}`);
-  // first slide has school name + 2 CTAs
-  const firstSlide = html.match(/<article class="hero-carousel-slide is-home"[\s\S]*?<\/article>/);
-  assert.ok(firstSlide, 'first slide (is-home) present');
-  assert.match(firstSlide[0], /San Diego Chinese Academy/);
-  const ctaCount = (firstSlide[0].match(/<a class="btn/g) || []).length;
-  assert.ok(ctaCount >= 2, 'first slide has ≥2 CTA buttons');
-  // no-JS fallback: first slide has no visibility:hidden
-  assert.match(firstSlide[0], /hero-carousel-slide is-current|is-home/);
-  // prev/next + dots present
+  const slideCount = (html.match(/<article class="hero-carousel-slide/g) || []).length;
+  assert.ok(slideCount >= 1, `expected ≥1 slide, got ${slideCount}`);
+  assert.match(html, /<article class="hero-carousel-slide[^"]*"[\s\S]*?<\/article>/);
   assert.match(html, /data-carousel-prev/);
   assert.match(html, /data-carousel-next/);
   assert.match(html, /data-carousel-dot="0"/);
 });
 
-test('Slides seeded ≥ 8 (DB)', () => {
+test('Slides seeded ≥ 1 (DB): the 30th-anniversary photo slide', () => {
   const n = db.prepare('SELECT COUNT(*) c FROM slides WHERE published = 1').get().c;
-  assert.ok(n >= 8, `expected ≥8 slides, got ${n}`);
+  assert.ok(n >= 1, `expected ≥1 slide, got ${n}`);
 });
 
 test('Admin CRUD: create / update / delete a slide', async () => {

@@ -153,6 +153,7 @@ export function registerPublicRoutes(app, bridge) {
       programs: db.prepare('SELECT * FROM programs ORDER BY sort, name_en LIMIT 8').all(),
       sponsors: db.prepare('SELECT * FROM sponsors ORDER BY sort, name').all(),
       portalUrl: setting(db, 'registration_portal', lang),
+      ...portedCtx(db, 'home', lang),
       _settings: {
         school_name_en: setting(db, 'school_name_en', lang),
         school_name_zh: setting(db, 'school_name_zh', lang),

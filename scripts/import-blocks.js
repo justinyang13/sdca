@@ -36,6 +36,7 @@ const PLAN = {
   'education-resource': { page: 'education-resource', source_url: '/education-resource/' },
   'disclaimer': { page: 'disclaimer', source_url: '/disclaimer/' },
   'privacy-policy': { page: 'privacy', source_url: '/privacy-policy/' },
+  'home': { create: 'home', title_en: 'Home', title_zh: '首頁', source_url: '/' },
   'media': { page: 'media', source_url: '/media/' },
   'registration': { page: 'enroll', source_url: '/registration/' },
   'countact-us': { page: 'contact', source_url: '/countact-us/' },
@@ -169,6 +170,13 @@ function main() {
         if (!v.src.startsWith('/img/old/')) {
           fatal.push(`${oldSlug}: image src not root-absolute /img/old/…: ${v.src}`);
           return;
+        }
+        if (!fs.existsSync(path.join(PUBLIC_DIR, v.src.slice(1)))) {
+          // process-old-images may have filed it under another year dir (e.g. misc): reuse that copy
+          const base = path.basename(v.src);
+          const oldRoot = path.join(PUBLIC_DIR, 'img', 'old');
+          const hit = fs.readdirSync(oldRoot).map((d) => path.join(oldRoot, d, base)).find((f) => fs.existsSync(f));
+          if (hit) { fs.mkdirSync(path.dirname(path.join(PUBLIC_DIR, v.src.slice(1))), { recursive: true }); fs.copyFileSync(hit, path.join(PUBLIC_DIR, v.src.slice(1))); }
         }
         if (!fs.existsSync(path.join(PUBLIC_DIR, v.src.slice(1)))) {
           fatal.push(`${oldSlug}: image file missing on disk: public${v.src}`);

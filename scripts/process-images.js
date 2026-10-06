@@ -16,6 +16,11 @@ const WIDTHS = [480, 960, 1600];
 
 // role values used by later phases; alt text bilingual.
 const PHOTOS = [
+  { name: 'intro-bg', src: 'design/generated/intro-bg.png', role: 'home-hero-intro',
+    alt_en: 'Soft ink-wash plum blossom branches on cream paper', alt_zh: '宣紙上的水墨梅花枝' },
+  { name: 'enroll-bg', src: 'design/generated/enroll-bg.png', role: 'home-hero-enroll',
+    alt_en: 'A school desk with a calligraphy brush, a Chinese workbook and a red paper lantern',
+    alt_zh: '書桌上的毛筆、中文練習本與紅燈籠' },
   { name: 'classroom-bilingual', file: 'SDCA-Bilingual-Class-1-1.jpeg', role: 'home-hero',
     alt_en: 'SDCA bilingual class: students in a bright classroom with their teacher',
     alt_zh: '聖地牙哥中華學苑雙語班：明亮的教室內，學生與老師一起上課' },
@@ -114,10 +119,10 @@ function dimensions(p) {
 mkdirSync(OUT_DIR, { recursive: true });
 const manifest = [];
 for (const p of PHOTOS) {
-  const src = path.join(SRC_DIR, p.file);
+  const src = p.src ? path.join(root, p.src) : path.join(SRC_DIR, p.file);
   if (!existsSync(src)) throw new Error(`missing source ${src}`);
   const dim = dimensions(src);
-  const entry = { name: p.name, source: `research/assets/images/${p.file}`, role: p.role,
+  const entry = { name: p.name, source: p.src || `research/assets/images/${p.file}`, role: p.role,
     alt_en: p.alt_en, alt_zh: p.alt_zh, sw: dim.w, sh: dim.h, files: [] };
   for (const w of WIDTHS) {
     const target = Math.min(w, dim.w);

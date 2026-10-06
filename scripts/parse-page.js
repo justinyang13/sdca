@@ -331,7 +331,7 @@ function blocksFromWidget(w, notes) {
       if (!a) return [];
       const label = normWs(textOf(a)) || 'Link';
       if ((a.attrs.href || '').endsWith('.pdf')) return [{ file: makeFileBlock(a.attrs.href, label) }];
-      return [{ button: { label, href: a.attrs.href, target: a.attrs.target || '_self' } }];
+      return [{ button: { label, href: normHref(a.attrs.href), target: a.attrs.target || '_self' } }];
     }
     case 'video': {
       const iframe = findDesc(w, (n) => n.tag === 'iframe');
@@ -437,7 +437,7 @@ export function parsePage(html, assets) {
       const widgets = allDesc(col).filter((n) => n.attrs['data-element_type'] === 'widget' || n.attrs['data-element-type'] === 'widget');
       const got = [];
       for (const w of widgets) {
-        if (!colList.includes(w) && allDesc(col).includes(w)) { const bs = blocksFromWidget(w, notes); const hide = hideOf(w); if (hide.length) bs.forEach((b) => { b.hide = hide; }); got.push(...bs); }
+        if (!colList.includes(w) && allDesc(col).includes(w)) { const bs = blocksFromWidget(w, notes); const hide = [...new Set([...hideOf(w), ...hideOf(col), ...hideOf(sec)])]; if (hide.length) bs.forEach((b) => { b.hide = hide; }); got.push(...bs); }
       }
       return got;
     });
@@ -461,7 +461,10 @@ export function parsePage(html, assets) {
         signature.push('image_text');
       } else {
         const nonEmpty = colBlocks.filter((cb) => cb.length);
-        blocks.push({ columns: { count: nonEmpty.length, cols: nonEmpty } });
+        if (!nonEmpty.length) { signature.push('columns:0'); continue; }
+        const all = nonEmpty.flat();
+        const common = all.every((x) => x.hide && x.hide.length) ? ['desktop', 'tablet', 'phone'].filter((d) => all.every((x) => x.hide.includes(d))) : [];
+        blocks.push({ columns: { count: nonEmpty.length, cols: nonEmpty }, ...(common.length ? { hide: common } : {}) });
         signature.push(`columns:${nonEmpty.length}`);
       }
     }

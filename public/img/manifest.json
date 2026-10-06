@@ -1,6 +1,58 @@
 {
-  "generated": "2026-10-05T18:55:20.003Z",
+  "generated": "2026-10-06T05:37:20.051Z",
   "images": [
+    {
+      "name": "intro-bg",
+      "source": "design/generated/intro-bg.png",
+      "role": "home-hero-intro",
+      "alt_en": "Soft ink-wash plum blossom branches on cream paper",
+      "alt_zh": "宣紙上的水墨梅花枝",
+      "sw": 1920,
+      "sh": 1088,
+      "files": [
+        {
+          "file": "img/intro-bg-480.jpg",
+          "w": 480,
+          "h": 272
+        },
+        {
+          "file": "img/intro-bg-960.jpg",
+          "w": 960,
+          "h": 544
+        },
+        {
+          "file": "img/intro-bg-1600.jpg",
+          "w": 1600,
+          "h": 907
+        }
+      ]
+    },
+    {
+      "name": "enroll-bg",
+      "source": "design/generated/enroll-bg.png",
+      "role": "home-hero-enroll",
+      "alt_en": "A school desk with a calligraphy brush, a Chinese workbook and a red paper lantern",
+      "alt_zh": "書桌上的毛筆、中文練習本與紅燈籠",
+      "sw": 1920,
+      "sh": 1088,
+      "files": [
+        {
+          "file": "img/enroll-bg-480.jpg",
+          "w": 480,
+          "h": 272
+        },
+        {
+          "file": "img/enroll-bg-960.jpg",
+          "w": 960,
+          "h": 544
+        },
+        {
+          "file": "img/enroll-bg-1600.jpg",
+          "w": 1600,
+          "h": 907
+        }
+      ]
+    },
     {
       "name": "classroom-bilingual",
       "source": "research/assets/images/SDCA-Bilingual-Class-1-1.jpeg",
@@ -151,9 +203,9 @@
           "h": 885
         },
         {
-          "file": "img/graduation-2023-1600.jpg",
-          "w": 1600,
-          "h": 1476
+          "file": "img/graduation-2023-1170.jpg",
+          "w": 1170,
+          "h": 1079
         }
       ]
     },
@@ -203,9 +255,9 @@
           "h": 543
         },
         {
-          "file": "img/lantern-performance-1600.jpg",
-          "w": 1600,
-          "h": 904
+          "file": "img/lantern-performance-996.jpg",
+          "w": 996,
+          "h": 563
         }
       ]
     },
@@ -229,9 +281,9 @@
           "h": 640
         },
         {
-          "file": "img/yoga-class-1600.jpg",
-          "w": 1600,
-          "h": 1067
+          "file": "img/yoga-class-1024.jpg",
+          "w": 1024,
+          "h": 683
         }
       ]
     },
@@ -255,9 +307,9 @@
           "h": 608
         },
         {
-          "file": "img/teacher-meeting-1600.jpg",
-          "w": 1600,
-          "h": 1013
+          "file": "img/teacher-meeting-1024.jpg",
+          "w": 1024,
+          "h": 648
         }
       ]
     },
@@ -333,9 +385,9 @@
           "h": 1285
         },
         {
-          "file": "img/poetry-award-1600.jpg",
-          "w": 1600,
-          "h": 2142
+          "file": "img/poetry-award-1530.jpg",
+          "w": 1530,
+          "h": 2048
         }
       ]
     },
@@ -401,19 +453,19 @@
       "sh": 535,
       "files": [
         {
-          "file": "img/teacher-dinner-480.jpg",
-          "w": 480,
-          "h": 642
+          "file": "img/teacher-dinner-400.jpg",
+          "w": 400,
+          "h": 535
         },
         {
-          "file": "img/teacher-dinner-960.jpg",
-          "w": 960,
-          "h": 1284
+          "file": "img/teacher-dinner-400.jpg",
+          "w": 400,
+          "h": 535
         },
         {
-          "file": "img/teacher-dinner-1600.jpg",
-          "w": 1600,
-          "h": 2140
+          "file": "img/teacher-dinner-400.jpg",
+          "w": 400,
+          "h": 535
         }
       ]
     },
@@ -437,9 +489,9 @@
           "h": 584
         },
         {
-          "file": "img/karaoke-contest-1600.jpg",
-          "w": 1600,
-          "h": 974
+          "file": "img/karaoke-contest-1475.jpg",
+          "w": 1475,
+          "h": 898
         }
       ]
     },
@@ -453,19 +505,19 @@
       "sh": 300,
       "files": [
         {
-          "file": "img/tai-chi-480.jpg",
-          "w": 480,
-          "h": 640
+          "file": "img/tai-chi-225.jpg",
+          "w": 225,
+          "h": 300
         },
         {
-          "file": "img/tai-chi-960.jpg",
-          "w": 960,
-          "h": 1280
+          "file": "img/tai-chi-225.jpg",
+          "w": 225,
+          "h": 300
         },
         {
-          "file": "img/tai-chi-1600.jpg",
-          "w": 1600,
-          "h": 2133
+          "file": "img/tai-chi-225.jpg",
+          "w": 225,
+          "h": 300
         }
       ]
     },
@@ -489,9 +541,9 @@
           "h": 510
         },
         {
-          "file": "img/students-perform-1600.jpg",
-          "w": 1600,
-          "h": 851
+          "file": "img/students-perform-1040.jpg",
+          "w": 1040,
+          "h": 553
         }
       ]
     },
@@ -619,9 +671,9 @@
           "h": 652
         },
         {
-          "file": "img/food-fair-1600.jpg",
-          "w": 1600,
-          "h": 1087
+          "file": "img/food-fair-985.jpg",
+          "w": 985,
+          "h": 669
         }
       ]
     }

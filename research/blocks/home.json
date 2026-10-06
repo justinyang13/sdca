@@ -2,28 +2,52 @@
   "slug": "home",
   "blocks": [
     {
-      "image": {
-        "src": "/img/old/misc/SDCA-Spring-Words-Left.gif",
-        "alt": "",
-        "caption": "",
-        "width": null,
-        "height": null,
-        "sha256": "9bbef29441a0d0d586b5cd68c3b0435d889a62ab83d197dbce2598be58ac6312",
-        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Spring-Words-Left.gif"
-      }
-    },
-    {
-      "richtext": "聖地牙哥中華學苑\n成立於1988年， 為一所非營利組織， 承載著弘揚中華文化的使命， 教授中華語言與文化。 強大的師資、 專業的管理、 生動活潑的課程與活動設置，  學校的規模日益擴大。 學校設立有學前班、注音班、拼音班、普通班、雙語班、學分班和成人班。 中華學苑上課的校址是 La Jolla Country Day School, 學校的設備先進， 校園環境優美， 秉持著小班教學。聖地牙哥中華學苑是 WASC 認證的學校。\nSan Diego Chinese Academy\nis a non-profit organization established in 1988. Our mission is to preserve and promote Chinese tradition, culture and language. We have a team of outstanding faculty and professional administrative personnel. Our classes are conducted in a lively atmosphere interspersed with fun cultural activities. We offer Pre-kindergarten to Grade 12 immersive Chinese classes with ZhuYin and PinYin, bilingual Chinese classes, high school credit classes and adult class. All classes are maintained at a low student to teacher ratio. We are located at La Jolla Country Day School with its beautiful campus and advanced amenities. SDCA is Fully Accredited by WASC."
-    },
-    {
-      "image": {
-        "src": "/img/old/misc/SDCA-Spring-Words-Right.gif",
-        "alt": "",
-        "caption": "",
-        "width": null,
-        "height": null,
-        "sha256": "2b305ed13bdd0a0c27963dd8ea8fb94727b99e784aa917e5bfc6b4f9b9bf6e24",
-        "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Spring-Words-Right.gif"
+      "columns": {
+        "count": 4,
+        "cols": [
+          [
+            {
+              "image": {
+                "src": "/img/old/2018/SDCA-Spring-Words-Left.gif",
+                "alt": "",
+                "caption": "",
+                "width": null,
+                "height": null,
+                "sha256": "9bbef29441a0d0d586b5cd68c3b0435d889a62ab83d197dbce2598be58ac6312",
+                "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Spring-Words-Left.gif"
+              },
+              "hide": [
+                "phone"
+              ]
+            }
+          ],
+          [
+            {
+              "richtext": "聖地牙哥中華學苑成立於1988年， 為一所非營利組織， 承載著弘揚中華文化的使命， 教授中華語言與文化。 強大的師資、 專業的管理、 生動活潑的課程與活動設置，  學校的規模日益擴大。 學校設立有學前班、注音班、拼音班、普通班、雙語班、學分班和成人班。 中華學苑上課的校址是 La Jolla Country Day School, 學校的設備先進， 校園環境優美， 秉持著小班教學。聖地牙哥中華學苑是 WASC 認證的學校。"
+            }
+          ],
+          [
+            {
+              "richtext": "San Diego Chinese Academy is a non-profit organization established in 1988. Our mission is to preserve and promote Chinese tradition, culture and language. We have a team of outstanding faculty and professional administrative personnel. Our classes are conducted in a lively atmosphere interspersed with fun cultural activities. We offer Pre-kindergarten to Grade 12 immersive Chinese classes with ZhuYin and PinYin, bilingual Chinese classes, high school credit classes and adult class. All classes are maintained at a low student to teacher ratio. We are located at La Jolla Country Day School with its beautiful campus and advanced amenities. SDCA is Fully Accredited by WASC."
+            }
+          ],
+          [
+            {
+              "image": {
+                "src": "/img/old/2018/SDCA-Spring-Words-Right.gif",
+                "alt": "",
+                "caption": "",
+                "width": null,
+                "height": null,
+                "sha256": "2b305ed13bdd0a0c27963dd8ea8fb94727b99e784aa917e5bfc6b4f9b9bf6e24",
+                "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Spring-Words-Right.gif"
+              },
+              "hide": [
+                "phone"
+              ]
+            }
+          ]
+        ]
       }
     },
     {
@@ -36,24 +60,33 @@
       }
     },
     {
-      "list": {
-        "ordered": false,
-        "items": [
-          "10/04/2026 各班親師座談會、班代表會議(1), Teachers/Parents Meeting, Room Parents Meeting (1)",
-          "10/11/2026 退費及轉班截止, Last Day of Tuition Refund and Class Change",
-          "10/18/2026 教務研討會議（2）、防火演習, Teachers Meeting (2), Fire Drill",
-          "10/24/2026 學分班文化課(1), Credit Class Culture Lesson (1)",
-          "10/25/2026 上學期期中考, Mid-term Exam",
-          "11/01/2026 班級寫字比賽、萬聖節活動、班代表會議(2), Class Chinese Character Writing Contest, Halloween Activities, Room Parents Meeting (2)"
+      "columns": {
+        "count": 1,
+        "cols": [
+          [
+            {
+              "list": {
+                "ordered": false,
+                "items": [
+                  "10/04/2026 各班親師座談會、班代表會議(1), Teachers/Parents Meeting, Room Parents Meeting (1)",
+                  "10/11/2026 退費及轉班截止, Last Day of Tuition Refund and Class Change",
+                  "10/18/2026 教務研討會議（2）、防火演習, Teachers Meeting (2), Fire Drill",
+                  "10/24/2026 學分班文化課(1), Credit Class Culture Lesson (1)",
+                  "10/25/2026 上學期期中考, Mid-term Exam",
+                  "11/01/2026 班級寫字比賽、萬聖節活動、班代表會議(2), Class Chinese Character Writing Contest, Halloween Activities, Room Parents Meeting (2)"
+                ]
+              }
+            },
+            {
+              "file": {
+                "label": "行事曆 School Calendar",
+                "href": "__OLD_PDF__/2026/2026-27_School_Calendar.pdf",
+                "sha256": "0c0bd725733777adb63411964227a632d9155e73969e38c5a39945e6e9220d55",
+                "local_path": "research/assets/pdf/2026-27_School_Calendar.pdf"
+              }
+            }
+          ]
         ]
-      }
-    },
-    {
-      "file": {
-        "label": "行事曆 School Calendar",
-        "href": "__OLD_PDF__/2026/2026-27_School_Calendar.pdf",
-        "sha256": "0c0bd725733777adb63411964227a632d9155e73969e38c5a39945e6e9220d55",
-        "local_path": "research/assets/pdf/2026-27_School_Calendar.pdf"
       }
     },
     {
@@ -66,34 +99,52 @@
       }
     },
     {
-      "richtext": "我們不再接受郵寄註冊. 請在九月十三日開學日到辦公室辦理註冊. We are no longer accepting registration by mail. Please submit the Registration Form and your payment\nto the office\non the first day of school, September 13\n."
+      "richtext": "我們不再接受郵寄註冊. 請在九月十三日開學日到辦公室辦理註冊. We are no longer accepting registration by mail. Please submit the Registration Form and your payment to the office on the first day of school, September 13. "
     },
     {
-      "list": {
-        "ordered": false,
-        "items": [
-          "註冊須知與網路註冊說明",
-          "Registration Notice and Online Registration Instructions",
-          "義工工作說明 Volunteer Job Descriptions"
+      "columns": {
+        "count": 1,
+        "cols": [
+          [
+            {
+              "list": {
+                "ordered": false,
+                "items": [
+                  "註冊須知與網路註冊說明",
+                  "Registration Notice and Online Registration Instructions",
+                  "義工工作說明 Volunteer Job Descriptions"
+                ]
+              }
+            }
+          ]
         ]
       }
     },
     {
-      "button": {
-        "label": "新家庭註冊 New Family Sign Up",
-        "href": "https://register.sandiegochineseschool.com/signin/register",
-        "target": "_blank"
+      "columns": {
+        "count": 1,
+        "cols": [
+          [
+            {
+              "button": {
+                "label": "新家庭註冊 New Family Sign Up",
+                "href": "https://register.sandiegochineseschool.com/signin/register",
+                "target": "_blank"
+              }
+            },
+            {
+              "button": {
+                "label": "舊生註冊 Returning Student Sign In",
+                "href": "https://register.sandiegochineseschool.com/signin",
+                "target": "_blank"
+              }
+            },
+            {
+              "richtext": "如果有任何問題, 請 email 或是洽電 (858)205-7322. If you have any questions, please email or contact us at (858)205-7322."
+            }
+          ]
+        ]
       }
-    },
-    {
-      "button": {
-        "label": "舊生註冊 Returning Student Sign In",
-        "href": "https://register.sandiegochineseschool.com/signin",
-        "target": "_blank"
-      }
-    },
-    {
-      "richtext": "如果有任何問題, 請\nemail\n或是洽電 (858)205-7322. If you have any questions, please\nemail\nor contact us at (858)205-7322."
     },
     {
       "divider": {}
@@ -101,12 +152,18 @@
     {
       "heading": {
         "level": 1,
-        "text": "中華學苑成人華語文班 SDCA Adult Chinese Mandarin Class TCML"
+        "text": "中華學苑成人華語文班 SDCA Adult Chinese Mandarin Class TCML",
+        "links": [
+          {
+            "t": "中華學苑成人華語文班 SDCA Adult Chinese Mandarin Class TCML",
+            "href": "/en/programs/tcml"
+          }
+        ]
       }
     },
     {
       "image": {
-        "src": "/img/old/misc/Adult.9730cd1e.jpg",
+        "src": "/img/old/2026/Adult.9730cd1e.jpg",
         "alt": "",
         "caption": "",
         "width": null,
@@ -118,391 +175,533 @@
     {
       "heading": {
         "level": 1,
-        "text": "申請表格 Application Form"
-      }
-    },
-    {
-      "divider": {}
-    },
-    {
-      "gallery": {
-        "mode": "slider",
-        "items": [
+        "text": "申請表格 Application Form",
+        "links": [
           {
-            "src": "/img/old/misc/SDCA-30th-Anniversary-5.dbbd3020.jpg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "8fe9528e2f47873ecfe5c845db0d5139fef948269aec56d9bd3ec4f118d54056",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-30th-Anniversary-5.dbbd3020.jpg"
-          },
-          {
-            "src": "/img/old/misc/Pre-K-Program-5.jpeg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "d40890630bf9080216bd21578a88ced118e8faa9538d50200085b47724e5470f",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Pre-K-Program-5.jpeg"
-          },
-          {
-            "src": "/img/old/misc/SDCA-Fundamental-Class-Regular.jpeg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "5b0fe4b120a01e1c242af370fd8a2060c9ba9079a48028f72e3e417766d18e5c",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Fundamental-Class-Regular.jpeg"
-          },
-          {
-            "src": "/img/old/misc/SDCA-Bilingual-Class.jpg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "6ad2a9c16e9363adad2ba907d43d6d9a4e956d7837e2a3fbd9e945c595b91633",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Bilingual-Class.jpg"
-          },
-          {
-            "src": "/img/old/misc/SDCA-Credit-Class-Cultural-Activity-5.jpg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "f8aeb63f48e72b3bbc5f98259a58534aa1748f11bded40527a48b391bd556bfd",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Credit-Class-Cultural-Activity-5.jpg"
-          },
-          {
-            "src": "/img/old/misc/SDCA-Chinese-Typing.jpeg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "272b009ecb36edf6b33ec104716c9432e9e57d321fccaa7d2fa388b0d630a25c",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Chinese-Typing.jpeg"
-          },
-          {
-            "src": "/img/old/misc/SDCA-2017-2018-Graduates.jpeg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "e65c6f8c4b8eb7da8d26b94f224ed7fa7476421e0550560ffccbb27ff2a0cb49",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-2017-2018-Graduates.jpeg"
-          },
-          {
-            "src": "/img/old/misc/SDCA-Poetry-Recitation-Contest.jpg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "04fd0ad981dc7c7c1e4aeafe1c807decc67c1df431c57fb0c1d667418180d7d8",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Poetry-Recitation-Contest.jpg"
-          },
-          {
-            "src": "/img/old/misc/SDCA-Cultural-Day.f3d89943.jpeg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "8b8932fc4148d47c20959a83912690389a93399b6027f6579104be32be14398c",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Cultural-Day.f3d89943.jpeg"
-          },
-          {
-            "src": "/img/old/misc/SDCA-Qigong-Seminar.9caf4036.jpeg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "efb1d55b301baf721efe69f7ff8d364d6904f01e6c712d1015ca970893874e0c",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Qigong-Seminar.9caf4036.jpeg"
-          },
-          {
-            "src": "/img/old/misc/SDCA-Community-Service.afeae869.jpeg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "780230f4c8f85b8158bfa3068316d514de71e04f83cd726ee1ce82c8531784b6",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Community-Service.afeae869.jpeg"
+            "t": "申請表格 Application Form",
+            "href": "https://forms.gle/qpiQZTGVN2zideHd7"
           }
         ]
       }
     },
     {
-      "button": {
-        "label": "課程安排 Class Descriptions",
-        "href": "https://sandiegochineseschool.com/class-placement/",
-        "target": "_blank"
-      }
-    },
-    {
-      "file": {
-        "label": "行事曆 School Calendar",
-        "href": "__OLD_PDF__/2026/2025-2026_School_Calendar-03152026.pdf",
-        "sha256": "7f04458830f502638437d575ea612e612c34294379f76575d6fba8cfa044fe85",
-        "local_path": "research/assets/pdf/2025-2026_School_Calendar-03152026.pdf"
-      }
-    },
-    {
-      "button": {
-        "label": "義工服務 Volunteer Sign Up",
-        "href": "https://sandiegochineseschool.com/volunteer-opportunity/",
-        "target": "_blank"
-      }
-    },
-    {
-      "button": {
-        "label": "家庭聯絡事項 Weekly Announcement",
-        "href": "https://sandiegochineseschool.com/upcoming-event/",
-        "target": "_blank"
-      }
-    },
-    {
-      "heading": {
-        "level": 2,
-        "text": "家庭聯絡事項"
-      }
-    },
-    {
-      "heading": {
-        "level": 2,
-        "text": "Weekly Announcement"
-      }
-    },
-    {
-      "list": {
-        "ordered": false,
-        "items": [
-          "本週",
-          "上週",
-          "This Week",
-          "Last Week"
+      "columns": {
+        "count": 1,
+        "cols": [
+          [
+            {
+              "divider": {}
+            },
+            {
+              "gallery": {
+                "mode": "slider",
+                "items": [
+                  {
+                    "src": "/img/old/2018/SDCA-30th-Anniversary-5.dbbd3020.jpg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "8fe9528e2f47873ecfe5c845db0d5139fef948269aec56d9bd3ec4f118d54056",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-30th-Anniversary-5.dbbd3020.jpg"
+                  },
+                  {
+                    "src": "/img/old/2018/Pre-K-Program-5.jpeg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "d40890630bf9080216bd21578a88ced118e8faa9538d50200085b47724e5470f",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Pre-K-Program-5.jpeg"
+                  },
+                  {
+                    "src": "/img/old/2018/SDCA-Fundamental-Class-Regular.jpeg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "5b0fe4b120a01e1c242af370fd8a2060c9ba9079a48028f72e3e417766d18e5c",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Fundamental-Class-Regular.jpeg"
+                  },
+                  {
+                    "src": "/img/old/2018/SDCA-Bilingual-Class.jpg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "6ad2a9c16e9363adad2ba907d43d6d9a4e956d7837e2a3fbd9e945c595b91633",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Bilingual-Class.jpg"
+                  },
+                  {
+                    "src": "/img/old/2018/SDCA-Credit-Class-Cultural-Activity-5.jpg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "f8aeb63f48e72b3bbc5f98259a58534aa1748f11bded40527a48b391bd556bfd",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Credit-Class-Cultural-Activity-5.jpg"
+                  },
+                  {
+                    "src": "/img/old/2018/SDCA-Chinese-Typing.jpeg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "272b009ecb36edf6b33ec104716c9432e9e57d321fccaa7d2fa388b0d630a25c",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Chinese-Typing.jpeg"
+                  },
+                  {
+                    "src": "/img/old/2018/SDCA-2017-2018-Graduates.jpeg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "e65c6f8c4b8eb7da8d26b94f224ed7fa7476421e0550560ffccbb27ff2a0cb49",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-2017-2018-Graduates.jpeg"
+                  },
+                  {
+                    "src": "/img/old/2018/SDCA-Poetry-Recitation-Contest.jpg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "04fd0ad981dc7c7c1e4aeafe1c807decc67c1df431c57fb0c1d667418180d7d8",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Poetry-Recitation-Contest.jpg"
+                  },
+                  {
+                    "src": "/img/old/2018/SDCA-Cultural-Day.f3d89943.jpeg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "8b8932fc4148d47c20959a83912690389a93399b6027f6579104be32be14398c",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Cultural-Day.f3d89943.jpeg"
+                  },
+                  {
+                    "src": "/img/old/2018/SDCA-Qigong-Seminar.9caf4036.jpeg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "efb1d55b301baf721efe69f7ff8d364d6904f01e6c712d1015ca970893874e0c",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Qigong-Seminar.9caf4036.jpeg"
+                  },
+                  {
+                    "src": "/img/old/2018/SDCA-Community-Service.afeae869.jpeg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "780230f4c8f85b8158bfa3068316d514de71e04f83cd726ee1ce82c8531784b6",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/SDCA-Community-Service.afeae869.jpeg"
+                  }
+                ]
+              }
+            }
+          ]
         ]
       }
     },
     {
-      "heading": {
-        "level": 2,
-        "text": "活動攝影 Recent Event Photo"
-      }
-    },
-    {
-      "gallery": {
-        "mode": "slider",
-        "items": [
-          {
-            "src": "/img/old/misc/2021-CNY-1.jpg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "224270d5173ddfb56686f846f08b2590e766db73634c015cbc4d406c36bc0c6e",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/2021-CNY-1.jpg"
-          },
-          {
-            "src": "/img/old/misc/2021-CNY-2.jpg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "85de75b12238700ec36e5b5cf3a2c3e19f933133ee86e2316984a87c9f98f9ca",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/2021-CNY-2.jpg"
-          },
-          {
-            "src": "/img/old/misc/image.jpeg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "2793edd2c0b47d550879a6fde164b6eeae478c192ea5716602db293111db9baa",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/image.jpeg"
-          },
-          {
-            "src": "/img/old/misc/Textbook-Pickup-Day.jpg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "433f32fab06503b2b2116714eca47f0f8f11770572f31ab9d123e55feb067bed",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Textbook-Pickup-Day.jpg"
-          },
-          {
-            "src": "/img/old/misc/image2.2de9ca97.jpeg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "5b994e1190918d65db62fa54e0ff695bacfd15d243e2889cc4dc7d40bb03a7be",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/image2.2de9ca97.jpeg"
-          },
-          {
-            "src": "/img/old/misc/Class-of-2020-1.fab7fd8d.jpg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "decdde244078127c2fa2dd3351d93f90eea1aad76d88fb52e2c99946970e54d2",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Class-of-2020-1.fab7fd8d.jpg"
-          },
-          {
-            "src": "/img/old/misc/Ujam-1.jpg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "5ee28b80ed9e9ecead453ce907f13210d58b797714e2ffd2736fcdc71a68951c",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Ujam-1.jpg"
-          },
-          {
-            "src": "/img/old/misc/Student-Store.jpg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "c0bbc4dc153ea7c9d737633c30af94f21b1e4e215c060503144bba58318aeac6",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Student-Store.jpg"
-          },
-          {
-            "src": "/img/old/misc/IMG_8348.jpg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "2d89492b995fcc75a75016ec751bfadba4f6c521db545433d9714afc9e324b7e",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/IMG_8348.jpg"
-          },
-          {
-            "src": "/img/old/misc/Credit-Class-Food-Activity.jpeg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "e5c232d18ba0be73fb2361bcdffb4f3c7b139d3ff167b1c254fc19bbef3cb3ff",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Credit-Class-Food-Activity.jpeg"
-          },
-          {
-            "src": "/img/old/misc/Writing-1.jpeg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "b865c236880ac077f1ea2136fa2f22208978608662a2ec97779339ddcbb8e461",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Writing-1.jpeg"
-          },
-          {
-            "src": "/img/old/misc/IMG_7835.jpg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "74a8d2ba4347de4659a465fcbda8add4080adb02b1932e3a992cd1e9ae1a7ae6",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/IMG_7835.jpg"
-          },
-          {
-            "src": "/img/old/misc/Teacher-Meeting.jpg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "7f77110c4cd2a974f30ce22749e7d961e969025996e4cdf1ba750ca3e633ae8d",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Teacher-Meeting.jpg"
-          },
-          {
-            "src": "/img/old/misc/CSL-Project.jpg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "6136c485086fbd511ff8c096cfabb3f47c0cdc62957a4be2c6a14284e9b51e94",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/CSL-Project.jpg"
-          },
-          {
-            "src": "/img/old/misc/Credit-Class-Poetry-Recitation.jpeg",
-            "alt": "",
-            "caption": "",
-            "width": null,
-            "height": null,
-            "sha256": "5e46da768d32d8c3fa8d3229d62afc404c002e1c5f56e8fc7a91516472bd6f05",
-            "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Credit-Class-Poetry-Recitation.jpeg"
-          }
+      "columns": {
+        "count": 4,
+        "cols": [
+          [
+            {
+              "button": {
+                "label": "課程安排 Class Descriptions",
+                "href": "/en/programs/classes",
+                "target": "_blank"
+              }
+            }
+          ],
+          [
+            {
+              "file": {
+                "label": "行事曆 School Calendar",
+                "href": "__OLD_PDF__/2026/2025-2026_School_Calendar-03152026.pdf",
+                "sha256": "7f04458830f502638437d575ea612e612c34294379f76575d6fba8cfa044fe85",
+                "local_path": "research/assets/pdf/2025-2026_School_Calendar-03152026.pdf"
+              }
+            }
+          ],
+          [
+            {
+              "button": {
+                "label": "義工服務 Volunteer Sign Up",
+                "href": "/en/parents/volunteer",
+                "target": "_blank"
+              }
+            }
+          ],
+          [
+            {
+              "button": {
+                "label": "家庭聯絡事項 Weekly Announcement",
+                "href": "/en/news?kind=weekly",
+                "target": "_blank"
+              }
+            }
+          ]
         ]
       }
     },
     {
-      "heading": {
-        "level": 3,
-        "text": "SDCA Cultural Activity Playlist"
-      }
-    },
-    {
-      "divider": {}
-    },
-    {
-      "heading": {
-        "level": 2,
-        "text": "新學年第一學期遠距教學\nRemote Learning Fall 2020"
-      }
-    },
-    {
-      "richtext": "由於加州新冠肺炎疫情加重，聖地牙哥多個學區已經決定下學\n年\n遠\n距教學。我們學校也決定在2020-2021學年的第一學期實行遠距教學，第二學期將視當時疫情情況再做決定。\nDue to the increase in COVID-19 cases in California, many school districts in San Diego have decided to implement remote learning for the next school year. Our school has decided to implement remote learning for the first semester of the 2020-2021 school year. We will decide what to do regarding the second semester based on the situation of the epidemic later on."
-    },
-    {
-      "divider": {}
-    },
-    {
-      "heading": {
-        "level": 2,
-        "text": "2020-2021 網上註冊On-line Registration"
-      }
-    },
-    {
-      "button": {
-        "label": "Enroll New Student",
-        "href": "https://www.sandiegochineseschool.com/registration/signin/register",
-        "target": "_self"
-      }
-    },
-    {
-      "button": {
-        "label": "Enroll Returning Student",
-        "href": "https://www.sandiegochineseschool.com/registration/signin",
-        "target": "_self"
-      }
-    },
-    {
-      "list": {
-        "ordered": false,
-        "items": [
-          "註冊須知與網路註冊說明",
-          "Registration Notice and Online Registration Instructions",
-          "義工工作說明 Volunteer Job Descriptions"
+      "columns": {
+        "count": 2,
+        "cols": [
+          [
+            {
+              "heading": {
+                "level": 2,
+                "text": "家庭聯絡事項"
+              },
+              "hide": [
+                "desktop",
+                "tablet"
+              ]
+            },
+            {
+              "heading": {
+                "level": 2,
+                "text": "Weekly Announcement"
+              },
+              "hide": [
+                "desktop",
+                "tablet"
+              ]
+            },
+            {
+              "list": {
+                "ordered": false,
+                "items": [
+                  "本週",
+                  "上週",
+                  "This Week",
+                  "Last Week"
+                ]
+              },
+              "hide": [
+                "desktop",
+                "tablet"
+              ]
+            }
+          ],
+          [
+            {
+              "heading": {
+                "level": 2,
+                "text": "活動攝影 Recent Event Photo",
+                "links": [
+                  {
+                    "t": "活動攝影 Recent Event Photo",
+                    "href": "/en/media"
+                  }
+                ]
+              },
+              "hide": [
+                "desktop",
+                "tablet"
+              ]
+            },
+            {
+              "gallery": {
+                "mode": "slider",
+                "items": [
+                  {
+                    "src": "/img/old/2021/2021-CNY-1.jpg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "224270d5173ddfb56686f846f08b2590e766db73634c015cbc4d406c36bc0c6e",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/2021-CNY-1.jpg"
+                  },
+                  {
+                    "src": "/img/old/2021/2021-CNY-2.jpg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "85de75b12238700ec36e5b5cf3a2c3e19f933133ee86e2316984a87c9f98f9ca",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/2021-CNY-2.jpg"
+                  },
+                  {
+                    "src": "/img/old/2020/image.jpeg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "2793edd2c0b47d550879a6fde164b6eeae478c192ea5716602db293111db9baa",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/image.jpeg"
+                  },
+                  {
+                    "src": "/img/old/2020/Textbook-Pickup-Day.jpg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "433f32fab06503b2b2116714eca47f0f8f11770572f31ab9d123e55feb067bed",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Textbook-Pickup-Day.jpg"
+                  },
+                  {
+                    "src": "/img/old/2020/image2.2de9ca97.jpeg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "5b994e1190918d65db62fa54e0ff695bacfd15d243e2889cc4dc7d40bb03a7be",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/image2.2de9ca97.jpeg"
+                  },
+                  {
+                    "src": "/img/old/2020/Class-of-2020-1.fab7fd8d.jpg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "decdde244078127c2fa2dd3351d93f90eea1aad76d88fb52e2c99946970e54d2",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Class-of-2020-1.fab7fd8d.jpg"
+                  },
+                  {
+                    "src": "/img/old/2020/Ujam-1.jpg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "5ee28b80ed9e9ecead453ce907f13210d58b797714e2ffd2736fcdc71a68951c",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Ujam-1.jpg"
+                  },
+                  {
+                    "src": "/img/old/2020/Student-Store.jpg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "c0bbc4dc153ea7c9d737633c30af94f21b1e4e215c060503144bba58318aeac6",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Student-Store.jpg"
+                  },
+                  {
+                    "src": "/img/old/2019/IMG_8348.jpg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "2d89492b995fcc75a75016ec751bfadba4f6c521db545433d9714afc9e324b7e",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/IMG_8348.jpg"
+                  },
+                  {
+                    "src": "/img/old/2019/Credit-Class-Food-Activity.jpeg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "e5c232d18ba0be73fb2361bcdffb4f3c7b139d3ff167b1c254fc19bbef3cb3ff",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Credit-Class-Food-Activity.jpeg"
+                  },
+                  {
+                    "src": "/img/old/2019/Writing-1.jpeg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "b865c236880ac077f1ea2136fa2f22208978608662a2ec97779339ddcbb8e461",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Writing-1.jpeg"
+                  },
+                  {
+                    "src": "/img/old/2019/IMG_7835.jpg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "74a8d2ba4347de4659a465fcbda8add4080adb02b1932e3a992cd1e9ae1a7ae6",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/IMG_7835.jpg"
+                  },
+                  {
+                    "src": "/img/old/2019/Teacher-Meeting.jpg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "7f77110c4cd2a974f30ce22749e7d961e969025996e4cdf1ba750ca3e633ae8d",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Teacher-Meeting.jpg"
+                  },
+                  {
+                    "src": "/img/old/2019/CSL-Project.jpg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "6136c485086fbd511ff8c096cfabb3f47c0cdc62957a4be2c6a14284e9b51e94",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/CSL-Project.jpg"
+                  },
+                  {
+                    "src": "/img/old/2018/Credit-Class-Poetry-Recitation.jpeg",
+                    "alt": "",
+                    "caption": "",
+                    "width": null,
+                    "height": null,
+                    "sha256": "5e46da768d32d8c3fa8d3229d62afc404c002e1c5f56e8fc7a91516472bd6f05",
+                    "local_path": "/Users/Maxi/Code/SDCA/research/assets/images/Credit-Class-Poetry-Recitation.jpeg"
+                  }
+                ]
+              },
+              "hide": [
+                "desktop",
+                "tablet"
+              ]
+            },
+            {
+              "heading": {
+                "level": 3,
+                "text": "SDCA Cultural Activity Playlist",
+                "links": [
+                  {
+                    "t": "SDCA Cultural Activity Playlist",
+                    "href": "https://www.youtube.com/playlist?list=PL-etO5dM7pdvvPot-VAjFbX9Memc-K4fx"
+                  }
+                ]
+              },
+              "hide": [
+                "desktop",
+                "tablet"
+              ]
+            }
+          ]
         ]
-      }
+      },
+      "hide": [
+        "desktop",
+        "tablet"
+      ]
     },
     {
-      "divider": {}
+      "divider": {},
+      "hide": [
+        "desktop",
+        "tablet",
+        "phone"
+      ]
+    },
+    {
+      "columns": {
+        "count": 2,
+        "cols": [
+          [
+            {
+              "heading": {
+                "level": 2,
+                "text": "新學年第一學期遠距教學\nRemote Learning Fall 2020"
+              },
+              "hide": [
+                "desktop",
+                "tablet",
+                "phone"
+              ]
+            },
+            {
+              "richtext": "由於加州新冠肺炎疫情加重，聖地牙哥多個學區已經決定下學年遠距教學。我們學校也決定在2020-2021學年的第一學期實行遠距教學，第二學期將視當時疫情情況再做決定。\nDue to the increase in COVID-19 cases in California, many school districts in San Diego have decided to implement remote learning for the next school year. Our school has decided to implement remote learning for the first semester of the 2020-2021 school year. We will decide what to do regarding the second semester based on the situation of the epidemic later on.",
+              "hide": [
+                "desktop",
+                "tablet",
+                "phone"
+              ]
+            }
+          ],
+          [
+            {
+              "divider": {},
+              "hide": [
+                "desktop",
+                "tablet",
+                "phone"
+              ]
+            },
+            {
+              "heading": {
+                "level": 2,
+                "text": "2020-2021 網上註冊On-line Registration"
+              },
+              "hide": [
+                "desktop",
+                "tablet",
+                "phone"
+              ]
+            },
+            {
+              "button": {
+                "label": "Enroll New Student",
+                "href": "/en/enroll",
+                "target": "_self"
+              },
+              "hide": [
+                "desktop",
+                "tablet",
+                "phone"
+              ]
+            },
+            {
+              "button": {
+                "label": "Enroll Returning Student",
+                "href": "/en/enroll",
+                "target": "_self"
+              },
+              "hide": [
+                "desktop",
+                "tablet",
+                "phone"
+              ]
+            },
+            {
+              "list": {
+                "ordered": false,
+                "items": [
+                  "註冊須知與網路註冊說明",
+                  "Registration Notice and Online Registration Instructions",
+                  "義工工作說明 Volunteer Job Descriptions"
+                ]
+              },
+              "hide": [
+                "desktop",
+                "tablet",
+                "phone"
+              ]
+            }
+          ]
+        ]
+      },
+      "hide": [
+        "desktop",
+        "tablet",
+        "phone"
+      ]
+    },
+    {
+      "divider": {},
+      "hide": [
+        "desktop",
+        "tablet",
+        "phone"
+      ]
     }
   ],
   "signature": [
+    "columns:4",
     "1col",
     "1col",
     "1col",
+    "columns:1",
     "1col",
     "1col",
     "1col",
+    "columns:1",
+    "columns:1",
     "1col",
+    "columns:1",
+    "columns:4",
+    "columns:0",
+    "columns:2",
     "1col",
-    "1col",
-    "1col",
-    "1col",
-    "1col",
-    "1col",
-    "1col",
-    "1col",
-    "1col",
-    "1col",
+    "columns:2",
     "1col"
   ],
   "notes": [],

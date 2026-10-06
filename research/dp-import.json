@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-06T04:56:33.743Z",
+  "generated": "2026-10-06T05:17:43.779Z",
   "pages": {
     "about": {
       "from": "about-sdca",
@@ -106,6 +106,13 @@
       "files": 0,
       "dropped": []
     },
+    "home": {
+      "from": "home",
+      "blocks": 19,
+      "images": 29,
+      "files": 2,
+      "dropped": []
+    },
     "media": {
       "from": "media",
       "blocks": 152,
@@ -180,6 +187,6 @@
   "append:sponsors-2": true,
   "createdDocs": [],
   "ledger": [],
-  "wrote": 25,
+  "wrote": 26,
   "skippedAdmin": 0
 }
