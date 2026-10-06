@@ -11,3 +11,4 @@ research/raw/
 research/assets/
 research/logs/
 research/__pycache__/
+.claude/
