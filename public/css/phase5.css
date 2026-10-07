@@ -67,7 +67,7 @@
   font-size: 0.8rem; font-weight: 600; color: var(--gray-600);
   margin-bottom: 2px;
 }
-.cal-cell.has-events .cal-day { color: var(--navy); }
+.cal-cell.has-events .cal-day { color: var(--blue); }
 .cal-event {
   display: block;
   font-size: 0.78rem; font-weight: 500; color: var(--ink);
@@ -79,7 +79,7 @@
   overflow: hidden; text-overflow: ellipsis;
   white-space: nowrap;
 }
-.cal-event:hover { background: var(--surface-2, var(--surface)); color: var(--red); }
+.cal-event:hover { background: var(--surface-2, var(--surface)); color: var(--blue); }
 .cal-more { font-size: 0.72rem; color: var(--gray-500); padding-left: 6px; }
 
 /* Media query: smaller cells on mobile */

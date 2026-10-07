@@ -150,9 +150,9 @@ h3.blk-heading { font-size: 1.15rem; }
 [data-page="home"] .blocks > .blk-columns:first-child { grid-template-columns: 90px minmax(0,1fr) minmax(0,1fr) 90px; align-items: start; }
 [data-page="home"] .blocks > .blk-columns:first-child .blk-image img { box-shadow: none; border-radius: 0; max-width: 100%; }
 [data-page="home"] .blk-file, [data-page="home"] .blk-button { text-align: center; margin: 0; }
-[data-page="home"] .blk-file a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px 22px; border-radius: var(--radius); background: var(--red); color: #fff; font-weight: 600; text-decoration: none; text-align: center; }
+[data-page="home"] .blk-file a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px 22px; border-radius: var(--radius); background: var(--blue); color: #fff; font-weight: 600; text-decoration: none; text-align: center; }
 [data-page="home"] .blk-file a svg { display: none; }
-[data-page="home"] .blk-file a:hover { background: #8f0e21; }
+[data-page="home"] .blk-file a:hover { background: var(--blue-700); }
 [data-page="home"] .blk-columns:has(.blk-button, .blk-file) { align-items: stretch; }
 [data-page="home"] .blk-columns:has(.blk-button, .blk-file) .blk-col { align-content: center; justify-items: center; }
 @media (max-width: 800px) { [data-page="home"] .blocks > .blk-columns:first-child { grid-template-columns: 1fr; } }
@@ -179,7 +179,7 @@ h3.blk-heading { font-size: 1.15rem; }
 .mc-day { padding: 6px 0; border-radius: 6px; color: var(--ink); }
 .mc-empty { visibility: hidden; }
 .mc-today { outline: 1px solid var(--navy); }
-.mc-has { background: var(--red); color: #fff; font-weight: 600; cursor: help; }
+.mc-has { background: var(--blue); color: #fff; font-weight: 600; cursor: help; }
 @media (max-width: 800px) { [data-page="home"] .home-upcoming { grid-template-columns: 1fr; } .mini-cal { max-width: 320px; } }
 [data-page="home"] .home-upcoming-side { display: grid; gap: var(--sp-3); }
 [data-page="home"] .home-upcoming-cal-btn .blk-file { text-align: center; }

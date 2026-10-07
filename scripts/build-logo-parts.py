@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """Build the 3-part logo family from public/brand/logo-mark.svg (traced original mark).
-Part 1 = red rounded badge with white shield mark; Part 2 = badge + Chinese name; Part 3 = + English name and 'Non-Profit · Since 1988'.
+Part 1 = blue rounded badge with white shield mark; Part 2 = badge + Chinese name; Part 3 = + English name and 'Non-Profit · Since 1988'.
 Writes public/brand/logo-1-badge*.svg, logo-2-badge-name*.svg, logo-3-full*.svg (light + -dark variants for navy backgrounds)."""
 import re
 src = open('public/brand/logo-mark.svg').read()
 D = re.search(r' d="([^"]+)"', src).group(1)
-RED = '#B3112A'; NAVY = '#0B2545'; GRAY = '#5B6B84'
+BLUE = '#210488'; NAVY = '#0B2545'; GRAY = '#5B6B84'
 SERIF_ZH = "'Noto Serif TC','Songti TC','PMingLiU',serif"
 SERIF_EN = "Georgia,'Times New Roman',serif"
 BW, BH = 144, 180                      # badge size: aspect matches the shield so padding is equal on all sides
 PAD = 3; MH = BH - 2*PAD; S = MH / 446; MW = 353 * S   # shield almost touches the badge edges            # mark scale (fits badge with padding)
-badge = (f'<rect width="{BW}" height="{BH}" rx="14" fill="{RED}"/>'
+badge = (f'<rect width="{BW}" height="{BH}" rx="14" fill="{BLUE}"/>'
          f'<g transform="translate({(BW-MW)/2:.2f} {PAD}) scale({S:.5f})"><path fill="#fff" stroke="#fff" stroke-width="1.4" stroke-linejoin="round" fill-rule="evenodd" d="{D}"/></g>')
 def wrap(w, body, title, h=BH):
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}" role="img" aria-label="{title}">'

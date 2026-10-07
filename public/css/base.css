@@ -34,7 +34,7 @@ a:hover { color: var(--red); }
   box-shadow: var(--focus-ring);
   border-radius: var(--radius-sm);
 }
-:where(.btn, .btn-primary):focus-visible { box-shadow: var(--focus-ring-red); }
+:where(.btn, .btn-primary):focus-visible { box-shadow: var(--focus-ring-blue); }
 
 img, svg, video { display: block; max-width: 100%; height: auto; }
 

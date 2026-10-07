@@ -9,8 +9,8 @@
   min-height: 40px; padding: 0 var(--sp-3); border: 1px solid var(--gray-300); border-radius: var(--radius-sm); font: inherit; background: #fff; max-width: 100%;
 }
 .portal-body input:focus, .portal-body select:focus { outline: 2px solid var(--navy); outline-offset: 1px; }
-.portal-body input.submit { min-height: 44px; padding: 0 var(--sp-5); border: 0; border-radius: var(--radius); background: var(--red); color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
-.portal-body input.submit:hover { background: #8f0e21; }
+.portal-body input.submit { min-height: 44px; padding: 0 var(--sp-5); border: 0; border-radius: var(--radius); background: var(--blue); color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+.portal-body input.submit:hover { background: var(--blue-700); }
 .portal-body a { color: var(--red); }
 .portal-body .register-link { display: block; margin: 0 0 var(--sp-3); }
 .portal-body h1 { font-size: 1.6rem; margin: 0 0 var(--sp-4); }
