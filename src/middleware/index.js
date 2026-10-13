@@ -107,7 +107,7 @@ export function applyBaseMiddleware(app) {
     name: 'sdca_sid',
     httpOnly: true,
     sameSite: 'Lax',
-    cookie: { maxAge: 7 * 24 * 3600 * 1000 },
+    cookie: { maxAge: 7 * 24 * 3600 * 1000, httpOnly: true, sameSite: 'lax', secure: config.https },
   }));
 
   app.use(langMiddleware);

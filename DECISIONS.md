@@ -14,3 +14,10 @@
 - 2026-10-05: ROADMAP v2: capture once (crawl v2) -> deterministic import -> strict parity tests -> section-by-section passes vs old screenshots -> menu/hero -> hardening.
 - 2026-10-05: owner: simple 1:1 project. ROADMAP v3 Direct Port replaces capture/section passes: reuse old main-content HTML verbatim in new layout.
 - 2026-10-05: clarified: NOT reuse old HTML; rebuild clean HTML with same content, order, layout arrangement and images (block-tree parser + renderer).
+
+## 2026-10-13 — School portal (owner decisions)
+- Build it ourselves in this repo (Node + SQLite), no Qwen; same site style; all old portal screens rebuilt and wired up.
+- No online payments for now: check or cash only. Fees are configured by staff per school year in one place.
+- Student login (credit students only) sees their own school, class, teacher and credit grades; no classmates.
+- Emails are logged to an outbox until a real sender is chosen. Hosting stays on this Mac (launchd + Tailscale) for now; revisit later.
+- Real family data is NOT loaded; demo uses invented families. Screenshots of the old portal stay out of git (research/SDCA Portal/ is ignored).

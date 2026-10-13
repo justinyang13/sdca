@@ -16,7 +16,7 @@ const BASE = arg('base', '/sdca').replace(/\/$/, '');
 const OUT = path.resolve(ROOT, arg('out', 'dist'));
 const PORT = 3199;
 const ORIGIN = `http://127.0.0.1:${PORT}`;
-const SKIP = /^\/(admin|api|search|healthz|robots\.txt|sitemap\.xml)(\/|$|\?)|[?&](year|date)=|[?&]month=(?!(2026-(0[89]|1[0-2])|2027-(0[1-7]))$)/;
+const SKIP = /^\/(admin|api|search|healthz|robots\.txt|sitemap\.xml)(\/|$|\?)|^\/(en|zh)\/portal(\/?$|\/(?!signin|register|forgot-username|forgot-password|privacy)[^?]*)|[?&](year|date)=|[?&]month=(?!(2026-(0[89]|1[0-2])|2027-(0[1-7]))$)/;
 
 const html = new Map();   // urlPath(+query) -> { file, body }
 const assets = new Set(); // url paths to copy from the server
@@ -86,7 +86,7 @@ async function main() {
       if (seen.size > 2500) { console.warn('crawl cap reached'); break; }
       seen.add(u); if (seen.size % 25 === 0) console.log('crawl', seen.size, queue.length, u);
       let r;
-      try { r = await fetch(ORIGIN + u, { redirect: 'manual' }); } catch (e) { console.warn('fetch failed', u); continue; }
+      try { r = await fetch(ORIGIN + u, { redirect: 'manual', headers: { 'x-static-build': '1' } }); } catch (e) { console.warn('fetch failed', u); continue; }
       const loc = r.headers.get('location');
       if (r.status >= 300 && r.status < 400 && loc) {
         redirects.set(u, loc.replace(ORIGIN, ''));

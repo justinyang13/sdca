@@ -1,0 +1,54 @@
+<%
+  const ownLabel = (fd) => b(fd.label.en, fd.label.zh);
+  const val = (n) => (values && values[n] !== undefined && values[n] !== null ? values[n] : '');
+  const cents = (n) => (val(n) === '' ? '' : (Number(val(n)) / 100).toFixed(2));
+%>
+<div class="portal-head">
+  <h1><%= id ? b('Edit', '編輯') : b('New', '新增') %> <%= b(ent.singular.en, ent.singular.zh) %></h1>
+  <div class="portal-actions"><a class="btn btn-ghost" href="<%= url('/manage/' + key) %>">‹ <%= b(ent.label.en, ent.label.zh) %></a>
+    <% if (detailUrl) { %><a class="btn btn-ghost" href="/<%= lang %><%= detailUrl %>"><%= b('More Details', '詳細資料') %></a><% } %>
+    <% if (key === 'roles' && id) { %><a class="btn btn-primary" href="<%= url('/manage/roles/' + id + '/permissions') %>"><%= b('Permissions', '權限') %></a><% } %></div>
+</div>
+<% if (errors && errors._form) { %><p class="portal-error" role="alert"><%= errors._form %></p><% } %>
+<form method="post" action="<%= id ? url('/manage/' + key + '/' + id) : url('/manage/' + key) %>" class="pform pform-wide portal-card">
+  <%- csrfField() %>
+  <% ent.fields.forEach(function(fd){
+       const err = errors && errors[fd.name] ? errors[fd.name] : '';
+       const dis = readOnly ? ' disabled' : '';
+       if (fd.type === 'readonly') { %>
+    <div class="frow"><label><%= ownLabel(fd) %></label><div class="fctl"><span class="ro"><%= fd.name.endsWith('_at') ? fmtDateTime(val(fd.name)) : val(fd.name) %></span></div></div>
+  <%   } else if (fd.type === 'bool') { %>
+    <div class="frow"><label for="f_<%= fd.name %>"><%= ownLabel(fd) %></label><div class="fctl"><input type="checkbox" id="f_<%= fd.name %>" name="<%= fd.name %>" value="1" <%= Number(val(fd.name)) ? 'checked' : '' %><%= dis %>></div></div>
+  <%   } else if (fd.type === 'ref') { const rf = refs[fd.name]; %>
+    <div class="frow<%= err ? ' has-error' : '' %>"><label for="f_<%= fd.name %>"><%- fd.required ? '<span class="req">*</span> ' : '' %><%= ownLabel(fd) %></label><div class="fctl">
+      <% if (rf.mode === 'select') { %>
+      <select id="f_<%= fd.name %>" name="<%= fd.name %>"<%= dis %>><option value=""></option><% rf.options.forEach(function(o){ %><option value="<%= o.id %>" <%= String(val(fd.name)) === String(o.id) ? 'selected' : '' %>><%= o.label %></option><% }) %></select>
+      <% } else { %>
+      <input type="text" class="ref-input" data-ref="<%= fd.ref %>" data-url="<%= url('/api/lookup/' + fd.ref) %>" data-target="h_<%= fd.name %>" value="<%= rf.label %>" placeholder="<%= b('type to search', '輸入搜尋') %>" autocomplete="off"<%= dis %>>
+      <input type="hidden" id="h_<%= fd.name %>" name="<%= fd.name %>" value="<%= val(fd.name) %>">
+      <% } %>
+      <% if (err) { %><span class="ferr"><%= err %></span><% } %></div></div>
+  <%   } else {
+         const opts = fd.type === 'select' ? fd.options.map(function(o){ return { v: o.v, label: one(o.en, o.zh) }; })
+           : fd.type === 'yn' ? [{v:'Y',label:b('Yes','是')},{v:'N',label:b('No','否')}] : fd.type === 'gender' ? [{v:'M',label:b('Male','男')},{v:'F',label:b('Female','女')}] : null;
+         const type = ['email','tel','number','date'].includes(fd.type) ? fd.type : fd.type === 'password' ? 'password' : fd.type === 'datetime' ? 'datetime-local' : fd.type === 'money' ? 'number' : 'text';
+         const v = fd.type === 'money' ? cents(fd.name) : fd.type === 'datetime' ? String(val(fd.name)).replace(' ', 'T').slice(0, 16) : val(fd.name);
+         const attrs = (fd.type === 'money' ? 'step="0.01" ' : '') + (fd.step ? 'step="' + fd.step + '" ' : '') + (dis ? 'disabled' : '');
+  %>
+    <%- field({ label: ownLabel(fd), name: fd.name, type: fd.type === 'textarea' ? 'textarea' : type, value: v, options: opts, error: err, required: fd.required && fd.type !== 'password', attrs: attrs, help: fd.type === 'money' ? b('dollars', '美元') : '' }) %>
+  <%   } }); %>
+
+  <% if (userRoles) { %>
+  <div class="frow"><label><%= b('Roles', '角色') %></label><div class="fctl checklist">
+    <% userRoles.forEach(function(r){ %><label class="chk"><input type="checkbox" name="roles" value="<%= r.id %>" <%= r.checked ? 'checked' : '' %><%= readOnly ? ' disabled' : '' %>> <%= b(r.name_en, r.name_zh) %></label><% }) %>
+    <small class="fhelp"><%= b('A person can hold several roles, e.g. Parent + Teacher + Room Parent.', '一個人可以有多個角色，例如 家長 + 老師 + 班媽。') %></small></div></div>
+  <% } %>
+  <p class="req-note"><span class="req">*</span> <%= b('Required Field', '必須填寫') %></p>
+  <div class="fact">
+    <% if (!readOnly) { %><button class="btn btn-primary" type="submit"><%= b('Save', '儲存') %></button><% } %>
+    <a class="btn btn-ghost" href="<%= url('/manage/' + key) %>"><%= b('Cancel', '取消') %></a>
+  </div>
+</form>
+<% if (id && canDelete) { %>
+<form method="post" action="<%= url('/manage/' + key + '/' + id + '/delete') %>" class="inline" data-confirm="<%= b('Delete this record?', '確定刪除？') %>"><%- csrfField() %><button type="submit" class="btn btn-ghost danger"><%= b('Delete', '刪除') %></button></form>
+<% } %>

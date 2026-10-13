@@ -1,0 +1,23 @@
+<div class="portal-card portal-card-narrow">
+  <h1><%= b('Please Sign In', '請登入') %></h1>
+  <% if (error) { %><p class="portal-error" role="alert"><%= error %></p><% } %>
+  <form method="post" action="<%= url('/signin') %>" class="pform">
+    <%- csrfField() %>
+    <%- field({ label: b('Username', '用戶名稱'), name: 'username', value: username, attrs: 'autocomplete="username" autofocus required' }) %>
+    <%- field({ label: b('Password', '密碼'), name: 'password', type: 'password', attrs: 'autocomplete="current-password" required' }) %>
+    <div class="fact"><button class="btn btn-primary" type="submit"><%= b('Sign In', '登入') %></button></div>
+  </form>
+  <p class="portal-links">
+    <a href="<%= url('/forgot-username') %>"><%= b('Forgot username? Try to find username here', '忘記用戶名稱？查詢用戶名稱') %></a><br>
+    <a href="<%= url('/forgot-password') %>"><%= b('Forgot password? Request password reset here', '忘記密碼？重建密碼') %></a>
+  </p>
+  <p class="portal-help"><%= b('Should you require any further assistance, please contact', '若需任何協助，請寄電子郵件至') %> <a href="mailto:office.sdca@gmail.com">office.sdca@gmail.com</a></p>
+  <ul class="portal-linklist">
+    <li><a href="/pdf/registration-notice-english" target="_blank" rel="noopener">Registration Notice &amp; Online Registration FAQ</a> · <a href="/pdf/registration-notice-chinese" target="_blank" rel="noopener">註冊須知與網上註冊常見問答集</a></li>
+    <li><a href="/pdf/online-registration-user-guide" target="_blank" rel="noopener"><%= b('Online Registration User Guide', '網上註冊說明') %></a></li>
+    <li><a href="/<%= lang %>/programs/classes"><%= b('General Class Information', '課程簡介') %></a></li>
+    <li><a href="/pdf/portal-user-manual" target="_blank" rel="noopener"><%= b('Portal Manual', '使用手冊') %></a></li>
+    <li><a href="<%= url('/privacy') %>"><%= b('Privacy Policy', '隱私權須知') %></a></li>
+  </ul>
+  <p class="portal-newfamily"><%= b('New to San Diego Chinese Academy?', '新學生家長') %> <a class="btn btn-ghost" href="<%= url('/register') %>"><%= b('Register here', '請由此登入') %></a></p>
+</div>

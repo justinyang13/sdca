@@ -1,0 +1,19 @@
+<%# Itemised fee form. locals: rows, calc, reg, money, b, parent, school, printMode %>
+<% rows.forEach(function(r){ const w = r.who; %>
+<div class="fee-student">
+  <p><% if (lang === 'zh') { %>學生 <strong><%= w.chinese_name %> <%= w.english_first_name %> <%= w.english_last_name %></strong> 就讀 <%= gl(r.gradeLabel) %> <%= r.ct ? one(r.ct.name_en, r.ct.name_zh) : '' %><% } else { %>For <strong><%= w.english_first_name %> <%= w.english_last_name %> <%= w.chinese_name %></strong> entering grade <%= gl(r.gradeLabel) %> <%= r.ct ? one(r.ct.name_en, r.ct.name_zh) : '' %><% } %></p>
+  <table class="fee-table"><tbody>
+    <tr><th><%= b('Registration Fee', '報名費') %>:</th><td class="num"><%= money(r.registrationNet) %></td><td><% if (r.earlyRegDiscount) { %><span class="good"><%= b('Early Reg Discount', '預註冊優惠') %> (−<%= money(r.earlyRegDiscount) %>)</span><% } %></td></tr>
+    <tr><th><%= b('Tuition', '學費') %>:</th><td class="num"><%= money(r.tuition) %></td><td></td></tr>
+    <tr><th><%= b('Miscellaneous Fees', '學雜費') %>:</th><td class="num"><%= money(r.misc) %></td><td></td></tr>
+    <% if (r.siblingDiscount) { %><tr><th><%= b('Sibling Discount', '手足折扣') %>:</th><td class="num">−<%= money(r.siblingDiscount) %></td><td></td></tr><% } %>
+    <% if (r.facultyDiscountPending) { %><tr class="muted"><th><%= b('Faculty/board discount (reimbursed 2nd semester)', '教職員折扣 (第二學期退還)') %>:</th><td class="num"><%= money(r.facultyDiscountPending) %></td><td></td></tr><% } %>
+  </tbody></table>
+</div>
+<% }) %>
+<table class="fee-table fee-totals"><tbody>
+  <% if (calc.scripDeposit) { %><tr><th><%= b('Scrip Deposit', '禮券訂金') %>:</th><td class="num"><%= money(calc.scripDeposit) %></td></tr><% } %>
+  <% if (calc.scripPurchase) { %><tr><th><%= b('Scrip Purchase', '禮券購買') %>:</th><td class="num"><%= money(calc.scripPurchase) %></td></tr><% } %>
+  <tr><th><%= b('Service Fee', '代勞費') %>:</th><td class="num"><%= money(calc.serviceFee) %></td></tr>
+  <tr class="grand"><th><%= b('Grand Total', '總計') %>:</th><td class="num"><%= money(calc.grand) %></td></tr>
+</tbody></table>

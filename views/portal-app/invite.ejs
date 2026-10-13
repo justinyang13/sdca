@@ -1,0 +1,16 @@
+<div class="portal-card portal-card-narrow">
+  <h1><%= b('Create User With Invitation', '用邀請建立用戶') %></h1>
+  <% if (!valid) { %>
+    <p class="portal-error"><%= b('This invitation has expired. Reply to the invitation email to get a new one.', '邀請已失效，請回覆邀請郵件重新申請。') %></p>
+  <% } else { %>
+  <% if (error) { %><p class="portal-error" role="alert"><%= error %></p><% } %>
+  <form method="post" action="<%= url('/invite/' + token) %>" class="pform">
+    <%- csrfField() %>
+    <%- field({ label: b('Home or cell phone (verification)', '住家或手機號碼 (驗證)'), name: 'phone', type: 'tel', required: true, attrs: 'required' }) %>
+    <%- field({ label: b('Username', '用戶名稱'), name: 'username', value: username, required: true, attrs: 'required minlength="4" autocomplete="username"' }) %>
+    <%- field({ label: b('Password', '密碼'), name: 'password', type: 'password', required: true, attrs: 'required minlength="8"' }) %>
+    <%- field({ label: b('Re-type Password', '再輸入密碼'), name: 'password2', type: 'password', required: true, attrs: 'required' }) %>
+    <div class="fact"><button class="btn btn-primary" type="submit"><%= b('Create Account', '建立帳戶') %></button></div>
+  </form>
+  <% } %>
+</div>

@@ -1,0 +1,19 @@
+<%
+  const opt = [{v:'',label:''}].concat(jobs.map(function(j){ return {v:j.id,label:one(j.name_en, j.name_zh)}; }));
+  const cur = function(i){ return values['job_' + i] || (mine.filter(function(m){ return m.status !== 'declined'; })[i-1] || {}).job_id || ''; };
+  const declined = mine.some(function(m){ return m.status === 'declined'; });
+%>
+<h1>PTA Volunteer Sign Up 家長會義工報名表</h1>
+<p><%= b('SDCA needs you to sign up for volunteers. We rely heavily on parent volunteers to assist academic and maintain all non-academic functions of the school.', '聖地牙哥中華學苑需要您報名義工。校內所有課外活動與部份的輔助教學活動大多仰賴家長服務才得以舉辦。') %>
+  <% if (serviceFee) { %><%= b('We charge a service fee of ' + money(serviceFee) + ' per family, which is refundable when a parent participates as a volunteer and completes the service. Refund will be given as Scrip gift cards of the same value.', '本校酌收每個家庭代勞費 ' + money(serviceFee) + '，只要家長參與校內服務達一定時數，此項訂金即可退還，以等值的禮券退還。') %><% } %></p>
+<p><%= b('The more parents we have to volunteer, the less duty each parent will have to do.', '參與的家長人數越多，每人分擔的工作就越少。') %></p>
+<% if (declined) { %><p class="portal-ok"><%= b('You told us you cannot volunteer this year. You can change that below.', '您表示今年無法擔任義工，可在下方更改。') %></p><% } %>
+<% if (error) { %><p class="portal-error" role="alert"><%= error %></p><% } %>
+<form method="post" action="<%= url('/volunteer') %>" class="portal-card pform pform-wide"><%- csrfField() %><input type="hidden" name="family" value="<%= fid %>">
+  <p><%= b('Please select up to three jobs that you are interested in.', '請選擇最多三項有興趣的工作。') %> <strong><%= b('Please select “TBD” if you are not sure what you want to do. PTA will contact you shortly.', '如果不確定，請選「TBD」，家長會將與您聯繫。') %></strong></p>
+  <% [1,2,3].forEach(function(i){ %><%- field({ label: [b('First Priority','第一選擇'), b('Second Priority','第二選擇'), b('Third Priority','第三選擇')][i-1], name: 'job_' + i, value: cur(i), options: opt }) %><% }) %>
+  <div class="fact"><button class="btn btn-primary" type="submit"><%= b('Submit', '送出') %></button>
+    <button class="btn btn-ghost" type="submit" name="cannot" value="1"><%= b('I cannot volunteer', '我無法擔任義工') %></button></div>
+  <p class="portal-warn-text"><%= b('“Webmaster Committee”, “Volunteer Coordinator”, “Teacher’s Snack Duty” and “SDCA weekly mail pick up” are reserved for preschool parents who need to stay in the classroom during lecture time.', '「網路組」「義工連絡組」「老師點心輪值」與「幫學校拿郵件服務」保留給學前班需要留在教室的家長。') %></p>
+</form>
+<p><a href="<%= url('') %>">‹ <%= b('Home', '首頁') %></a></p>

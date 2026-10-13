@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { newDb } from '../src/db/open.js';
-import { applyMigrations, MIGRATIONS_DIR } from '../src/db/migrate.js';
+import { applyMigrations, listMigrations, MIGRATIONS_DIR } from '../src/db/migrate.js';
 
 const EXPECTED_TABLES = [
   'pages', 'announcements', 'events', 'programs', 'people', 'sponsors',
@@ -23,7 +23,7 @@ test('migration applies once and is idempotent', () => {
   try {
     const db = newDb(file);
     const first = applyMigrations(db);
-    assert.equal(first.length, 6, 'first run applies 001..006 migrations');
+    assert.equal(first.length, listMigrations().length, 'first run applies every migration file');
     const second = applyMigrations(db);
     assert.equal(second.length, 0, 'second run applies nothing');
     db.close();

@@ -23,6 +23,7 @@ export function verifyPassword(password, stored) {
     expected = Buffer.from(hashHex, 'hex');
   } catch { return false; }
   const actual = crypto.scryptSync(String(password), salt, KEYLEN);
+  if (actual.length !== expected.length) return false;
   return crypto.timingSafeEqual(actual, expected);
 }
 

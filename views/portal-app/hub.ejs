@@ -1,0 +1,6 @@
+<%# Landing page for a top-level menu. locals: hubTitle {en,zh}, rows [[{en,zh}, value]], cards [{en,zh,desc_en,desc_zh,href,blank}] %>
+<div class="portal-head"><h1><%= b(hubTitle.en, hubTitle.zh) %></h1></div>
+<% if (rows.length) { %><div class="portal-card"><dl class="kv"><% rows.forEach(function(r){ %><dt><%= b(r[0].en, r[0].zh) %></dt><dd><%= r[1] %></dd><% }) %></dl></div><% } %>
+<div class="hub-cards"><% cards.forEach(function(c){ %>
+  <a class="portal-card hub-card" href="<%= c.href %>"<%- c.blank ? ' target="_blank" rel="noopener"' : '' %>><strong><%= b(c.en, c.zh) %></strong><span><%= b(c.desc_en || '', c.desc_zh || '') %></span></a>
+<% }) %></div>

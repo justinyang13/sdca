@@ -1,0 +1,14 @@
+<%- include('_stepper', { step: 3 }) %>
+<h1><%= b('Tuition and Fee For ' + year.label + ' School Year Registration Form', '學年學費與費用註冊表') %></h1>
+<p><span class="pill"><%= reg.status %></span> <%= b('Parent', '家長') %>: <strong><%= parent %></strong></p>
+<% if (payments.length) { %><p class="portal-ok"><% payments.forEach(function(p){ %><%= b('This payment was processed on', '付款日期') %> <%= fmtDateTime(p.transaction_date) %> — <%= money(p.amount_cents) %> (<%= p.method %><%= p.check_number ? ' #' + p.check_number : '' %>)<br><% }) %></p><% } %>
+<div class="portal-card"><%- include('_feeform', { rows: rows, calc: calc, reg: reg, money: money, b: b, one: one }) %></div>
+<% if (reg.status === 'submitted') { %>
+<p class="portal-note-box"><%= b('To complete your registration, print this form and submit it with your payment (check or cash) to the SDCA office. Registration is not complete until payment is received. We do not accept credit cards or mail-in registration.', '請列印此註冊表，連同付款 (支票或現金) 交給學校辦公室。收到付款後註冊才算完成。學校不收信用卡，也不接受郵寄註冊。') %></p>
+<% } %>
+<p class="btn-row">
+  <a class="btn btn-primary" href="<%= url('/registrations/' + reg.id + '/print') %>" target="_blank" rel="noopener"><%= b('Print Registration Form', '列印註冊表') %></a>
+  <a class="btn btn-ghost" href="<%= url(staffView ? '/manage/registrations' : '') %>"><%= b('Finish', '完成') %></a>
+  <% if (canPay && reg.status === 'submitted') { %><a class="btn btn-ghost" href="<%= url('/finance/payment?registration=' + reg.id) %>"><%= b('Enter Payment', '輸入付款') %></a><% } %>
+  <% if (reg.status !== 'paid' && reg.status !== 'cancelled') { %><form method="post" action="<%= url('/registrations/' + reg.id + '/cancel') %>" class="inline" data-confirm="<%= b('Cancel this registration?', '取消此註冊？') %>"><%- csrfField() %><button class="btn btn-ghost" type="submit"><%= b('Cancel Registration', '取消註冊') %></button></form><% } %>
+</p>

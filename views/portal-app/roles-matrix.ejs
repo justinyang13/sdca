@@ -1,0 +1,29 @@
+<div class="portal-head">
+  <h1><%= b('Permissions for role', '角色權限') %>: <%= b(role.name_en, role.name_zh) %></h1>
+  <div class="portal-actions"><a class="btn btn-ghost" href="<%= url('/manage/roles') %>">‹ <%= b('Roles', '角色') %></a></div>
+</div>
+<p class="muted"><%= b('Only Admin can change this page. Tick what this role may do. “All” = every record; the narrower scopes limit a role to its own family, own classes or own record.', '只有管理員可修改。勾選此角色可做的事。「全部」代表所有資料；較窄的範圍僅限自己的家庭、班級或自己的資料。') %></p>
+<% if (locked) { %><p class="portal-ok"><%= b('Admin always has every permission and cannot be changed.', '管理員永遠擁有所有權限，無法修改。') %></p><% } %>
+<form method="post" action="<%= url('/manage/roles/' + role.id + '/permissions') %>" class="portal-card">
+  <%- csrfField() %>
+  <div class="table-wrap"><table class="portal-table matrix">
+    <thead><tr><th><%= b('Resource', '資源') %></th><% ['list','view','create','update','delete','export'].forEach(function(a){ %><th><%= a %></th><% }) %></tr></thead>
+    <tbody>
+    <% rows.forEach(function(r){ %>
+      <tr><th scope="row"><%= b(r.label.en, r.label.zh) %></th>
+        <% ['list','view','create','update','delete','export'].forEach(function(a){ const c = r.actions.find(function(x){ return x.a === a; }); %>
+        <td><% if (c) { %><input type="checkbox" name="p:<%= c.code %>" value="all" <%= c.scope ? 'checked' : '' %> <%= locked ? 'disabled' : '' %> aria-label="<%= c.code %>"><% } else { %>–<% } %></td>
+        <% }) %></tr>
+    <% }) %>
+    </tbody></table></div>
+  <h2><%= b('Special permissions', '特殊權限') %></h2>
+  <table class="portal-table"><thead><tr><th><%= b('Permission', '權限') %></th><th><%= b('What it allows', '說明') %></th><th><%= b('Scope', '範圍') %></th></tr></thead><tbody>
+    <% special.forEach(function(p){ %>
+    <tr><td><code><%= p.code %></code></td><td><%= p.description %></td><td>
+      <select name="p:<%= p.code %>" <%= locked ? 'disabled' : '' %>>
+        <option value="" <%= !p.scope ? 'selected' : '' %>>—</option>
+        <% ['all','own_family','own_classes','own_record'].forEach(function(s){ %><option value="<%= s %>" <%= p.scope === s ? 'selected' : '' %>><%= s %></option><% }) %>
+      </select></td></tr>
+    <% }) %></tbody></table>
+  <% if (!locked) { %><div class="fact"><button class="btn btn-primary" type="submit"><%= b('Save Permissions', '儲存權限') %></button></div><% } %>
+</form>

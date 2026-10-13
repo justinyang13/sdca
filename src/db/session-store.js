@@ -1,84 +1,51 @@
-// src/db/session-store.js — express-session store backed by SQLite `sessions` table.
-// Implements the Store interface required by express-session:
-//   get / set / destroy / touch / clear
-//   on / emit / length
-//   createSession / generate
-// Session objects are minimal: { cookie, user }.
+// src/db/session-store.js — express-session store backed by the SQLite `sessions` table.
+// A real express-session Store subclass, so req.session.save() / regenerate() / destroy() behave normally.
+import session from 'express-session';
 
-export function createSessionStore(db) {
-  const listeners = {};
+const expiresOf = (sess) => (sess && sess.cookie && sess.cookie.expires ? new Date(sess.cookie.expires).getTime() : Date.now() + 7 * 24 * 3600 * 1000);
 
-  const store = {
-    name: 'sdca-sqlite',
+class SqliteStore extends session.Store {
+  constructor(db) {
+    super();
+    this.db = db;
+    this.name = 'sdca-sqlite';
+  }
 
-    on(ev, fn) { (listeners[ev] = listeners[ev] || []).push(fn); return store; },
-    emit(ev, ...args) { (listeners[ev] || []).forEach(fn => fn(...args)); return store; },
-    length(cb) {
-      try {
-        const row = db.prepare('SELECT COUNT(*) c FROM sessions').get();
-        return cb(null, row.c);
-      } catch (err) { return cb(err); }
-    },
+  get(sid, cb) {
+    try {
+      const row = this.db.prepare('SELECT data FROM sessions WHERE sid = ? AND (expires IS NULL OR expires > ?)').get(sid, Date.now());
+      if (!row) return cb(null, null);
+      try { return cb(null, JSON.parse(row.data)); } catch { return cb(null, null); }
+    } catch (err) { return cb(err); }
+  }
 
-    // Build a session object for a fresh sid.
-    generate(req) {
-      const sess = { cookie: { originalMaxAge: null, originalExpires: null, path: '/', httpOnly: true } };
-      sess.touch = (cb) => cb && cb();
-      sess.reset = (cb) => { sess.cookie = { path: '/', httpOnly: true }; cb && cb(); };
-      sess.reload = (cb) => cb && cb();
-      sess.save = (cb) => cb && cb();
-      sess.destroy = (cb) => { sess.user = undefined; cb && cb(); };
-      req.session = sess;
-    },
+  set(sid, sess, cb) {
+    try {
+      this.db.prepare(`INSERT INTO sessions (sid, data, expires) VALUES (?, ?, ?)
+        ON CONFLICT(sid) DO UPDATE SET data = excluded.data, expires = excluded.expires`).run(sid, JSON.stringify(sess), expiresOf(sess));
+      if (Math.random() < 0.01) this.db.prepare('DELETE FROM sessions WHERE expires IS NOT NULL AND expires < ?').run(Date.now());
+      return cb && cb(null);
+    } catch (err) { return cb && cb(err); }
+  }
 
-    // Wrap a deserialized session object with the expected cookie shape.
-    createSession(req, sess) {
-      if (!sess.cookie) sess.cookie = { path: '/', httpOnly: true };
-      if (typeof sess.touch !== 'function') sess.touch = (cb) => cb && cb();
-      if (typeof sess.reset !== 'function') sess.reset = (cb) => { sess.cookie = { path: '/', httpOnly: true }; cb && cb(); };
-      if (typeof sess.reload !== 'function') sess.reload = (cb) => cb && cb();
-      if (typeof sess.save !== 'function') sess.save = (cb) => cb && cb();
-      if (typeof sess.destroy !== 'function') sess.destroy = (cb) => { sess.user = undefined; cb && cb(); };
-      req.session = sess;
-    },
+  touch(sid, sess, cb) {
+    try {
+      this.db.prepare('UPDATE sessions SET expires = ? WHERE sid = ?').run(expiresOf(sess), sid);
+      return cb && cb(null);
+    } catch (err) { return cb && cb(err); }
+  }
 
-    get(sid, cb) {
-      try {
-        const row = db.prepare('SELECT data FROM sessions WHERE sid = ? AND (expires IS NULL OR expires > ?)').get(sid, Date.now());
-        if (!row) return cb(null, null);
-        let value;
-        try { value = JSON.parse(row.data); } catch { return cb(null, null); }
-        return cb(null, value);
-      } catch (err) { return cb(err); }
-    },
+  destroy(sid, cb) {
+    try { this.db.prepare('DELETE FROM sessions WHERE sid = ?').run(sid); return cb && cb(null); } catch (err) { return cb && cb(err); }
+  }
 
-    set(sid, session, cb) {
-      try {
-        const data = JSON.stringify(session);
-        const expires = session && session.cookie && session.cookie.expires
-          ? new Date(session.cookie.expires).getTime()
-          : null;
-        db.prepare(`
-          INSERT INTO sessions (sid, data, expires) VALUES (?, ?, ?)
-          ON CONFLICT(sid) DO UPDATE SET data = excluded.data, expires = excluded.expires
-        `).run(sid, data, expires);
-        return cb && cb(null);
-      } catch (err) { return cb && cb(err); }
-    },
+  clear(cb) {
+    try { this.db.prepare('DELETE FROM sessions').run(); return cb && cb(null); } catch (err) { return cb && cb(err); }
+  }
 
-    destroy(sid, cb) {
-      try {
-        db.prepare('DELETE FROM sessions WHERE sid = ?').run(sid);
-        return cb && cb(null);
-      } catch (err) { return cb && cb(err); }
-    },
-
-    clear(cb) {
-      try { db.prepare('DELETE FROM sessions').run(); return cb && cb(null); }
-      catch (err) { return cb && cb(err); }
-    },
-
-    touch(sid, session, cb) { return this.set(sid, session, cb); },
-  };
-  return store;
+  length(cb) {
+    try { return cb(null, this.db.prepare('SELECT COUNT(*) AS c FROM sessions').get().c); } catch (err) { return cb(err); }
+  }
 }
+
+export function createSessionStore(db) { return new SqliteStore(db); }

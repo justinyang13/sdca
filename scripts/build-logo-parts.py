@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Build the 3-part logo family from public/brand/logo-mark.svg (traced original mark).
-Part 1 = blue rounded badge with white shield mark; Part 2 = badge + Chinese name; Part 3 = + English name and 'Non-Profit · Since 1988'.
+Part 1 = the shield mark in brand blue (no box); Part 2 = badge + Chinese name; Part 3 = + English name and 'Non-Profit · Since 1988'.
 Writes public/brand/logo-1-badge*.svg, logo-2-badge-name*.svg, logo-3-full*.svg (light + -dark variants for navy backgrounds)."""
 import re
 src = open('public/brand/logo-mark.svg').read()
@@ -10,8 +10,9 @@ SERIF_ZH = "'Noto Serif TC','Songti TC','PMingLiU',serif"
 SERIF_EN = "Georgia,'Times New Roman',serif"
 BW, BH = 144, 180                      # badge size: aspect matches the shield so padding is equal on all sides
 PAD = 3; MH = BH - 2*PAD; S = MH / 446; MW = 353 * S   # shield almost touches the badge edges            # mark scale (fits badge with padding)
-badge = (f'<rect width="{BW}" height="{BH}" rx="14" fill="{BLUE}"/>'
-         f'<g transform="translate({(BW-MW)/2:.2f} {PAD}) scale({S:.5f})"><path fill="#fff" stroke="#fff" stroke-width="1.4" stroke-linejoin="round" fill-rule="evenodd" d="{D}"/></g>')
+def badge_ink(ink):   # the shield/lion artwork itself is the logo: ink colour on a transparent background, no box
+    return (f'<g transform="translate({(BW-MW)/2:.2f} {PAD}) scale({S:.5f})"><path fill="{ink}" stroke="{ink}" stroke-width="1.4" stroke-linejoin="round" fill-rule="evenodd" d="{D}"/></g>')
+badge = badge_ink(BLUE)
 def wrap(w, body, title, h=BH):
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}" role="img" aria-label="{title}">'
             f'<title>{title}</title>{body}</svg>\n')
@@ -25,6 +26,7 @@ ZX = BW + 14                          # Chinese text x
 EX = ZX + 4*72 + 24                   # English text x
 variants = {'': (NAVY, NAVY, GRAY), '-dark': ('#FFFFFF', '#FFFFFF', '#C9D3E3')}
 for suf, (zc, ec, sc) in variants.items():
+    badge = badge_ink('#FFFFFF' if suf else BLUE)
     open(f'public/brand/logo-1-badge{suf}.svg', 'w').write(wrap(BW, badge, 'SDCA'))
     open(f'public/brand/logo-2-badge-name{suf}.svg', 'w').write(wrap(ZX + 4*72 + 4, badge + zh(ZX, zc), '聖地牙哥中華學苑'))
     open(f'public/brand/logo-3-full{suf}.svg', 'w').write(wrap(EX + 450, badge + zh(ZX, zc) + en(EX, ec, sc), '聖地牙哥中華學苑 San Diego Chinese Academy — Non-Profit · Since 1988'))
@@ -42,6 +44,7 @@ def png(svg_path, out, width):
 for base in ('logo-1-badge', 'logo-2-badge-name', 'logo-3-full'):
     for suf in ('', '-dark'):
         png(f'public/brand/{base}{suf}.svg', f'public/brand/{base}{suf}.png', 1200 if base == 'logo-1-badge' else 2400)
+badge = badge_ink(BLUE)   # favicons use the blue artwork
 os.makedirs('public/favicon', exist_ok=True)
 for name, px in (('favicon-32', 32), ('apple-touch-icon-180', 180), ('icon-192', 192), ('icon-512', 512)):
     pad = max(1, round(px * 0.04)); ih = px - 2*pad; iw = round(ih * BW / BH)

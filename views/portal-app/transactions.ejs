@@ -1,0 +1,9 @@
+<h1><%= b('Transaction History', '付款紀錄') %></h1>
+<h2><%= b('Registration Transactions', '註冊付款') %></h2>
+<% if (!registrations.length) { %><p class="muted"><%= b('No Transaction History', '沒有付款紀錄') %></p><% } else { %>
+<table class="portal-table"><thead><tr><th><%= b('Date', '日期') %></th><th><%= b('Type', '類型') %></th><th class="num"><%= b('Amount', '金額') %></th></tr></thead><tbody>
+  <% registrations.forEach(function(t){ %><tr><td><a class="btn btn-ghost" href="<%= url('/transactions/' + t.id) %>"><%= fmtDateTime(t.transaction_date) %></a></td><td><%= one(t.type_en, t.type_zh) %></td><td class="num"><%= t.voided_at ? '(void) ' : '' %><%= money(t.amount_cents) %></td></tr><% }) %></tbody></table><% } %>
+<h2><%= b('Other Transactions', '其他交易') %></h2>
+<% if (!others.length) { %><p class="muted">—</p><% } else { %>
+<table class="portal-table"><thead><tr><th><%= b('Date', '日期') %></th><th><%= b('Type', '類型') %></th><th class="num"><%= b('Amount', '金額') %></th></tr></thead><tbody>
+  <% others.forEach(function(t){ %><tr><td><a class="btn btn-ghost" href="<%= url('/transactions/' + t.id) %>"><%= fmtDate(t.transaction_date) %></a></td><td><%= one(t.type_en, t.type_zh) %></td><td class="num"><%= t.voided_at ? '(void) ' : '' %><%= money(t.amount_cents) %></td></tr><% }) %></tbody></table><% } %>

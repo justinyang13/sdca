@@ -1,0 +1,25 @@
+<%
+  const e = errors || {}; const v = values || {};
+  const yn = [{v:'Y',label:b('Yes','是')},{v:'N',label:b('No','否')}];
+  const st = [{v:'CA',label:'CA'},{v:'AZ',label:'AZ'},{v:'NV',label:'NV'},{v:'Other',label:'Other'}];
+%>
+<div class="portal-card"><h1><%= b('Edit Family Address', '編輯家庭住址') %></h1>
+  <form method="post" action="<%= url('/families/' + id + '/edit') %>" class="pform pform-wide"><%- csrfField() %>
+    <fieldset>
+      <%- field({ label: b('Street', '路名'), name: 'street', value: v.street, error: e.street, required: true }) %>
+      <%- field({ label: b('City', '城市名'), name: 'city', value: v.city, error: e.city, required: true }) %>
+      <%- field({ label: b('State', '州名'), name: 'state', value: v.state, options: st }) %>
+      <%- field({ label: b('Zipcode', '郵遞區號'), name: 'zipcode', value: v.zipcode, error: e.zipcode, required: true }) %>
+      <%- field({ label: b('Home Phone', '住家電話'), name: 'home_phone', type: 'tel', value: v.home_phone, error: e.home_phone, required: true }) %>
+      <%- field({ label: b('Cell Phone', '手機號碼'), name: 'cell_phone', type: 'tel', value: v.cell_phone }) %>
+      <%- field({ label: b('Email', '電子郵件信箱'), name: 'email', type: 'email', value: v.email, error: e.email, required: true }) %>
+      <%- field({ label: b('List In School Directory', '列在學校通訊錄'), name: 'list_in_directory', value: v.list_in_directory, options: yn }) %>
+    </fieldset>
+    <fieldset><legend><%= b('Emergency Contact', '緊急聯絡') %></legend>
+      <%- field({ label: b('Contact', '緊急聯絡人'), name: 'emergency_contact', value: v.emergency_contact, error: e.emergency_contact, required: true }) %>
+      <%- field({ label: b('Home Phone', '緊急聯絡電話'), name: 'emergency_home_phone', type: 'tel', value: v.emergency_home_phone, error: e.emergency_home_phone, required: true }) %>
+      <%- field({ label: b('Cell Phone', '緊急聯絡手機'), name: 'emergency_cell_phone', type: 'tel', value: v.emergency_cell_phone, error: e.emergency_cell_phone, required: true }) %>
+    </fieldset>
+    <p class="req-note"><span class="req">*</span> <%= b('Required Field', '必須填寫') %></p>
+    <div class="fact"><button class="btn btn-primary" type="submit"><%= b('Save', '儲存') %></button> <a class="btn btn-ghost" href="<%= url('/families/' + id) %>"><%= b('Cancel', '取消') %></a></div>
+  </form></div>

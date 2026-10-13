@@ -1,0 +1,24 @@
+<%
+  const e = errors || {};
+  const topt = types.map(function(t){ return {v:t.id,label:one(t.name_en,t.name_zh)}; });
+  const mopt = methods.map(function(m){ return {v:m.id,label:one(m.name_en,m.name_zh)}; });
+  const who = [{v:'',label:''}].concat(members.map(function(m){ return {v:m.id,label:m.english_first_name + ' ' + m.english_last_name + ' ' + m.chinese_name + ' (' + m.relationship + ')'}; }));
+%>
+<h1><%= b('New Manual Transaction', '新增手動交易') %><% if (famName) { %> — <%= famName %><% } %></h1>
+<form method="post" action="<%= url('/finance/manual/new') %>" class="pform pform-wide portal-card"><%- csrfField() %>
+  <% if (!v.family_id) { %><%- field({ label: b('Family', '家庭'), name: 'family_id', value: '', error: e.family_id, required: true, options: [{v:'',label:''}].concat(families.map(function(f){ return {v:f.id,label:f.label}; })) }) %>
+  <% } else { %><input type="hidden" name="family_id" value="<%= v.family_id %>"><% } %>
+  <%- field({ label: b('Transaction Type', '交易類型'), name: 'transaction_type_id', value: v.transaction_type_id, options: topt, required: true, error: e.transaction_type_id }) %>
+  <%- field({ label: b('Transaction Date', '交易日期'), name: 'transaction_date', type: 'date', value: v.transaction_date, required: true, error: e.transaction_date }) %>
+  <% if (members.length) { %><%- field({ label: b('For (person)', '對象'), name: 'person_id', value: v.person_id, options: who }) %>
+  <%- field({ label: b('Transaction By', '執行人'), name: 'executed_by_person_id', value: v.executed_by_person_id, options: who }) %><% } %>
+  <%- field({ label: b('Payment Method', '付款方式'), name: 'payment_method_id', value: v.payment_method_id, options: mopt, required: true, error: e.payment_method_id }) %>
+  <%- field({ label: b('Check Number', '支票號碼'), name: 'check_number', value: v.check_number, error: e.check_number }) %>
+  <%- field({ label: b('Amount ($)', '金額 ($)'), name: 'amount', type: 'number', value: v.amount, error: e.amount, attrs: 'step="0.01" min="0"', help: b('Leave blank when you add scrip cards below.', '加入下方禮券時可留空。') }) %>
+  <fieldset><legend><%= b('Scrip gift cards (optional)', '禮券 (選填)') %></legend>
+    <% for (var i = 0; i < 4; i++) { %><div class="frow"><label><%= b('Card', '禮券') %> <%= i + 1 %></label><div class="fctl">
+      <select name="product_<%= i %>"><option value=""></option><% products.forEach(function(p){ %><option value="<%= p.id %>" <%= String(v['product_' + i]) === String(p.id) ? 'selected' : '' %>><%= p.name %> (<%= money(p.denomination_cents) %>)</option><% }) %></select>
+      × <input type="number" name="qty_<%= i %>" value="<%= v['qty_' + i] || '' %>" min="0" style="width:5rem"></div></div><% } %></fieldset>
+  <%- field({ label: b('Note', '備註'), name: 'note', type: 'textarea', value: v.note }) %>
+  <div class="fact"><button class="btn btn-primary" type="submit"><%= b('Create', '建立') %></button> <a class="btn btn-ghost" href="<%= url('') %>"><%= b('Cancel', '取消') %></a></div>
+</form>

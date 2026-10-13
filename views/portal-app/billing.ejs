@@ -1,0 +1,8 @@
+<div class="portal-head"><h1><%= b('Billing', '帳務') %></h1></div>
+<div class="portal-card"><h2><%= b('Registrations', '註冊') %></h2>
+<% if (!regs.length) { %><p><%= b('No registrations yet.', '尚無註冊紀錄。') %></p><% } else { %>
+<table class="portal-table"><thead><tr><th><%= b('School Year', '學年') %></th><th><%= b('Status', '狀態') %></th><th class="num"><%= b('Total', '總額') %></th><th class="num"><%= b('Paid', '已付') %></th><th class="num"><%= b('Balance', '餘額') %></th><th></th></tr></thead><tbody>
+<% regs.forEach(function(r){ %><tr><td><%= r.year %></td><td><span class="pill"><%= r.status %></span></td><td class="num"><%= money(r.grand_total_cents) %></td><td class="num"><%= money(r.paid_cents) %></td><td class="num"><%= money(Math.max(0, r.grand_total_cents - r.paid_cents)) %></td><td><a href="<%= url('/registrations/' + r.id + '/form') %>"><%= b('View form', '檢視註冊表') %></a></td></tr><% }) %></tbody></table><% } %></div>
+<% if (recent.length) { %><div class="portal-card"><h2><%= b('Recent transactions', '最近交易') %></h2>
+<table class="portal-table"><tbody><% recent.forEach(function(t){ %><tr><td><a href="<%= url('/transactions/' + t.id) %>"><%= fmtDate(t.transaction_date) %></a></td><td><%= one(t.type_en, t.type_zh) %></td><td class="num"><%= t.voided_at ? b('VOID', '已作廢') : money(t.amount_cents) %></td></tr><% }) %></tbody></table></div><% } %>
+<div class="hub-cards"><% cards.forEach(function(c){ %><a class="portal-card hub-card" href="<%= c.href %>"><strong><%= b(c.en, c.zh) %></strong><span><%= b(c.desc_en, c.desc_zh) %></span></a><% }) %></div>

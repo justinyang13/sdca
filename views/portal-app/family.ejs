@@ -1,0 +1,11 @@
+<div class="portal-head"><h1><%= b('Family', '家庭') %> #<%= F.fam.id %></h1>
+  <div class="portal-actions">
+    <% if (staffView && can('families.update')) { %><a class="btn btn-ghost" href="<%= url('/manage/families/' + F.fam.id) %>"><%= b('Staff edit (all fields)', '員工編輯') %></a><% } %>
+    <% if (staffView && can('families.update') && !hasLogin) { %><form method="post" action="<%= url('/families/' + F.fam.id + '/invite') %>" class="inline"><%- csrfField() %><button class="btn btn-ghost" type="submit"><%= b('Send login invitation', '寄送登入邀請') %></button></form><% } %>
+    <% if (staffView && can('families.create')) { %><a class="btn btn-ghost" href="<%= url('/families/new') %>"><%= b('Create Another New Family', '新增另一個家庭') %></a><% } %>
+  </div></div>
+<%- include('_family', { F: F, staffView: staffView, canRegister: canRegister, me: null }) %>
+<% if (staffView) { %>
+<div class="portal-card"><h2><%= b('Transactions', '交易') %></h2>
+  <% if (!history.length) { %><p class="muted">—</p><% } else { %><table class="portal-table compact"><tbody><% history.forEach(function(t){ %><tr><td><a href="<%= url('/transactions/' + t.id) %>"><%= fmtDate(t.transaction_date) %></a></td><td><%= t.type %></td><td class="num"><%= t.voided_at ? '(void) ' : '' %><%= money(t.amount_cents) %></td></tr><% }) %></tbody></table><% } %></div>
+<% } %>

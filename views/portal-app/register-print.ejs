@@ -1,0 +1,12 @@
+<div class="print-sheet">
+  <h1>聖地牙哥中華學苑 San Diego Chinese Academy</h1>
+  <h2><%= b('Registration Form', '註冊表') %> — <%= year.label %></h2>
+  <p><strong><%= b('Mailing Address', '通訊地址') %>:</strong><br><%= school ? school.name_en : '' %><br><%= school ? school.mailing_street : '' %><br><%= school ? school.mailing_city + ', ' + school.mailing_state + ' ' + school.mailing_zip : '' %></p>
+  <% if (school && school.tax_id) { %><p><strong>Tax ID: <%= school.tax_id %></strong><br><%= b('Please consult with your tax advisor regarding tax deductibility of tuition paid.', '請洽稅務顧問了解學費是否可抵稅。') %></p><% } %>
+  <hr>
+  <p><%= b('Parent', '家長') %>: <strong><%= parent %></strong> · <%= b('Registration', '註冊') %> #<%= reg.id %> · <%= b('Status', '狀態') %>: <%= reg.status %></p>
+  <% if (payments.length) { %><p><% payments.forEach(function(p){ %><%= b('This payment was processed on', '付款日期') %> <%= fmtDateTime(p.transaction_date) %> — <%= money(p.amount_cents) %> (<%= p.method %><%= p.check_number ? ' #' + p.check_number : '' %>)<br><% }) %></p><% } %>
+  <%- include('_feeform', { rows: rows, calc: calc, reg: reg, money: money, b: b, one: one }) %>
+  <hr><p><%= b('Submit this form with your payment (check or cash) to the SDCA office.', '請將此表連同付款 (支票或現金) 交給學校辦公室。') %></p>
+  <p class="no-print"><button type="button" class="btn btn-primary" data-print><%= b('Print', '列印') %></button></p>
+</div>

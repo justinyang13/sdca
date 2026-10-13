@@ -29,3 +29,11 @@ Notes:
 ## Re-processing photos
 `node scripts/process-images.js` — idempotent, re-encodes all chosen photos into
 `public/img/` + rewrites `public/img/manifest.json`.
+
+## School portal (added 2026-10-13)
+- Start/stop/restart (launchd, survives reboot): `launchctl kickstart -k gui/$(id -u)/com.sdca.web` (restart) · `launchctl bootout gui/$(id -u)/com.sdca.web` (stop) · `launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.sdca.web.plist` (start).
+- URL: http://100.86.110.0:3100/en/portal/signin (Tailscale) — sign in with a demo login from `data/PORTAL-DEMO-LOGINS.txt`.
+- Reference data (roles, permissions, lookups, 15 volunteer jobs, waivers, fees for 3 school years): `npm run migrate && npm run portal:seed`.
+- Demo school with invented families: `npm run portal:demo` (WIPES all portal rows first), then restart the service.
+- Check everything: `npm test` · `node scripts/portal-smoke.js` · `node scripts/image-sweep.js`.
+- Per year: **Fees for a School Year** page (`/portal/fees`) → "Copy all fees from <previous year>" → edit dates, amounts, deadlines → tick "Registration open" and "Current school year".

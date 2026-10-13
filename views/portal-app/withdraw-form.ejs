@@ -1,0 +1,10 @@
+<h1><%= b('Withdraw student', '辦理退學') %> — <%= en.english_first_name %> <%= en.english_last_name %> <%= en.chinese_name %></h1>
+<div class="portal-card"><h2><%= b('Withdrawal fee schedule', '退學手續費') %></h2><table class="portal-table compact"><tbody>
+  <% rules.forEach(function(r){ %><tr><td><%= one(r.label_en, r.label_zh) %></td><td><%= fmtDate(r.from_date) %> – <%= fmtDate(r.to_date) %></td><td class="num"><%= r.no_refund ? b('NO REFUND', '不退費') : money(r.fee_cents) %></td></tr><% }) %></tbody></table></div>
+<form method="post" action="<%= url('/enrollments/' + en.id + '/withdraw') %>" class="pform pform-wide portal-card"><%- csrfField() %>
+  <%- field({ label: b('Application date', '申請日期'), name: 'applied_on', type: 'date', value: applied, required: true }) %>
+  <%- field({ label: b('Processing fee ($)', '手續費 ($)'), name: 'fee', type: 'number', value: fee.noRefund ? '' : ((fee.feeCents || 0) / 100).toFixed(2), attrs: 'step="0.01"', help: fee.noRefund ? b('Sixth week or later: no refund.', '第六週後不退費。') : '' }) %>
+  <%- field({ label: b('Refund ($)', '退費 ($)'), name: 'refund', type: 'number', value: fee.noRefund ? '0.00' : Math.max(0, (paidItem - (fee.feeCents || 0)) / 100).toFixed(2), attrs: 'step="0.01"', help: b('Paid for this student', '此學生已付') + ': ' + money(paidItem) }) %>
+  <%- field({ label: b('Reason', '原因'), name: 'reason', type: 'textarea' }) %>
+  <div class="fact"><button class="btn btn-primary" type="submit"><%= b('Process Withdrawal', '辦理退學') %></button> <a class="btn btn-ghost" href="<%= url('/manage/enrollments') %>"><%= b('Cancel', '取消') %></a></div>
+</form>

@@ -1,0 +1,11 @@
+<h1><%= b('Change User Name', '更改用戶名稱') %></h1>
+<div class="portal-card portal-card-narrow">
+  <p><%= b('Current user name', '目前用戶名稱') %>: <strong><%= U.user.username %></strong></p>
+  <% if (error) { %><p class="portal-error" role="alert"><%= error %></p><% } %>
+  <form method="post" action="<%= url('/change-username') %>" class="pform">
+    <%- csrfField() %>
+    <%- field({ label: b('New User Name', '新用戶名稱'), name: 'username', value: v, attrs: 'required minlength="4" maxlength="40" autocomplete="username"' }) %>
+    <%- field({ label: b('Current Password', '目前密碼'), name: 'current', type: 'password', attrs: 'required autocomplete="current-password"' }) %>
+    <div class="fact"><button class="btn btn-primary" type="submit"><%= b('Change User Name', '更改用戶名稱') %></button></div>
+  </form>
+</div>

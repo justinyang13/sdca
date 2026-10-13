@@ -1,0 +1,16 @@
+<%
+  const e = errors || {}; const v = values || {};
+  const yopt = years.map(function(y){ return {v:y.id,label:y.label}; });
+  const copt = [{v:'',label:''}].concat(classes.filter(function(c){ return !v.school_year_id || String(c.school_year_id) === String(v.school_year_id); }).map(function(c){ return {v:c.id,label:c.code + ' ' + one(c.name_en, c.name_zh)}; }));
+  const ropt = roles.map(function(r){ return {v:r.id,label:one(r.name_en, r.name_zh)}; });
+%>
+<div class="portal-card portal-card-narrow"><h1><%= b('Add Instructor Assignment', '新增任課指派') %> — <%= person.english_first_name %> <%= person.english_last_name %> <%= person.chinese_name %></h1>
+  <form method="post" action="<%= url('/people/' + person.id + '/assign') %>" class="pform"><%- csrfField() %>
+    <%- field({ label: b('School Year', '學年'), name: 'school_year_id', value: v.school_year_id, options: yopt, required: true, error: e.school_year_id }) %>
+    <%- field({ label: b('School Class', '班級'), name: 'school_class_id', value: v.school_class_id, options: copt, required: true, error: e.school_class_id }) %>
+    <%- field({ label: b('Start Date', '開始日期'), name: 'start_date', type: 'date', value: v.start_date }) %>
+    <%- field({ label: b('End Date', '結束日期'), name: 'end_date', type: 'date', value: v.end_date }) %>
+    <%- field({ label: b('Role', '角色'), name: 'assignment_role_id', value: v.assignment_role_id, options: ropt, required: true, error: e.assignment_role_id }) %>
+    <p class="req-note"><span class="req">*</span> <%= b('Required Field', '必須填寫') %></p>
+    <div class="fact"><button class="btn btn-primary" type="submit"><%= b('Create', '建立') %></button> <a class="btn btn-ghost" href="<%= url('/people/' + person.id) %>"><%= b('Cancel', '取消') %></a></div>
+  </form></div>

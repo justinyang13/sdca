@@ -1,0 +1,6 @@
+<h1><%= b('Reports & Exports', '報表與匯出') %><% if (year) { %> <small>· <%= year.label %></small><% } %></h1>
+<div class="card-grid">
+  <% if (can('student_list.list')) { %><a class="portal-card class-card" href="<%= url('/manage/student_list') %>"><strong><%= b('Student List', '學生名單') %></strong><small><%= b('Search, filter and download every student with class, parents and contacts.', '搜尋、篩選並下載每位學生的班級、家長與聯絡資料。') %></small></a><% } %>
+  <% if (can('volunteer_list.list')) { %><a class="portal-card class-card" href="<%= url('/manage/volunteer_list') %>"><strong><%= b('Volunteer List', '義工名單') %></strong><small><%= b('Search, filter and download volunteer jobs, priorities and parent contacts.', '搜尋、篩選並下載義工工作、順位與家長聯絡資料。') %></small></a><% } %>
+  <% if (can('transactions.list')) { %><a class="portal-card class-card" href="<%= url('/manage/transactions') %>"><strong><%= b('Transactions', '交易') %></strong><small><%= b('All payments and refunds.', '所有付款與退款。') %></small></a><% } %>
+</div>

@@ -1,0 +1,23 @@
+<div class="print-sheet">
+  <h1>聖地牙哥中華學苑 San Diego Chinese Academy</h1>
+  <h2><%= b('Tuition and Fee — School Year Registration Receipt', '學年學費與費用註冊收據') %></h2>
+  <p><strong><%= b('Mailing Address', '通訊地址') %>:</strong><br><%= school ? school.name_en : '' %><br><%= school ? school.mailing_street : '' %><br><%= school ? school.mailing_city + ', ' + school.mailing_state + ' ' + school.mailing_zip : '' %></p>
+  <p><strong>Tax ID: <%= school ? school.tax_id : '' %></strong><br><%= b('Please consult with your tax advisor regarding tax deductibility of tuition paid.', '請洽稅務顧問了解學費是否可抵稅。') %></p><hr>
+  <p><%= b('This payment was processed on', '付款日期') %> <%= fmtDateTime(tx.transaction_date) %><br><%= money(tx.amount_cents) %> <%= b('has been received with', '已收到，付款方式') %> <%= one(tx.method_en, tx.method_zh) %><%= tx.check_number ? ' (' + b('check number', '支票號碼') + ' ' + tx.check_number + ')' : '' %></p><hr>
+  <p><strong><%= b('Parent', '家長') %>: <%= parent %></strong></p>
+  <% items.forEach(function(i){ %>
+  <p><% if (lang === 'zh') { %>學生 <strong><%= i.chinese_name %> <%= i.english_first_name %> <%= i.english_last_name %></strong> 就讀 <%= gl(i.grade_label) %> <%= one(i.ct_en, i.ct_zh) %><% } else { %>For <strong><%= i.english_first_name %> <%= i.english_last_name %> <%= i.chinese_name %></strong> entering grade <%= gl(i.grade_label) %> <%= one(i.ct_en, i.ct_zh) %><% } %></p>
+  <table class="fee-table"><tbody>
+    <tr><th><%= b('Registration Fee', '報名費') %>:</th><td class="num"><%= money(i.registration_fee_cents - i.early_reg_discount_cents) %></td></tr>
+    <tr><th><%= b('Tuition', '學費') %>:</th><td class="num"><%= money(i.tuition_cents) %></td></tr>
+    <tr><th><%= b('Miscellaneous Fees', '學雜費') %>:</th><td class="num"><%= money(i.misc_fee_cents) %></td></tr>
+    <% if (i.sibling_discount_cents) { %><tr><th><%= b('Sibling Discount', '手足折扣') %>:</th><td class="num">−<%= money(i.sibling_discount_cents) %></td></tr><% } %>
+  </tbody></table><hr>
+  <% }) %>
+  <% if (reg) { %><table class="fee-table fee-totals"><tbody>
+    <tr><th><%= b('Scrip Deposit', '禮券訂金') %>:</th><td class="num"><%= money(reg.scrip_deposit_cents) %></td></tr>
+    <tr><th><%= b('Scrip Purchase', '禮券購買') %>:</th><td class="num"><%= money(reg.scrip_purchase_cents) %></td></tr>
+    <tr><th><%= b('Service Fee', '代勞費') %>:</th><td class="num"><%= money(reg.service_fee_cents) %></td></tr>
+    <tr class="grand"><th><%= b('Grand Total', '總計') %>:</th><td class="num"><%= money(reg.grand_total_cents) %></td></tr></tbody></table><% } %>
+  <p class="no-print"><button type="button" class="btn btn-primary" data-print><%= b('Print', '列印') %></button></p>
+</div>

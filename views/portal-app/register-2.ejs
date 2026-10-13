@@ -1,0 +1,13 @@
+<%- include('_stepper', { step: 2 }) %>
+<h1><%= b('Consent, Release, Indemnification, and Assumption of Risk', '同意、免責與風險承擔') %></h1>
+<p class="muted"><%= b('Please review the waiver carefully.', '請仔細閱讀同意書。') %></p>
+<form method="post" action="<%= url('/registrations/' + reg.id + '/waiver') %>" class="portal-card portal-doc">
+  <%- csrfField() %>
+  <% docs.forEach(function(d){ %>
+    <h2><%= lang === 'zh' ? (d.title_zh || d.title_en) : d.title_en %></h2>
+    <% (lang === 'zh' && d.body_zh ? d.body_zh : d.body_en).split(/\n\n+/).forEach(function(par){ %><p><%= par %></p><% }) %><hr>
+  <% }) %>
+  <label class="chk"><input type="checkbox" name="agree" value="1" required> <strong><%= b('By ticking this box and clicking “Agree and Continue”, I agree to the legal terms outlined above.', '勾選此框並按「同意並繼續」，表示我同意以上法律條款。') %></strong></label>
+  <div class="fact"><button class="btn btn-primary" type="submit"><%= b('Agree and Continue', '同意並繼續') %></button></div>
+</form>
+<form method="post" action="<%= url('/registrations/' + reg.id + '/cancel') %>" class="inline"><%- csrfField() %><button class="btn btn-ghost" type="submit"><%= b('Cancel Registration', '取消註冊') %></button></form>

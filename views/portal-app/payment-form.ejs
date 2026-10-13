@@ -1,0 +1,14 @@
+<% const e = errors || {}; const mopt = methods.map(function(m){ return {v:m.id,label:one(m.name_en,m.name_zh)}; }); %>
+<h1><%= b('Enter Registration Payment', '輸入註冊付款') %></h1>
+<% if (!pending.length) { %><p class="muted"><%= b('There are no submitted registrations waiting for payment.', '目前沒有等待付款的註冊。') %></p><% } %>
+<form method="post" action="<%= url('/finance/payment') %>" class="pform pform-wide portal-card"><%- csrfField() %>
+  <%- field({ label: b('Registration', '註冊'), name: 'registration', value: chosen, error: e.registration, required: true,
+      options: [{v:'',label:''}].concat(pending.map(function(r){ return {v:r.id,label:'#' + r.id + ' — ' + r.parent + ' — ' + money(r.grand_total_cents) + (r.paid ? ' (paid ' + money(r.paid) + ')' : '')}; })) }) %>
+  <% if (reg) { %><p class="muted"><%= b('Amount due', '應付') %>: <strong><%= money(reg.grand_total_cents - reg.paid) %></strong> · <a href="<%= url('/registrations/' + reg.id + '/form') %>" target="_blank" rel="noopener"><%= b('view registration form', '檢視註冊表') %></a></p><% } %>
+  <%- field({ label: b('Transaction Date', '付款日期'), name: 'transaction_date', type: 'date', value: v.transaction_date, required: true }) %>
+  <%- field({ label: b('Payment Method', '付款方式'), name: 'payment_method_id', value: v.payment_method_id, options: mopt, required: true, error: e.payment_method_id }) %>
+  <%- field({ label: b('Check Number', '支票號碼'), name: 'check_number', value: v.check_number, error: e.check_number }) %>
+  <%- field({ label: b('Amount ($)', '金額 ($)'), name: 'amount', type: 'number', value: v.amount, error: e.amount, required: true, attrs: 'step="0.01" min="0"' }) %>
+  <%- field({ label: b('Note', '備註'), name: 'note', type: 'textarea', value: v.note }) %>
+  <div class="fact"><button class="btn btn-primary" type="submit"><%= b('Record Payment', '記錄付款') %></button> <a class="btn btn-ghost" href="<%= url('') %>"><%= b('Cancel', '取消') %></a></div>
+</form>

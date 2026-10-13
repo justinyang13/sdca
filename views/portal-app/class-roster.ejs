@@ -1,0 +1,15 @@
+<%
+  const sortHref = function(k){ return url('/class-roster') + '?sort=' + k + '&dir=' + ((sort === k && dir === 'ASC') ? 'desc' : 'asc'); };
+  const th = function(k, en, zh, cls){ return '<th scope="col"' + (cls ? ' class="' + cls + '"' : '') + '><a class="sortlink' + (sort === k ? ' on ' + dir.toLowerCase() : '') + '" href="' + sortHref(k) + '">' + (lang === 'zh' ? zh : en) + '</a></th>'; };
+%>
+<h1><%= b('Class Roster', '班級人數清單') %><% if (year) { %> <small>· <%= year.label %></small><% } %></h1>
+<div class="table-wrap">
+<table class="portal-table">
+  <thead><tr><%- th('code', 'Class', '班級') %><%- th('room', 'Room', '教室') %><%- th('teacher', 'Teacher', '老師') %><%- th('n', 'Students', '學生', 'num') %></tr></thead>
+  <tbody>
+  <% classes.forEach(function(c){ %><tr><td class="nw"><a href="<%= url('/classes/' + c.id) %>"><%= c.code %> <%= one(c.name_en, c.name_zh) %></a></td><td class="nw"><%= c.room || '—' %></td><td><%= c.teacher || '—' %></td><td class="num"><%= c.n %></td></tr><% }) %>
+  <% if (!classes.length) { %><tr><td colspan="4" class="empty"><%= b('Nothing found.', '沒有資料。') %></td></tr><% } %>
+  </tbody>
+</table>
+</div>
+<p class="muted"><%= b('Open a class, then use Print and choose “Save as PDF” in your browser to get a PDF roster.', '開啟班級後按「列印」，在瀏覽器選擇「另存為 PDF」即可取得 PDF 名單。') %></p>

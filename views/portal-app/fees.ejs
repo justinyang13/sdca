@@ -1,0 +1,49 @@
+<%
+  const e = errors || {};
+  const cOpt = [{v:'',label:b('(all class types)', '(所有班別)')}].concat(types.map(function(t){ return {v:t.id,label:one(t.name_en, t.name_zh)}; }));
+  const blank = [{id:'',code:'',name_en:'',name_zh:'',applies_to:'student',class_type_id:null,amount_cents:0,percent:null,from_nth_child:null,deadline:'',active:1,sort:99}];
+  const rowsF = fees.concat(blank, [Object.assign({}, blank[0])]);
+  const rowsW = rules.concat([{id:'',label_en:'',label_zh:'',from_date:'',to_date:'',fee_cents:0,no_refund:0,sort:99}]);
+%>
+<div class="portal-head"><h1><%= b('Fees for a School Year', '學年費用設定') %></h1>
+  <form method="get" class="portal-toolbar"><label class="tb-filter"><span><%= b('School year', '學年') %></span><select name="year" data-autosubmit>
+    <% years.forEach(function(y){ %><option value="<%= y.id %>" <%= y.id === year.id ? 'selected' : '' %>><%= y.label %></option><% }) %></select></label></form></div>
+<p class="muted"><%= b('One place for everything that depends on the school year: key dates, every fee and discount, and the withdrawal fee schedule. Registration forms and receipts are calculated from these numbers.', '這裡集中設定每學年的重要日期、所有費用與折扣、退學手續費。註冊表與收據都依這裡的數字計算。') %></p>
+<% if (e._form) { %><p class="portal-error" role="alert"><%= e._form %></p><% } %>
+<% if (previous && !fees.length) { %>
+<form method="post" action="<%= url('/fees/copy') %>" class="portal-card"><%- csrfField() %><input type="hidden" name="from" value="<%= previous.id %>"><input type="hidden" name="to" value="<%= year.id %>">
+  <p><%= b('This year has no fees yet.', '此學年尚未設定費用。') %> <button class="btn btn-primary" type="submit"><%= b('Copy all fees from ' + previous.label, '從 ' + previous.label + ' 複製所有費用') %></button></p></form>
+<% } %>
+<form method="post" action="<%= url('/fees') %>" class="portal-card"><%- csrfField() %><input type="hidden" name="year_id" value="<%= year.id %>">
+  <h2><%= b('Key dates', '重要日期') %> — <%= year.label %></h2>
+  <div class="grid-3">
+    <%- field({ label: b('First day of school', '開學日'), name: 'first_day', type: 'date', value: year.first_day }) %>
+    <%- field({ label: b('Last day of school', '結業日'), name: 'last_day', type: 'date', value: year.last_day }) %>
+    <%- field({ label: b('Second semester starts', '第二學期開始'), name: 'second_semester_start', type: 'date', value: year.second_semester_start }) %>
+    <%- field({ label: b('Early registration deadline', '預註冊截止日'), name: 'early_reg_deadline', type: 'date', value: year.early_reg_deadline }) %>
+    <div class="frow"><label for="registration_open"><%= b('Registration open', '開放註冊') %></label><div class="fctl"><input type="checkbox" id="registration_open" name="registration_open" value="1" <%= year.registration_open ? 'checked' : '' %>></div></div>
+    <div class="frow"><label for="is_current"><%= b('Current school year', '目前學年') %></label><div class="fctl"><input type="checkbox" id="is_current" name="is_current" value="1" <%= year.is_current ? 'checked' : '' %>></div></div>
+  </div>
+  <h2><%= b('Fees and discounts', '費用與折扣') %></h2>
+  <div class="table-wrap"><table class="portal-table compact fee-edit"><thead><tr>
+    <th><%= b('Fee', '費用') %></th><th>EN</th><th>中文</th><th><%= b('Applies to', '適用') %></th><th><%= b('Class type', '班別') %></th><th class="num"><%= b('Amount ($)', '金額 ($)') %></th><th>%</th><th><%= b('From Nth child', '第N位起') %></th><th><%= b('Deadline', '截止日') %></th><th><%= b('Active', '啟用') %></th><th>#</th><th><%= b('Delete', '刪除') %></th></tr></thead><tbody>
+    <% rowsF.forEach(function(f, i){ %><tr class="<%= f.id ? '' : 'new-row' %>">
+      <td><input type="hidden" name="fee_<%= i %>_id" value="<%= f.id %>"><select name="fee_<%= i %>_code"><option value=""></option><% codes.forEach(function(c){ %><option value="<%= c.v %>" <%= f.code === c.v ? 'selected' : '' %>><%= one(c.en, c.zh) %></option><% }) %></select></td>
+      <td><input name="fee_<%= i %>_name_en" value="<%= f.name_en %>" size="22"></td><td><input name="fee_<%= i %>_name_zh" value="<%= f.name_zh %>" size="10"></td>
+      <td><select name="fee_<%= i %>_applies_to"><option value="student" <%= f.applies_to === 'student' ? 'selected' : '' %>><%= b('Student', '學生') %></option><option value="family" <%= f.applies_to === 'family' ? 'selected' : '' %>><%= b('Family', '家庭') %></option></select></td>
+      <td><select name="fee_<%= i %>_class_type_id"><% cOpt.forEach(function(o){ %><option value="<%= o.v %>" <%= String(f.class_type_id || '') === String(o.v) ? 'selected' : '' %>><%= o.label %></option><% }) %></select></td>
+      <td class="num"><input name="fee_<%= i %>_amount" value="<%= f.id ? (f.amount_cents / 100).toFixed(2) : '' %>" size="8" inputmode="decimal"></td>
+      <td><input name="fee_<%= i %>_percent" value="<%= f.percent ?? '' %>" size="4"></td><td><input name="fee_<%= i %>_from_nth_child" value="<%= f.from_nth_child ?? '' %>" size="3"></td>
+      <td><input type="date" name="fee_<%= i %>_deadline" value="<%= f.deadline || '' %>"></td>
+      <td><input type="checkbox" name="fee_<%= i %>_active" value="1" <%= f.active ? 'checked' : '' %>></td><td><input name="fee_<%= i %>_sort" value="<%= f.sort ?? '' %>" size="3"></td>
+      <td><% if (f.id) { %><input type="checkbox" name="fee_<%= i %>_del" value="1" aria-label="delete"><% } else { %><span class="muted"><%= b('new', '新增') %></span><% } %></td></tr><% }) %>
+  </tbody></table></div>
+  <p class="muted"><%= b('Examples: Tuition per class type; Registration fee; Early registration discount (amount = fee waived, with a deadline); Sibling discount (amount, from the 3rd child); Service fee per family; Faculty/board discount (percent).', '例如：各班別學費、報名費、預註冊優惠 (金額與截止日)、手足折扣 (金額、從第三位起)、每家代勞費、教職員折扣 (百分比)。') %></p>
+  <h2><%= b('Withdrawal fee schedule', '退學手續費') %></h2>
+  <div class="table-wrap"><table class="portal-table compact"><thead><tr><th>EN</th><th>中文</th><th><%= b('From', '從') %></th><th><%= b('To', '到') %></th><th class="num"><%= b('Fee ($)', '手續費 ($)') %></th><th><%= b('No refund', '不退費') %></th><th>#</th><th><%= b('Delete', '刪除') %></th></tr></thead><tbody>
+    <% rowsW.forEach(function(w, i){ %><tr><td><input type="hidden" name="wd_<%= i %>_id" value="<%= w.id %>"><input name="wd_<%= i %>_label_en" value="<%= w.label_en %>" size="26"></td><td><input name="wd_<%= i %>_label_zh" value="<%= w.label_zh %>" size="12"></td>
+      <td><input type="date" name="wd_<%= i %>_from_date" value="<%= w.from_date || '' %>"></td><td><input type="date" name="wd_<%= i %>_to_date" value="<%= w.to_date || '' %>"></td>
+      <td class="num"><input name="wd_<%= i %>_fee" value="<%= w.id ? (w.fee_cents / 100).toFixed(2) : '' %>" size="8"></td><td><input type="checkbox" name="wd_<%= i %>_no_refund" value="1" <%= w.no_refund ? 'checked' : '' %>></td>
+      <td><input name="wd_<%= i %>_sort" value="<%= w.sort ?? '' %>" size="3"></td><td><% if (w.id) { %><input type="checkbox" name="wd_<%= i %>_del" value="1" aria-label="delete"><% } %></td></tr><% }) %></tbody></table></div>
+  <div class="fact"><button class="btn btn-primary" type="submit"><%= b('Save everything', '全部儲存') %></button></div>
+</form>

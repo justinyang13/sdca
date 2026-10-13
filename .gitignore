@@ -14,3 +14,6 @@ research/__pycache__/
 .claude/
 storage/uploads/
 dist/
+
+# real portal screenshots (personal data) - never commit
+research/SDCA Portal/

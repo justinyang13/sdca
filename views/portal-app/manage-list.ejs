@@ -1,0 +1,92 @@
+<%
+  const pageHref = (n) => url('/manage/' + key) + '?' + qs({ page: n });
+  const sortHref = (k) => url('/manage/' + key) + '?' + qs({ sort: k, dir: (result.sort === k && result.dir === 'asc') ? 'desc' : 'asc', page: null });
+  const cellVal = (r, c) => {
+    if (c.key === 'grade_label') return gl(r[c.key]);
+    if (c.field && c.field.type === 'ref') return r[c.key + '__label'] || '';
+    if (c.field && c.field.type === 'bool') return r[c.key] ? '✓' : '';
+    if (c.field && c.field.type === 'money') return r[c.key] == null ? '' : money(r[c.key]);
+    if (c.field && c.field.type === 'select') { const o = (c.field.options || []).find(function(o){ return String(o.v) === String(r[c.key]); }); return o ? one(o.en, o.zh) : (r[c.key] ?? ''); }
+    if (c.field && (c.field.type === 'datetime')) return fmtDateTime(r[c.key]);
+    return r[c.key] ?? '';
+  };
+  // columns shown by default (the rest live behind the Columns picker and the row's expand panel)
+  const allKeys = result.cols.map(function(c){ return c.key; });
+  const defKeys = ent.defaultCols ? ent.defaultCols.filter(function(k){ return allKeys.indexOf(k) >= 0; }) : (allKeys.length > 8 ? allKeys.slice(0, 7) : allKeys);
+  if (defKeys.indexOf(allKeys[0]) < 0) defKeys.unshift(allKeys[0]);
+  const isDef = function(k){ return defKeys.indexOf(k) >= 0; };
+  const WRAPOK = ['allergy', 'special_medical_needs', 'notes', 'street', 'course_name', 'description', 'note', 'withdrawal_reason', 'subject', 'body'];
+  const oneLine = function(c){ return !(c.type === 'ref' || c.type === 'textarea' || c.extra || WRAPOK.indexOf(c.key) >= 0); };
+  const colCls = function(c, extra){ return ((extra || '') + (oneLine(c) ? ' nw' : '') + (isDef(c.key) ? '' : ' col-off')).trim(); };
+  const hasMore = defKeys.length < allKeys.length;
+  const detailCols = ent.fields.filter(function(fd){ return fd.type !== 'password'; }).map(function(fd){ return { key: fd.name, label: fd.label, field: fd, type: fd.type }; })
+    .concat((ent.listExtra || []).map(function(x){ return { key: x.key, label: x.label, type: 'text' }; }));
+  const totalCols = result.cols.length;
+%>
+<div class="portal-head">
+  <h1><%= b(ent.label.en, ent.label.zh) %> <small class="count">(<%= result.total.toLocaleString() %>)</small></h1>
+  <div class="portal-actions">
+    <% if (canExport) { %><a class="btn btn-ghost" href="<%= url('/manage/' + key + '/export.csv') %>?<%= qs({ page: null }) %>"><%= b('Download CSV', '下載 CSV') %></a><% } %>
+    <% if (canCreate) { %><a class="btn btn-primary" href="<%= url('/manage/' + key + '/new') %>">+ <%= b('New', '新增') %> <%= one(ent.singular.en, ent.singular.zh) %></a><% } %>
+    <% if (key === 'roles') { %><span class="muted"><%= b('Open a role → Permissions to edit what it can do.', '開啟角色 → 權限，可編輯此角色權限。') %></span><% } %>
+  </div>
+</div>
+<form method="get" action="<%= url('/manage/' + key) %>" class="portal-toolbar" role="search" data-instant-filters>
+  <input type="hidden" name="yr" value="1">
+  <label class="tb-search"><span class="sr-only"><%= b('Search', '搜尋') %></span><input type="search" name="q" value="<%= q %>" placeholder="<%= b('Search', '搜尋') %>…"></label>
+  <% widgets.forEach(function(w){ %>
+    <label class="tb-filter"><span><%= b(w.label.en, w.label.zh) %></span>
+      <% if (w.kind === 'select') { %>
+      <select name="f_<%= w.name %>"><option value=""><%= b('All', '全部') %></option>
+        <% w.options.forEach(function(o){ %><option value="<%= o.v %>" <%= String(w.value) === String(o.v) ? 'selected' : '' %>><%= one(o.en, o.zh) %></option><% }) %></select>
+      <% } else { %><input type="text" name="f_<%= w.name %>" value="<%= w.value %>"><% } %>
+    </label>
+  <% }) %>
+  <label class="tb-filter"><span><%= b('Show', '顯示') %></span>
+    <select name="ps"><% [10,25,50,100].forEach(function(n){ %><option value="<%= n %>" <%= result.pageSize === n ? 'selected' : '' %>><%= n %></option><% }) %></select></label>
+  <button type="submit" hidden>Search</button>
+  <a class="tb-reset" href="<%= url('/manage/' + key) %>?yr=1"><%= b('Reset', '重設') %></a>
+</form>
+<% if (hasMore) { %>
+<div class="col-picker-bar">
+  <details class="col-picker" data-col-picker="<%= key %>" data-defaults="<%= defKeys.join(',') %>">
+    <summary class="btn btn-ghost"><%= b('Columns', '欄位') %></summary>
+    <div class="col-picker-menu">
+      <% result.cols.forEach(function(c, ci){ %><label><input type="checkbox" value="<%= c.key %>" <%= isDef(c.key) ? 'checked' : '' %> <%= ci === 0 ? 'disabled' : '' %>> <%= b(c.label.en, c.label.zh) %></label><% }) %>
+      <button type="button" class="linklike" data-col-reset><%= b('Reset to default', '恢復預設') %></button>
+    </div>
+  </details>
+</div>
+<% } %>
+<div class="table-wrap" data-col-table="<%= key %>">
+<table class="portal-table">
+  <thead><tr>
+    <% result.cols.forEach(function(c){ %>
+    <th scope="col" data-col="<%= c.key %>" class="<%= colCls(c) %>"><a class="sortlink<%= result.sort === c.key ? ' on ' + result.dir : '' %>" href="<%= sortHref(c.key) %>"><%= b(c.label.en, c.label.zh) %></a></th>
+    <% }) %>
+  </tr></thead>
+  <tbody>
+    <% if (!result.rows.length) { %><tr><td colspan="<%= totalCols %>" class="empty"><%= b('Nothing found.', '沒有資料。') %></td></tr><% } %>
+    <% result.rows.forEach(function(r){ const d = detailUrl(r); %>
+    <tr class="data-row">
+      <% result.cols.forEach(function(c, ci){ %>
+      <td data-col="<%= c.key %>" class="<%= colCls(c, c.type === 'money' ? 'num' : '') %>"><% if (ci === 0) { %><button type="button" class="row-toggle" aria-expanded="false" aria-label="<%= b('Show details', '顯示詳細資料') %>">▸</button><a href="<%= (d && ent.readOnly) ? '/' + lang + d : url('/manage/' + key + '/' + r.id) %>"><%= cellVal(r, c) || '—' %></a><% } else { %><%= cellVal(r, c) %><% } %></td>
+      <% }) %>
+    </tr>
+    <tr class="row-detail" hidden><td colspan="<%= totalCols %>"><div class="detail-inner"><dl class="kv">
+      <% detailCols.forEach(function(c){ const v = cellVal(r, c); if (v === '' || v === null || v === undefined) return; %><dt><%= b(c.label.en, c.label.zh) %></dt><dd><%= v %></dd><% }) %>
+      <dt>ID</dt><dd><%= r.id %></dd>
+      <% if (d) { %><dt></dt><dd><a href="/<%= lang %><%= d %>"><%= b('More Details', '詳細') %></a></dd><% } %>
+    </dl></div></td></tr>
+    <% }) %>
+  </tbody>
+</table>
+</div>
+<nav class="pager" aria-label="pagination">
+  <span><%= b('Showing', '顯示') %> <%= result.total ? (result.page - 1) * result.pageSize + 1 : 0 %>–<%= Math.min(result.total, result.page * result.pageSize) %> / <%= result.total.toLocaleString() %></span>
+  <span class="pager-links">
+    <% if (result.page > 1) { %><a href="<%= pageHref(1) %>">«</a><a href="<%= pageHref(result.page - 1) %>">‹ <%= b('Previous', '上一頁') %></a><% } %>
+    <strong><%= result.page %> / <%= result.pages %></strong>
+    <% if (result.page < result.pages) { %><a href="<%= pageHref(result.page + 1) %>"><%= b('Next', '下一頁') %> ›</a><a href="<%= pageHref(result.pages) %>">»</a><% } %>
+  </span>
+</nav>

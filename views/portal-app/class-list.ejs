@@ -1,0 +1,23 @@
+<%
+  const teacher = staffAssign.find(function(s){ return s.code === 'primary_instructor'; });
+  const rp = staffAssign.filter(function(s){ return s.code === 'room_parent'; });
+  const nm = function(p){ return p.english_first_name + ' ' + p.english_last_name + (p.chinese_name ? ' ' + p.chinese_name : ''); };
+%>
+<div class="portal-head">
+  <h1><%= teacher ? nm(teacher) + ' ' + b('Teacher', '老師') + ' · ' : '' %><%= one(cls.name_en, cls.name_zh) %></h1>
+  <div class="portal-actions">
+    <a class="btn btn-ghost" href="javascript:window.print()" data-print><%= b('Print', '列印') %></a>
+    <% if (grades) { %><a class="btn btn-primary" href="<%= url('/classes/' + cls.id + '/grades') %>"><%= b('Credit grades', '學分成績') %></a><% } %>
+  </div>
+</div>
+<p><strong><%= b('Room', '教室') %>:</strong> <%= cls.room || '—' %> &nbsp; <strong><%= b('Room Parent', '班媽/班爸') %>:</strong> <%= rp.length ? rp.map(nm).join(', ') : '—' %> &nbsp; <strong><%= b('Class type', '班別') %>:</strong> <%= one(cls.ct_en, cls.ct_zh) %> · <%= cls.year_label %></p>
+<div class="table-wrap"><table class="portal-table compact">
+  <thead><tr><th><%= b('Student', '學生') %></th><th><%= b('Last Name', '姓') %></th><th><%= b('First Name', '名') %></th>
+    <% if (isStaff) { %><th><%= b('Gender', '性別') %></th><th><%= b('Allergy', '過敏') %></th><th><%= b('Special Medical Needs', '醫護') %></th><% } %></tr></thead>
+  <tbody>
+    <% students.forEach(function(s, i){ %><tr><td><%= s.chinese_name || (i + 1) %></td><td><%= s.english_last_name %></td><td><%= s.english_first_name %></td>
+      <% if (isStaff) { %><td><%= s.gender %></td><td><%= s.allergy %></td><td><%= s.special_medical_needs %></td><% } %></tr><% }) %>
+    <% if (!students.length) { %><tr><td colspan="6" class="empty"><%= b('No students yet.', '尚無學生。') %></td></tr><% } %>
+  </tbody>
+</table></div>
+<p><%= b('Total Student Count', '學生人數') %>: <strong><%= students.length %></strong><br><%= b('Current Time', '目前時間') %>: <%= now %></p>

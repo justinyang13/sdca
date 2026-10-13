@@ -1,0 +1,46 @@
+<%
+  const e = errors || {}; const v = values || {};
+  const nm = function(p){ return p.english_first_name + ' ' + p.english_last_name + (p.chinese_name ? ' ' + p.chinese_name : ''); };
+  const sel = [].concat(v.student || []).map(Number);
+  const hasSel = function(id){ return sel.length ? sel.includes(id) : draftItems.has(id); };
+%>
+<%- include('_stepper', { step: 1 }) %>
+<h1><%= b('Registration For ' + year.label + ' School Year', '註冊 ' + year.label + ' 學年') %></h1>
+<% if (e._form) { %><p class="portal-error" role="alert"><%= e._form %></p><% } %>
+<ul class="plain">
+  <li><%= b('Please read', '請閱讀') %> <a href="<%= faq %>" target="_blank" rel="noopener"><%= b('Registration Notice & Online Registration FAQ', '註冊須知與網上註冊常見問答集') %></a> <%= b('or contact', '或聯絡') %> <a href="mailto:office.sdca@gmail.com">office.sdca@gmail.com</a>.</li>
+  <li><%= b('Class type', '班別') %>:<ul>
+    <% types.forEach(function(c){ %><li><strong><%= one(c.name_en, c.name_zh) %></strong> — <%= c.is_credit ? b('High School credit classes', '高中課程') : (c.code === 'bilingual' ? b('Both Mandarin and English are used in lecture', '中英文教學') : b('Mandarin is heavily used in lecture', '中文教學')) %></li><% }) %></ul></li>
+</ul>
+<% if (already.length) { %>
+<h2><%= b('Students Already Registered For ' + year.label + ' School Year', '已註冊學生') %></h2>
+<table class="portal-table compact"><thead><tr><th><%= b('Student', '學生') %></th><th><%= year.label %> <%= b('Grade', '年級') %></th><th><%= b('School Class', '班級') %></th></tr></thead><tbody>
+  <% already.forEach(function(k){ const en = k.enrollment; %><tr><td><%= nm(k) %></td><td><%= en ? gl(en.grade_label) : '' %></td><td><%= en && en.code ? one(en.name_en, en.name_zh) : '—' %></td></tr><% }) %></tbody></table>
+<% } %>
+<% if (!selectable.length) { %>
+<div class="portal-card"><p class="muted"><%= b('All of your children are already registered. Use “Add Child” on the home page to add another child.', '所有子女都已註冊。如需新增子女，請在首頁按「加入學生」。') %></p>
+  <p><a class="btn btn-primary" href="<%= url('/families/' + fid + '/add-child') %>"><%= b('Add Child', '加入學生') %></a> <a class="btn btn-ghost" href="<%= url('') %>"><%= b('Home', '首頁') %></a></p></div>
+<% } else { %>
+<form method="post" action="<%= url('/families/' + fid + '/register') %>" class="portal-card">
+  <%- csrfField() %>
+  <h2><%= b('Select Students To Register', '未註冊學生') %></h2>
+  <p><%= b('Please check the boxes for students who are going to register, update birthdate and select preferred school class type.', '請勾選需要註冊的學生，生日與班別。') %></p>
+  <div class="table-wrap"><table class="portal-table compact"><thead><tr><th></th><th><%= b('Student', '學生') %></th><th><span class="req">*</span> <%= b('Birthday', '生日') %></th><th><span class="req">*</span> <%= b('Class Type', '班別') %></th></tr></thead><tbody>
+    <% selectable.forEach(function(k){ const di = draftItems.get(k.id); %>
+    <tr class="<%= e['birth_' + k.id] || e['ctype_' + k.id] ? 'has-error' : '' %>"><td><input type="checkbox" name="student" value="<%= k.id %>" id="st_<%= k.id %>" <%= hasSel(k.id) ? 'checked' : '' %>></td>
+      <td><label for="st_<%= k.id %>"><%= nm(k) %></label></td>
+      <td><input type="date" name="birth_<%= k.id %>" value="<%= (v['birth_' + k.id] || (di && di.birth_date_snapshot) || k.birth_date || '').slice(0,10) %>"></td>
+      <td><select name="ctype_<%= k.id %>"><option value=""></option><% types.forEach(function(c){ %><option value="<%= c.id %>" <%= String(v['ctype_' + k.id] || (di && di.class_type_id) || '') === String(c.id) ? 'selected' : '' %>><%= one(c.name_en, c.name_zh) %></option><% }) %></select></td></tr>
+    <% }) %></tbody></table></div>
+  <h2><%= b('Scrip Purchase Fundraising', '禮券購買') %></h2>
+  <%- field({ label: b('Total scrip purchase amount ($)', '禮券購買總金額 ($)'), name: 'scrip', type: 'number', value: v.scrip || '', error: e.scrip, attrs: 'min="0" step="1" inputmode="numeric"' }) %>
+  <h2><%= b('PTA Volunteer Sign Up', '家長會義工報名') %></h2>
+  <p><%= b('SDCA needs you to sign up for volunteers. We rely heavily on parent volunteers to assist academic and maintain all non-academic functions of the school. The service fee is refundable when a parent participates as a volunteer and completes the service. Refund is given in Scrip gift cards.', '聖地牙哥中華學苑需要您報名義工。代勞費在家長完成服務後可退還，以禮券方式退還。') %> <a href="<%= url('/volunteer?family=' + fid) %>" target="_blank" rel="noopener"><%= b('Volunteer Job Descriptions', '義工工作說明') %></a></p>
+  <p><strong><%= b('Please select up to three jobs. Select “TBD” if you are not sure — PTA will contact you.', '請選擇最多三項。不確定請選「TBD」，家長會將與您聯繫。') %></strong></p>
+  <% [1,2,3].forEach(function(i){ const cur = v['job_' + i] || (mine[i-1] && mine[i-1].job_id) || ''; %>
+  <div class="frow"><label for="job_<%= i %>"><%= [b('First Priority','第一選擇'), b('Second Priority','第二選擇'), b('Third Priority','第三選擇')][i-1] %></label><div class="fctl"><select id="job_<%= i %>" name="job_<%= i %>"><option value=""></option>
+    <% jobs.filter(function(j){ return !j.reserved_for_preschool || preschoolEligible; }).forEach(function(j){ %><option value="<%= j.id %>" <%= String(cur) === String(j.id) ? 'selected' : '' %>><%= one(j.name_en, j.name_zh) %></option><% }) %></select></div></div>
+  <% }) %>
+  <div class="fact"><button class="btn btn-primary" type="submit"><%= b('Continue', '繼續') %></button> <a class="btn btn-ghost" href="<%= url('') %>"><%= b('Cancel Registration', '取消註冊') %></a></div>
+</form>
+<% } %>

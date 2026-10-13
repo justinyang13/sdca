@@ -1,0 +1,22 @@
+<div class="portal-head"><h1><%= tx.is_registration ? b('Registration payment', '註冊付款') : b('Transaction', '交易') %> #<%= tx.id %></h1>
+  <div class="portal-actions"><a class="btn btn-ghost" href="javascript:history.back()">‹ <%= b('Back', '返回') %></a>
+    <% if (tx.is_registration && tx.registration_id) { %><a class="btn btn-primary" href="<%= url('/transactions/' + tx.id + '/receipt') %>" target="_blank" rel="noopener"><%= b('Print Registration Receipt', '列印註冊收據') %></a>
+      <a class="btn btn-ghost" href="<%= url('/registrations/' + tx.registration_id + '/form') %>"><%= b('Registration form', '註冊表') %></a><% } %></div></div>
+<% if (tx.voided_at) { %><p class="portal-error"><%= b('VOID', '已作廢') %> — <%= fmtDateTime(tx.voided_at) %> <%= tx.void_reason %></p><% } %>
+<div class="portal-card"><dl class="kv">
+  <dt><%= b('Family', '家庭') %></dt><dd><a href="<%= url('/families/' + tx.family_id) %>"><%= famName %></a></dd>
+  <dt><%= b('Transaction Type', '交易類型') %></dt><dd><%= one(tx.type_en, tx.type_zh) %></dd>
+  <dt><%= b('Transaction Date', '交易日期') %></dt><dd><%= fmtDateTime(tx.transaction_date) %></dd>
+  <dt><%= b('Payment Method', '付款方式') %></dt><dd><%= one(tx.method_en, tx.method_zh) %><%= tx.check_number ? ' — ' + b('check number', '支票號碼') + ' ' + tx.check_number : '' %></dd>
+  <% if (tx.executed_by) { %><dt><%= b('Executed by', '執行人') %></dt><dd><%= tx.executed_by %></dd><% } %>
+  <% if (tx.recorded_by) { %><dt><%= b('Recorded by', '登錄人') %></dt><dd><%= tx.recorded_by %> — <%= fmtDateTime(tx.created_at) %></dd><% } %>
+  <% if (tx.note) { %><dt><%= b('Note', '備註') %></dt><dd><%= tx.note %></dd><% } %>
+</dl>
+<% if (lines.length) { %><table class="portal-table compact"><tbody><% lines.forEach(function(l){ %><tr><td><%= l.description %> × <%= l.quantity %></td><td class="num"><%= money(l.amount_cents) %></td></tr><% }) %></tbody></table><% } %>
+<p class="total"><%= b('Total', '總計') %>: <strong><%= money(tx.amount_cents) %></strong></p></div>
+<% if (canVoid) { %>
+<form method="post" action="<%= url('/transactions/' + tx.id + '/void') %>" class="portal-card pform" data-confirm="<%= b('Void this transaction?', '作廢此交易？') %>"><%- csrfField() %>
+  <h2><%= b('Void transaction', '作廢交易') %></h2>
+  <%- field({ label: b('Reason', '原因'), name: 'reason', attrs: 'required' }) %>
+  <div class="fact"><button class="btn btn-ghost danger" type="submit"><%= b('Void', '作廢') %></button></div></form>
+<% } %>

@@ -1,0 +1,8 @@
+<div class="portal-card portal-doc">
+  <h1><%= b('Waiver', '網站使用同意書') %></h1>
+  <% docs.forEach(function(d){ %>
+    <h2><%= lang === 'zh' ? (d.title_zh || d.title_en) : d.title_en %></h2>
+    <% (lang === 'zh' && d.body_zh ? d.body_zh : d.body_en).split(/\n\n+/).forEach(function(par){ %><p><%= par %></p><% }) %>
+    <hr>
+  <% }) %>
+</div>

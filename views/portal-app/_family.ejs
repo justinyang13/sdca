@@ -1,0 +1,66 @@
+<%
+  const nmP = (p) => p ? (p.english_first_name + ' ' + p.english_last_name + (p.chinese_name ? ' ' + p.chinese_name : '')) : '';
+  const fam = F.fam; const yr = F.year;
+  const fid = fam.id;
+  const staffMode = staffView;
+  const regOpen = yr && yr.registration_open;
+%>
+<section class="family-home">
+  <% if (typeof me !== 'undefined' && me) { %>
+  <div class="portal-card"><h2><%= b('Person', '個人資料') %></h2>
+    <dl class="kv"><dt><%= b('Chinese Name', '中文姓名') %></dt><dd><%= me.chinese_name || '—' %></dd>
+      <dt><%= b('English Name', '英文姓名') %></dt><dd><%= me.english_first_name %> <%= me.english_last_name %></dd>
+      <dt><%= b('Gender', '性別') %></dt><dd><%= me.gender %></dd><dt><%= b('Birthday', '生日') %></dt><dd><%= fmtDate(me.birth_date) || '—' %></dd>
+      <dt><%= b('Native Language', '母語') %></dt><dd><%= me.native_language %></dd></dl>
+    <p><a class="btn btn-ghost" href="<%= url('/people/' + me.id + '/edit') %>"><%= b('Edit Person Details', '編輯個人資料') %></a></p></div>
+  <% } %>
+  <% if (canRegister && regOpen && F.children.length) { %><p><a class="btn btn-primary" href="<%= url('/families/' + fid + '/register') %>"><%= b('Register For ' + yr.label + ' School Year', '註冊 ' + yr.label + ' 學年') %></a>
+    <a class="btn btn-ghost" href="<%= url('/volunteer?family=' + fid) %>"><%= b('Volunteer Sign Up', '義工報名') %></a></p><% } %>
+  <div class="portal-card">
+    <h2><%= b('Family for', '家庭') %> <%= nmP(F.parent1) %></h2>
+    <dl class="kv">
+      <dt><%= b('Parent One', '家長一') %></dt><dd><%= nmP(F.parent1) || '—' %></dd>
+      <dt><%= b('Parent Two', '家長二') %></dt><dd><%= nmP(F.parent2) || '—' %></dd>
+      <dt><%= b('Children', '子女') %></dt><dd><%= F.children.map(nmP).join(', ') || '—' %></dd>
+      <dt><%= b('Address', '住址') %></dt><dd><%= fam.street %>, <%= fam.city %>, <%= fam.state %> <%= fam.zipcode %></dd>
+      <dt><%= b('Home Phone', '住家電話') %></dt><dd><%= fam.home_phone %></dd>
+      <dt><%= b('Cell Phone', '手機號碼') %></dt><dd><%= fam.cell_phone || '—' %></dd>
+      <dt><%= b('Email', '電子郵件') %></dt><dd><%= fam.email %></dd>
+      <dt><%= b('List in School Directory', '列在學校通訊錄') %></dt><dd><%= fam.list_in_directory === 'Y' ? b('Yes','是') : b('No','否') %></dd>
+      <dt><%= b('Emergency Contact', '緊急聯絡人') %></dt><dd><%= fam.emergency_contact %></dd>
+      <dt><%= b('Emergency Phone', '緊急聯絡電話') %></dt><dd><%= fam.emergency_home_phone %></dd>
+      <dt><%= b('Emergency Cell', '緊急聯絡手機') %></dt><dd><%= fam.emergency_cell_phone %></dd>
+    </dl>
+    <p class="btn-row"><a class="btn btn-ghost" href="<%= url('/families/' + fid + '/edit') %>"><%= b('Edit Family Address', '編輯家庭住址') %></a>
+      <a class="btn btn-ghost" href="<%= url('/families/' + fid + '/add-parent') %>"><%= b('Add Parent', '加入家長') %></a>
+      <a class="btn btn-ghost" href="<%= url('/families/' + fid + '/add-child') %>"><%= b('Add Child', '加入學生') %></a></p>
+  </div>
+  <div class="portal-card"><h2><%= b('Student Information', '學生資料') %></h2>
+    <% if (!F.children.length) { %><p class="muted"><%= b('No children yet. Use “Add Child”.', '尚未加入學生，請按「加入學生」。') %></p><% } %>
+    <% F.children.forEach(function(c){ const e = c.enrollment; %>
+    <div class="student-block">
+      <dl class="kv">
+        <dt><%= b('Chinese Name', '中文姓名') %></dt><dd><%= c.chinese_name || '—' %></dd>
+        <dt><%= b('English Name', '英文姓名') %></dt><dd><%= c.english_first_name %> <%= c.english_last_name %></dd>
+        <dt><%= b('Gender', '性別') %></dt><dd><%= c.gender %></dd>
+        <dt><%= b('Birthday', '生日') %></dt><dd><%= fmtDate(c.birth_date) %></dd>
+        <dt><%= b('Native Language', '母語') %></dt><dd><%= c.native_language %></dd>
+        <% if (c.allergy || c.special_medical_needs) { %><dt><%= b('Allergy / Medical', '過敏 / 醫護') %></dt><dd><%= [c.allergy, c.special_medical_needs].filter(Boolean).join(' / ') %></dd><% } %>
+        <% if (e) { %>
+        <dt><%= yr.label %> <%= b('SDCA Grade', 'SDCA 年級') %></dt><dd><%= gl(e.grade_label) || '—' %> <span class="pill"><%= e.status %></span></dd>
+        <% if (c.showPlacement) { %>
+        <dt><%= yr.label %> <%= b('Class', '班級') %></dt><dd><%= one(e.name_en, e.name_zh) %> / <%= b('Room', '教室') %>: <%= e.room || '—' %> / <%= b('Teacher', '老師') %>: <%= e.teacher || '—' %></dd>
+        <% } else { %><dt><%= yr.label %> <%= b('Class', '班級') %></dt><dd class="muted"><%= b('Class placement is shown one week before school starts.', '開學前一週會顯示班級。') %></dd><% } %>
+        <% } %>
+      </dl>
+      <p class="btn-row"><a class="btn btn-ghost" href="<%= url('/people/' + c.id + '/edit') %>"><%= b('Edit Student Details', '編輯學生資料') %></a>
+        <% if (e && e.is_credit || (e && /credit/i.test(e.ct_en || ''))) { %><a class="btn btn-ghost" href="<%= url('/people/' + c.id + '/school-info') %>"><%= b('Enter Middle/High School Info', '輸入國中/高中資料') %><%= c.hasSchoolInfo ? ' ✓' : '' %></a><% } %></p>
+    </div>
+    <% }) %>
+  </div>
+  <% if (F.registrations.length) { %><div class="portal-card"><h2><%= b('Registrations', '註冊') %> <%= yr ? yr.label : '' %></h2>
+    <table class="portal-table compact"><tbody><% F.registrations.forEach(function(r){ %><tr><td>#<%= r.id %></td><td><span class="pill"><%= r.status %></span></td><td class="num"><%= money(r.grand_total_cents) %></td>
+      <td><% if (r.status === 'draft') { %><a href="<%= url('/registrations/' + r.id + '/waiver') %>"><%= b('Continue registration', '繼續註冊') %></a><% } else { %><a href="<%= url('/registrations/' + r.id + '/form') %>"><%= b('View form', '檢視註冊表') %></a><% } %></td></tr><% }) %></tbody></table></div><% } %>
+  <% if (canRegister && regOpen && F.children.length) { %><p><a class="btn btn-primary" href="<%= url('/families/' + fid + '/register') %>"><%= b('Register For ' + yr.label + ' School Year', '註冊 ' + yr.label + ' 學年') %></a>
+    <a class="btn btn-ghost" href="<%= url('/volunteer?family=' + fid) %>"><%= b('Volunteer Sign Up', '義工報名') %></a></p><% } %>
+</section>

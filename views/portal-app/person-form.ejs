@@ -1,0 +1,47 @@
+<%
+  const e = errors || {};
+  const v = values || {};
+  const yn = [{v:'Y',label:b('Yes','是')},{v:'N',label:b('No','否')}];
+  const gd = [{v:'M',label:b('Male','男')},{v:'F',label:b('Female','女')}];
+  const lg = ['Mandarin','English','Cantonese','Japanese','Korean','Vietnamese','Russian','Swedish','Other'].map(function(x){ return {v:x,label:x}; });
+%>
+<div class="portal-card">
+  <h1><%= b(isNew ? 'Add' : 'Edit', isNew ? '新增' : '編輯') %> — <%= title %></h1>
+  <form method="post" action="<%= url(action) %>" class="pform pform-wide">
+    <%- csrfField() %>
+    <fieldset>
+      <%- field({ label: b('English Last Name', '姓'), name: 'english_last_name', value: v.english_last_name, error: e.english_last_name, required: true }) %>
+      <%- field({ label: b('English First Name', '名'), name: 'english_first_name', value: v.english_first_name, error: e.english_first_name, required: true }) %>
+      <%- field({ label: b('Chinese Name', '中文姓名'), name: 'chinese_name', value: v.chinese_name }) %>
+      <%- field({ label: b('Title', '職稱'), name: 'title', value: v.title }) %>
+      <%- field({ label: b('Gender', '性別'), name: 'gender', value: v.gender, options: gd, required: true }) %>
+      <%- field({ label: b('Birthday', '出生日期'), name: 'birth_date', type: 'date', value: (v.birth_date || '').slice(0,10), error: e.birth_date, required: true }) %>
+      <%- field({ label: b('Native Language', '母語'), name: 'native_language', value: v.native_language, options: lg }) %>
+      <%- field({ label: b('Regular School', '美國學校名稱'), name: 'regular_school', value: v.regular_school }) %>
+      <%- field({ label: b('Grade', '年級'), name: 'regular_grade', type: 'number', value: v.regular_grade, help: b('(numbers only)', '(只填數字)'), attrs: 'min="0" max="13"' }) %>
+      <% if (staffFields) { %>
+      <%- field({ label: b('Email', '電子郵件'), name: 'email', type: 'email', value: v.email, error: e.email }) %>
+      <%- field({ label: b('Mobile', '手機'), name: 'mobile', type: 'tel', value: v.mobile }) %>
+      <div class="frow"><label for="f_is_faculty"><%= b('Faculty / board member (10% discount)', '教職員/董事 (九折)') %></label><div class="fctl"><input type="checkbox" id="f_is_faculty" name="is_faculty" value="1" <%= Number(v.is_faculty) ? 'checked' : '' %>></div></div>
+      <% } %>
+    </fieldset>
+    <% if (!/Parent/.test(title)) { %>
+    <fieldset><legend><%= b('Medical Info', '醫療') %></legend>
+      <p class="portal-warn-text"><%= b('Please be sure to update your kids “Allergy” and “Special Medical Needs” records so our school personnel can be aware. Leave it blank if not applicable.', '請務必填寫您孩子的過敏和特殊醫療需求，好讓學校工作人員注意。如果沒有特殊醫療須知毋需填寫。') %></p>
+      <%- field({ label: b('Allergy', '過敏'), name: 'allergy', value: v.allergy }) %>
+      <%- field({ label: b('Special Medical Needs', '醫護'), name: 'special_medical_needs', value: v.special_medical_needs }) %>
+    </fieldset>
+    <fieldset><legend><%= b('Chinese Background Info', '中文背景') %></legend>
+      <p><strong><%= b('This section is for NEW students only', '新學生請填寫下列問題') %>:</strong></p>
+      <%- field({ label: b('Speak Chinese at home', '在家說中文?'), name: 'speak_chinese_home', value: v.speak_chinese_home, options: yn }) %>
+      <%- field({ label: b('Took Chinese lessons before', '上過中文?'), name: 'took_chinese_lessons', value: v.took_chinese_lessons, options: yn }) %>
+      <%- field({ label: b('Chinese school name', '中文學校名稱'), name: 'prior_chinese_school', value: v.prior_chinese_school }) %>
+      <%- field({ label: b('How many years', '幾年?'), name: 'prior_chinese_years', type: 'number', value: v.prior_chinese_years, help: b('(numbers only)', '(只填數字)') }) %>
+      <%- field({ label: b('How many hours/week', '每星期幾個小時?'), name: 'prior_chinese_hours_week', type: 'number', value: v.prior_chinese_hours_week, help: b('(numbers only)', '(只填數字)') }) %>
+      <%- field({ label: b('Notes', '備註'), name: 'notes', type: 'textarea', value: v.notes }) %>
+    </fieldset>
+    <% } %>
+    <p class="req-note"><span class="req">*</span> <%= b('Required Field', '必須填寫') %></p>
+    <div class="fact"><button class="btn btn-primary" type="submit"><%= b(isNew ? 'Add' : 'Save', isNew ? '新增' : '儲存') %></button> <a class="btn btn-ghost" href="<%= cancelUrl %>"><%= b('Cancel', '取消') %></a></div>
+  </form>
+</div>

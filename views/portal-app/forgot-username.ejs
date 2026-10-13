@@ -1,0 +1,18 @@
+<div class="portal-card portal-card-narrow">
+  <h1><%= b('Search for Username', '查詢用戶名稱') %></h1>
+  <p><%= b('Please enter the email address on record with Chinese School', '請輸入電子郵件信箱地址') %></p>
+  <form method="post" action="<%= url('/forgot-username') %>" class="pform">
+    <%- csrfField() %>
+    <%- field({ label: b('Email', '電子郵件'), name: 'email', type: 'email', value: email, attrs: 'required' }) %>
+    <div class="fact"><button class="btn btn-primary" type="submit"><%= b('Submit', '送出') %></button></div>
+  </form>
+  <% if (found !== null) { %>
+    <div class="portal-result">
+      <% if (found.length) { %>
+        <p><%= b('Username(s) found:', '找到的用戶名稱：') %></p>
+        <ul><% found.forEach(function(n){ %><li><strong><%= n %></strong></li><% }) %></ul>
+      <% } else { %><p><%= b('No username found for that email.', '找不到此電子郵件的用戶名稱。') %></p><% } %>
+    </div>
+  <% } %>
+  <p class="portal-links"><a href="<%= url('/signin') %>"><%= b('Back to Sign In', '回到登入') %></a></p>
+</div>

@@ -1,0 +1,3 @@
+<ol class="stepper" aria-label="<%= b('Registration steps', '註冊步驟') %>">
+  <% [1,2,3].forEach(function(n){ %><li class="<%= n === step ? 'on' : (n < step ? 'done' : '') %>"><span><%= n %></span></li><% }) %>
+</ol>

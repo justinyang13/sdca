@@ -13,6 +13,7 @@ import { blockHelpers } from './block-helpers.js';
 import { registerPublicRoutes } from './routes-public.js';
 import { registerPhase5Routes } from './routes-phase5.js';
 import { registerAdminRoutes } from './admin/routes.js';
+import { registerPortalRoutes } from './portal/index.js';
 import { lookupRedirect } from './redirects.js';
 import { portedCtx } from './ported.js';
 import { buildSitemap } from './sitemap.js';
@@ -47,7 +48,7 @@ export function createApp({ db = openDb() } = {}) {
       // Block renderer partials (views/blocks/*.ejs) get the DP text helpers as L.h.
       const L = locals || {};
       if (file.startsWith('blocks/')) L.h = blockHelpers;
-      return ejs.render(src, { lang, t: tFn, renderPart, L, imageManifest, assetUrl });
+      return ejs.render(src, { lang, langPath: L.langPath, t: tFn, renderPart, L, imageManifest, assetUrl });
     }
     return renderPart;
   }
@@ -155,6 +156,9 @@ export function createApp({ db = openDb() } = {}) {
     res.type('application/xml; charset=utf-8').send(xml);
   });
 
+
+  // ---------- School portal (accounts, families, registration, finance, volunteers, roles) ----------
+  registerPortalRoutes(app, { db, makeRenderPart, renderShell, t });
 
   // ---------- Phase 4 public pages ----------
   registerPublicRoutes(app, { makeRenderPart, renderShell, pageView, renderMarkdown, t, db, SUPPORTED });

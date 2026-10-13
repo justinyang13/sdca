@@ -1,0 +1,7 @@
+<%# Public portal pages (sign in, forgot password, register): centered card, no sidebar. %>
+<section class="section portal-app-section" data-portal>
+  <div class="container">
+    <% if (flash) { %><div class="portal-flash portal-flash-<%= flash.type || 'ok' %>" role="status"><%= flash.msg %></div><% } %>
+    <%- inner %>
+  </div>
+</section>

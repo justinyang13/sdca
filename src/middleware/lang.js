@@ -46,7 +46,7 @@ export function langMiddleware(req, res, next) {
   const lang = detectLang(req);
   req.lang = lang;
   const m = req.path.match(LANG_REGEX);
-  req.langPath = m ? req.path.slice(m[1].length) || '/' : req.path;
+  req.langPath = m ? (req.path.slice(m[1].length + 1) || '/') : req.path;
   req.langQuery = req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : '';
   next();
 }

@@ -1,0 +1,17 @@
+<div class="portal-head"><h1><%= b('Credit grades', '學分成績') %> — <%= cls.code %> <%= one(cls.name_en, cls.name_zh) %></h1>
+  <div class="portal-actions"><a class="btn btn-ghost" href="<%= url('/classes/' + cls.id) %>">‹ <%= b('Class list', '班級名單') %></a></div></div>
+<form method="get" class="portal-toolbar"><label class="tb-filter"><span><%= b('Term', '學期') %></span><select name="term" data-autosubmit>
+  <% [['S1','Semester 1 第一學期'],['S2','Semester 2 第二學期'],['FINAL','Final 學年']].forEach(function(o){ %><option value="<%= o[0] %>" <%= term === o[0] ? 'selected' : '' %>><%= o[1] %></option><% }) %></select></label></form>
+<form method="post" action="<%= url('/classes/' + cls.id + '/grades') %>" class="portal-card">
+  <%- csrfField() %><input type="hidden" name="term" value="<%= term %>">
+  <div class="table-wrap"><table class="portal-table compact"><thead><tr><th><%= b('Student', '學生') %></th><th><%= b('Letter', '等第') %></th><th>%</th><th><%= b('Credits', '學分') %></th><th><%= b('Comment', '評語') %></th><th><%= b('Visible to student & parent', '學生/家長可見') %></th></tr></thead><tbody>
+  <% rows.forEach(function(r){ %><tr>
+    <td><%= r.english_first_name %> <%= r.english_last_name %> <%= r.chinese_name %></td>
+    <td><input name="letter_<%= r.enrollment_id %>" value="<%= r.letter_grade || '' %>" size="3"></td>
+    <td><input name="pct_<%= r.enrollment_id %>" value="<%= r.percent ?? '' %>" size="5" inputmode="decimal"></td>
+    <td><input name="credits_<%= r.enrollment_id %>" value="<%= r.credits ?? 0.5 %>" size="3"></td>
+    <td><input name="comment_<%= r.enrollment_id %>" value="<%= r.teacher_comment || '' %>" size="30"></td>
+    <td><input type="checkbox" name="pub_<%= r.enrollment_id %>" value="1" <%= r.published ? 'checked' : '' %>></td></tr><% }) %>
+  </tbody></table></div>
+  <div class="fact"><button class="btn btn-primary" type="submit"><%= b('Save grades', '儲存成績') %></button></div>
+</form>

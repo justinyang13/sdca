@@ -1,16 +1,20 @@
 {
   "name": "sdca",
   "version": "0.0.1",
-  "description": "San Diego Chinese Academy (聖地牙哥中華學苑) website",
+  "description": "San Diego Chinese Academy (\u8056\u5730\u7259\u54e5\u4e2d\u83ef\u5b78\u82d1) website",
   "type": "module",
   "private": true,
-  "engines": { "node": ">=22.5" },
+  "engines": {
+    "node": ">=22.5"
+  },
   "scripts": {
     "start": "node src/server.js",
     "dev": "NODE_ENV=development node --watch src/server.js",
     "test": "node --test tests/",
     "migrate": "node src/db/run-migrate.js",
-    "seed": "node scripts/seed.js"
+    "seed": "node scripts/seed.js",
+    "portal:seed": "node scripts/portal-seed.js",
+    "portal:demo": "node scripts/portal-seed.js --demo"
   },
   "dependencies": {
     "compression": "^1.7.5",

@@ -1,0 +1,24 @@
+<%
+  const e = errors || {}; const v = values || {};
+  const st = [{v:'CA',label:'CA'},{v:'AZ',label:'AZ'},{v:'NV',label:'NV'},{v:'Other',label:'Other'}];
+  const dopt = [{v:'',label:''}].concat(districts.map(function(d){ return {v:d.id,label:d.name}; }));
+%>
+<div class="portal-card"><h1><%= b('Enter Middle / High School Info for', '輸入國中/高中資料') %> <%= person.chinese_name %> (<%= person.english_first_name %> <%= person.english_last_name %>)</h1>
+  <p><%= b('Credit class parents, please fill out your school counselor and mailing information.', '學分班家長們，請填寫學校的輔導老師與通訊住址。') %></p>
+  <form method="post" action="<%= url('/people/' + person.id + '/school-info') %>" class="pform pform-wide"><%- csrfField() %>
+    <%- field({ label: b('School Name', '學校名稱'), name: 'school_name', value: v.school_name, error: e.school_name, required: true }) %>
+    <%- field({ label: b('Grade', '年級'), name: 'grade', type: 'number', value: v.grade, error: e.grade, required: true, help: b('(numbers only)', '(只填數字)') }) %>
+    <%- field({ label: b('School Mailing Address', '學校通訊地址'), name: 'mailing_address', value: v.mailing_address, error: e.mailing_address, required: true }) %>
+    <%- field({ label: b('City', '城市名'), name: 'city', value: v.city, error: e.city, required: true }) %>
+    <%- field({ label: b('State', '州名'), name: 'state', value: v.state, options: st, required: true }) %>
+    <%- field({ label: b('Zipcode', '郵遞區號'), name: 'zipcode', value: v.zipcode, error: e.zipcode, required: true }) %>
+    <%- field({ label: b('Counselor Name', '輔導老師姓名'), name: 'counselor_name', value: v.counselor_name, error: e.counselor_name, required: true }) %>
+    <%- field({ label: b('Counselor Phone Number', '輔導老師電話'), name: 'counselor_phone', type: 'tel', value: v.counselor_phone }) %>
+    <%- field({ label: b('Counselor Extension Number', '輔導老師分機'), name: 'counselor_extension', value: v.counselor_extension }) %>
+    <%- field({ label: b('School District', '學區'), name: 'school_district_id', value: v.school_district_id, options: dopt, error: e.school_district_id, required: true }) %>
+    <%- field({ label: b('Other School District', '其他學區'), name: 'other_school_district', value: v.other_school_district }) %>
+    <%- field({ label: b('Notes', '備註'), name: 'notes', type: 'textarea', value: v.notes }) %>
+    <p class="req-note"><span class="req">*</span> <%= b('Required Field', '必須填寫') %></p>
+    <div class="fact"><button class="btn btn-primary" type="submit"><%= b('Save', '儲存') %></button></div>
+    <p class="muted"><%= b('Poway School District requires students in high school to submit Off-Campus Foreign Language Permission. Students retrieve the form from their high school and bring it to their school registration after filling it out. They don’t need the form to be signed by San Diego Chinese Academy.', 'Poway 學區要求學生提交校外外語教學申請表，學生直接在學校填寫表格即可，表格無須中華學苑簽名。') %></p>
+  </form></div>
