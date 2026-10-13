@@ -112,22 +112,30 @@ export function registerPeopleRoutes(app, { db, page, requireLogin }) {
     } catch (e) { db.exec('ROLLBACK'); throw e; }
     go(req, res, `/families/${id}`, { type: 'ok', msg: 'Child added. 已加入學生。' });
   });
+  // a family has at most two parents (parent one + parent two)
+  const freeParentSlot = (familyId) => {
+    const has = (rel) => db.prepare("SELECT 1 FROM family_members WHERE family_id = ? AND relationship = ? AND deleted_at IS NULL").get(familyId, rel);
+    return !has('parent_one') ? 'parent_one' : !has('parent_two') ? 'parent_two' : null;
+  };
+  const noRoom = (req, res, id) => go(req, res, `/families/${id}`, { type: 'warn', msg: 'A family can have two parents only. 每個家庭最多兩位家長。' });
   app.get(`${R}/families/:id/add-parent`, requireLogin, (req, res) => {
     const id = Number(req.params.id);
     if (!mayEditFamily(req, id)) return forbidden(req, res);
+    if (!freeParentSlot(id)) return noRoom(req, res, id);
     personFormPage(req, res, { values: { gender: 'F', native_language: 'Mandarin' }, action: `/families/${id}/add-parent`, title: 'Add Parent', isNew: true });
   });
   app.post(`${R}/families/:id/add-parent`, requireLogin, csrfMiddleware, (req, res) => {
     const id = Number(req.params.id);
     if (!mayEditFamily(req, id)) return forbidden(req, res);
+    if (!freeParentSlot(id)) return noRoom(req, res, id);
     const ent = ENTITIES.persons;
     const fields = [...PERSON_MAIN];
     const data = fromBody(ent, req.body, fields);
     const errors = validate({ ...ent, fields: ent.fields.filter((f) => fields.includes(f.name)) }, data);
     if (Object.keys(errors).length) return personFormPage(req, res, { values: data, errors, action: `/families/${id}/add-parent`, title: 'Add Parent', isNew: true });
-    const hasTwo = db.prepare("SELECT 1 FROM family_members WHERE family_id = ? AND relationship = 'parent_two' AND deleted_at IS NULL").get(id);
+    const slot = freeParentSlot(id);
     const pid = createPerson(db, data, req.portal.user.id);
-    addFamilyMember(db, id, pid, hasTwo ? 'guardian' : 'parent_two', req.portal.user.id, 2);
+    addFamilyMember(db, id, pid, slot, req.portal.user.id, slot === 'parent_one' ? 1 : 2);
     go(req, res, `/families/${id}`, { type: 'ok', msg: 'Parent added. 已加入家長。' });
   });
 

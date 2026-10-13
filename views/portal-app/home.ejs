@@ -90,7 +90,8 @@
 </section>
 <% } %>
 
-<% if (typeof families !== 'undefined' && families) { %>
+<% if (typeof families !== 'undefined' && families && families.length) { %>
+<section class="dash"><h1><%= b('Parent Resources', '家長專區') %><% if (year) { %> <small>· <%= year.label %></small><% } %></h1></section>
   <% families.forEach(function(F){ %><%- include('_family', { F: F, staffView: false, canRegister: canRegister, me: U.person }) %><% }) %>
 <% } %>
 

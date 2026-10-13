@@ -332,3 +332,18 @@ test('change user name: needs current password, rejects taken/invalid names, the
   assert.ok(!attemptLogin(db, 'new.parent02', pw).error);
   assert.equal(attemptLogin(db, 'demo.parentsecretary', pw).error, 'invalid');
 });
+
+test('a family can have only two parents', async () => {
+  const c = new Client(); await c.login('demo.parent01');
+  const fid = one("SELECT fm.family_id AS f FROM family_members fm JOIN users u ON u.person_id = fm.person_id WHERE u.username = 'demo.parent01'").f;
+  const before = one("SELECT COUNT(*) AS n FROM family_members WHERE family_id = ? AND relationship IN ('parent_one','parent_two','guardian') AND deleted_at IS NULL", fid).n;
+  // make sure this family has both parents, then a third must be refused
+  if (before < 2) await c.post(`/en/portal/families/${fid}/add-parent`, { english_last_name: 'Test', english_first_name: 'Second', gender: 'F', birth_date: '1980-01-01', native_language: 'Mandarin' });
+  const g = await c.get(`/en/portal/families/${fid}/add-parent`);
+  assert.equal(g.status, 302); assert.match(g.loc, new RegExp(`/families/${fid}$`));
+  const p = await c.post(`/en/portal/families/${fid}/add-parent`, { english_last_name: 'Third', english_first_name: 'Parent', gender: 'M', birth_date: '1980-01-01', native_language: 'Mandarin' });
+  assert.equal(p.status, 302);
+  assert.equal(one("SELECT COUNT(*) AS n FROM family_members WHERE family_id = ? AND relationship IN ('parent_one','parent_two','guardian') AND deleted_at IS NULL", fid).n, 2);
+  const home = await c.get(`/en/portal/families/${fid}`);
+  assert.doesNotMatch(home.text, /add-parent/);
+});
