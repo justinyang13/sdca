@@ -14,6 +14,8 @@ export const config = {
   // Tailscale, so this must stay false — otherwise helmet's
   // upgrade-insecure-requests CSP breaks CSS/JS.
   https: process.env.HTTPS === 'true',
+  // minutes of inactivity before portal / admin sessions end (every request or "stay signed in" ping restarts the clock)
+  sessionIdleMinutes: Math.max(1, Number(process.env.SESSION_IDLE_MINUTES) || 30),
   root,
   dataDir: process.env.DATA_DIR || path.join(root, 'data'),
   dbFile: process.env.DB_FILE || path.join(root, 'data', 'sdca.db'),

@@ -157,7 +157,7 @@ function demo() {
   const types = Object.fromEntries(all('SELECT id, code FROM class_types').map((c) => [c.code, c.id]));
   const level = (code) => one('SELECT id FROM class_levels WHERE code = ?', code)?.id || null;
   const role = (code) => one('SELECT id FROM roles WHERE code = ?', code).id;
-  const addUser = (personId, username, roles, type, lang = 'en') => { const p = pw(); createUser(db, { personId, username, password: username, roleCodes: roles, type, lang }); logins.push([username, roles.join('+'), username]); return username; };
+  const addUser = (personId, username, roles, type, lang = 'en') => { const p = pw(); const pwd = 'secret-' + username.replace(/^demo\./, ''); createUser(db, { personId, username, password: pwd, roleCodes: roles, type, lang }); logins.push([username, roles.join('+'), pwd]); return pwd; };
   const mkPerson = (o) => createPerson(db, o);
 
   // ---- staff
@@ -351,7 +351,7 @@ function demo() {
   q("INSERT INTO email_outbox (to_email, template, subject, body, status) VALUES (?,?,?,?,?)", 'demo.family33@example.com', 'registration_received', 'San Diego Chinese Academy - Registration received 已收到註冊', 'Please submit the printed form with your check. 請附上列印的註冊表與支票。', 'logged');
   audit(db, 'schools', 1, 'demo_seed', null, { families: FAMILIES }, null);
 
-  const out = ['SDCA portal — DEMO LOGINS (invented people; password = the username)', `Generated ${new Date().toISOString()}`, `Sign in at /en/portal/signin`, '',
+  const out = ['SDCA portal — DEMO LOGINS (invented people; password = secret-<username without demo.>)', `Generated ${new Date().toISOString()}`, `Sign in at /en/portal/signin`, '',
     'username'.padEnd(22) + 'role(s)'.padEnd(24) + 'password', ...logins.map(([u, r, p]) => u.padEnd(22) + r.padEnd(24) + p)];
   fs.mkdirSync(path.dirname(process.env.PORTAL_LOGINS_FILE || path.join(ROOT, 'data', 'x')), { recursive: true });
   const loginFile = process.env.PORTAL_LOGINS_FILE || path.join(ROOT, 'data', 'PORTAL-DEMO-LOGINS.txt');

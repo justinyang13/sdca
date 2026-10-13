@@ -212,3 +212,21 @@ a.pcal-day:hover { background: var(--blue, #210488); color: #fff; }
 
 .dt-pair { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .dt-pair input { min-width: 0; }
+
+/* public full-size calendar page */
+.fullcal-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+.fullcal-bar h2 { margin: 0 8px; min-width: 9ch; text-align: center; }
+.fullcal-actions { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+.fullcal .pcal-cell { min-height: 124px; }
+.fullcal .ev { white-space: normal; font-size: .8rem; }
+.fullcal-legend { display: flex; gap: 6px; flex-wrap: wrap; margin: 12px 0 0; }
+@media (max-width: 760px) { .fullcal .pcal-cell { min-height: 64px; } .fullcal .ev { font-size: .66rem; padding: 1px 3px; } .fullcal-actions { margin-left: 0; } }
+.view-tabs-wrap { padding-top: 24px; }
+.view-tabs { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.view-tabs a { padding: 8px 16px; border-radius: 999px; text-decoration: none; background: var(--surface, #F3F7FC); color: var(--navy, #0B2545); font-weight: 600; }
+.view-tabs a.is-active { background: var(--blue, #210488); color: #fff; }
+.view-tabs .view-tabs-pdf { margin-left: auto; background: none; text-decoration: underline; font-weight: 500; color: var(--blue, #210488); }
+.all-ev-month { margin: 22px 0 8px; font-size: 1.15rem; color: var(--navy, #0B2545); }
+
+/* idle sign-out warning */
+.idle-banner { position: fixed; z-index: 1000; left: 50%; bottom: 24px; transform: translateX(-50%); display: flex; gap: 14px; align-items: center; flex-wrap: wrap; justify-content: center; max-width: calc(100vw - 32px); padding: 14px 18px; background: #fff; border: 2px solid var(--blue, #210488); border-radius: 12px; box-shadow: 0 12px 34px rgba(16, 24, 40, .28); font-weight: 600; }

@@ -21,7 +21,7 @@ const BASE = process.env.LINKCHECK_BASE || 'http://localhost:3000';
 const PAGES = [
   '/', '/about', '/about/board', '/about/staff', '/about/principal',
   '/programs', '/programs/classes', '/programs/tcml', '/programs/recreational', '/programs/ta', '/programs/bell',
-  '/enroll', '/calendar', '/news', '/events', '/media',
+  '/enroll', '/calendar', '/news', '/media',
   '/parents/handbook', '/parents/volunteer', '/parents/scrip',
   '/documents', '/support', '/support/sponsors',
   '/contact', '/privacy', '/disclaimer', '/archive',

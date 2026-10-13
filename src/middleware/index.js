@@ -104,10 +104,11 @@ export function applyBaseMiddleware(app) {
     secret: process.env.SESSION_SECRET || 'sdca-dev-secret',
     resave: false,
     saveUninitialized: false,
+    rolling: true,                      // idle timeout: the cookie / store expiry restarts on every response
     name: 'sdca_sid',
     httpOnly: true,
     sameSite: 'Lax',
-    cookie: { maxAge: 7 * 24 * 3600 * 1000, httpOnly: true, sameSite: 'lax', secure: config.https },
+    cookie: { maxAge: config.sessionIdleMinutes * 60 * 1000, httpOnly: true, sameSite: 'lax', secure: config.https ? true : 'auto' },
   }));
 
   app.use(langMiddleware);

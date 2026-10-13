@@ -32,6 +32,8 @@ function renderError(app, res, status, lang, opts = {}) {
 
 export function createApp({ db = openDb() } = {}) {
   const app = express();
+  app.locals.idleMinutes = config.sessionIdleMinutes;
+  app.set('trust proxy', 'loopback');   // Tailscale Funnel (and any local proxy) forwards the real client address / https flag
   app.set('view engine', 'ejs');
   app.set('views', config.viewsDir);
   app.locals.t = t;

@@ -1,22 +1,120 @@
 <%
   const ld = function(s){ s = String(s); return /^\d{4}-\d{2}-\d{2}$/.test(s) ? new Date(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10)) : new Date(s.replace(' ', 'T')); };   // date-only strings are local days (not UTC)
 
-  // calendar.ejs — school-year PDFs + current-year event list.
-  // ctx: { docs, events }
+  // calendar.ejs — full-size public month calendar (events table) + school-year PDFs.
+  // ctx: { docs, events (this month's grid), month, gridStart, gridEnd, prevMonth, nextMonth, thisMonth }
   const L = lang;
   const docsArr = (typeof docs !== 'undefined' && docs) ? docs : [];
   const eventsArr = (typeof events !== 'undefined' && events) ? events : [];
   const title = (r) => L === 'zh' ? (r.title_zh || r.title_en || '') : (r.title_en || r.title_zh || '');
 %>
 <%- renderPart('partials/hero.ejs', {
-  heroTitle: L === 'zh' ? '行事曆' : 'Calendar',
-  heroSub: L === 'zh' ? '學年行事曆、教室地圖與重要日期。'
-                        : 'School-year calendars, the classroom map and key dates.',
+  heroTitle: L === 'zh' ? '活動與行事曆' : 'Events and Calendar',
+  heroSub: L === 'zh' ? '學年活動、行事曆與重要日期，以及可列印的 PDF 行事曆。'
+                        : 'School-year events and key dates, plus the printable calendar PDFs.',
   heroImage: '/img/banners/banner-books-ink.png',
   heroVariant: 'photo',
 }) %>
 
-<section class="section" aria-labelledby="cal-years-h">
+<%
+  const pad2 = function(n){ return String(n).padStart(2, '0'); };
+  const key = function(d){ return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); };
+  const dayOf = function(v){ return String(v).slice(0, 10); };
+  const todayKey = key(new Date());
+  const monthName = L === 'zh' ? (month.getFullYear() + ' 年 ' + (month.getMonth() + 1) + ' 月')
+    : ['January','February','March','April','May','June','July','August','September','October','November','December'][month.getMonth()] + ' ' + month.getFullYear();
+  const heads = L === 'zh' ? ['日','一','二','三','四','五','六'] : ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const CAT = { class: ['Class', '上課'], exam: ['Exam', '考試'], contest: ['Contest', '比賽'], meeting: ['Meeting', '會議'], deadline: ['Deadline', '截止日'], holiday: ['No school', '放假'], performance: ['Performance', '表演'], other: ['Other', '其他'] };
+  const cats = Object.keys(CAT);
+  const weeks = [];
+  for (let d = new Date(gridStart); d <= gridEnd; ) {
+    const wk = [];
+    for (let i = 0; i < 7; i++, d.setDate(d.getDate() + 1)) {
+      const k = key(d);
+      wk.push({ k: k, day: d.getDate(), inMonth: d.getMonth() === month.getMonth(),
+        ev: eventsArr.filter(function(e){ return dayOf(e.starts_at) <= k && dayOf(e.ends_at || e.starts_at) >= k; }) });
+    }
+    weeks.push(wk);
+  }
+  const mStart = key(new Date(month.getFullYear(), month.getMonth(), 1)); const mEnd = key(new Date(month.getFullYear(), month.getMonth() + 1, 0));
+  const inMonthEv = eventsArr.filter(function(e){ return dayOf(e.starts_at) <= mEnd && dayOf(e.ends_at || e.starts_at) >= mStart; });
+  const pdfDoc = docsArr.length ? docsArr[0] : null;
+%>
+<div class="container view-tabs-wrap">
+  <div class="view-tabs" role="tablist" aria-label="<%= L === 'zh' ? '檢視方式' : 'View' %>">
+    <a role="tab" class="<%= view !== 'list' ? 'is-active' : '' %>" aria-selected="<%= String(view !== 'list') %>" href="/<%= L %>/calendar"><%= L === 'zh' ? '月曆檢視' : 'Calendar' %></a>
+    <a role="tab" class="<%= view === 'list' ? 'is-active' : '' %>" aria-selected="<%= String(view === 'list') %>" href="/<%= L %>/calendar?view=list"><%= L === 'zh' ? '全部活動' : 'All events' %></a>
+    <% if (pdfDoc) { %><a class="view-tabs-pdf" href="/pdf/<%= pdfDoc.slug %>" target="_blank" rel="noopener"><%= L === 'zh' ? 'PDF 行事曆' : 'PDF calendar' %></a><% } %>
+  </div>
+</div>
+<% if (view === 'list') { %>
+<section class="section" aria-labelledby="cal-all-h">
+  <div class="container">
+    <h2 id="cal-all-h" class="sr-only"><%= L === 'zh' ? '全部活動' : 'All events' %></h2>
+    <% if (!eventsArr.length) { %><p class="ann-empty"><%= t('events.no_events') %></p><% } %>
+    <% let lastM = ''; eventsArr.forEach(function(e) { const m = String(e.starts_at).slice(0, 7);
+         if (m !== lastM) { lastM = m; const dm = ld(e.starts_at); %>
+      <h3 class="all-ev-month"><%= L === 'zh' ? (dm.getFullYear() + ' 年 ' + (dm.getMonth() + 1) + ' 月') : ['January','February','March','April','May','June','July','August','September','October','November','December'][dm.getMonth()] + ' ' + dm.getFullYear() %></h3>
+    <% } %>
+      <div class="events-list">
+      <%- renderPart('partials/event-row.ejs', {
+        evDate: ld(e.starts_at),
+        evTitle: title(e),
+        evHref: `/${L}/events/${e.slug}`,
+        evLocation: e.location || '',
+        evTime: e.all_day ? t('events.all_day') : '',
+      }) %>
+      </div>
+    <% }) %>
+  </div>
+</section>
+<% } else { %>
+<section class="section" aria-labelledby="cal-main-h">
+  <div class="container">
+    <div class="fullcal-bar">
+      <a class="btn btn-ghost" href="/<%= L %>/calendar?month=<%= prevMonth %>" aria-label="<%= L === 'zh' ? '上個月' : 'Previous month' %>">‹</a>
+      <h2 id="cal-main-h"><%= monthName %></h2>
+      <a class="btn btn-ghost" href="/<%= L %>/calendar?month=<%= nextMonth %>" aria-label="<%= L === 'zh' ? '下個月' : 'Next month' %>">›</a>
+      <a class="btn btn-ghost" href="/<%= L %>/calendar?month=<%= thisMonth %>"><%= L === 'zh' ? '今天' : 'Today' %></a>
+      <span class="fullcal-actions">
+        <% if (pdfDoc) { %><a class="btn btn-primary" href="/pdf/<%= pdfDoc.slug %>" target="_blank" rel="noopener"><%= L === 'zh' ? '檢視 PDF 行事曆' : 'View the PDF calendar' %></a><% } %>
+      </span>
+    </div>
+    <div class="pcal fullcal" role="grid" aria-label="<%= monthName %>">
+      <% heads.forEach(function(h){ %><div class="pcal-h" role="columnheader"><%= h %></div><% }) %>
+      <% weeks.forEach(function(wk){ wk.forEach(function(c){ %>
+      <div class="pcal-cell<%= c.inMonth ? '' : ' off' %><%= c.k === todayKey ? ' today' : '' %>" role="gridcell">
+        <span class="pcal-day"><%= c.day %></span>
+        <% c.ev.forEach(function(e){ %><a class="ev ev-<%= e.category || 'other' %>" href="/<%= L %>/events/<%= e.slug %>" title="<%= title(e) %>"><%= title(e) %></a><% }) %>
+      </div>
+      <% }) }) %>
+    </div>
+    <p class="fullcal-legend"><% cats.forEach(function(c){ %><span class="ev ev-<%= c %>"><%= CAT[c][L === 'zh' ? 1 : 0] %></span><% }) %></p>
+  </div>
+</section>
+
+<section class="section section-alt" aria-labelledby="cal-ev-h">
+  <div class="container">
+    <div class="section-head">
+      <h2 id="cal-ev-h"><%= L === 'zh' ? monthName + ' 活動' : 'Events in ' + monthName %></h2>
+    </div>
+    <div class="events-list">
+      <% if (!inMonthEv.length) { %><p class="ann-empty"><%= t('events.no_events') %></p><% } %>
+      <% inMonthEv.forEach(function(e) { %>
+      <%- renderPart('partials/event-row.ejs', {
+        evDate: ld(e.starts_at),
+        evTitle: title(e),
+        evHref: `/${L}/events/${e.slug}`,
+        evLocation: e.location || '',
+        evTime: e.all_day ? t('events.all_day') : '',
+      }) %>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<% } %>
+<section class="section" aria-labelledby="cal-years-h" id="pdf-calendars">
   <div class="container">
     <div class="section-head">
       <h2 id="cal-years-h"><%= t('calendar.years') %></h2>
@@ -42,26 +140,3 @@
   </div>
 </section>
 
-<section class="section section-alt" aria-labelledby="cal-ev-h">
-  <div class="container">
-    <div class="section-head">
-      <h2 id="cal-ev-h"><%= t('calendar.this_year') %></h2>
-      <p class="section-lead"><%= L === 'zh' ? '本學年的重要日期與活動。'
-                                              : 'Key dates and events for the current school year.' %></p>
-    </div>
-    <div class="events-list">
-      <% eventsArr.forEach(function(e) { %>
-      <%- renderPart('partials/event-row.ejs', {
-        evDate: ld(e.starts_at),
-        evTitle: title(e),
-        evHref: `/${L}/events/${e.slug}`,
-        evLocation: e.location || '',
-        evTime: e.all_day ? t('events.all_day') : '',
-      }) %>
-      <% }) %>
-    </div>
-    <div class="section-cta">
-      <a class="btn btn-ghost" href="/<%= L %>/events"><%= L === 'zh' ? '查看全部活動' : 'View All Events' %> →</a>
-    </div>
-  </div>
-</section>

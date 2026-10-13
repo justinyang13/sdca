@@ -20,7 +20,9 @@ export function registerAuthRoutes(app, { db, page, requireLogin, isStaticBuild 
   // ----- sign in -----
   app.get(`${R}/signin`, skipStatic, (req, res) => {
     if (req.portal) return go(req, res, '');
-    page(req, res, 'signin.ejs', { error: null, username: '' }, { title: 'Sign In', shell: 'bare' });
+    let error = null;
+    if (req.cookies?.sdca_timedout) { res.clearCookie('sdca_timedout', { path: '/' }); error = 'You were signed out because of inactivity. Please sign in again. 因閒置過久，已自動登出，請重新登入。'; }
+    page(req, res, 'signin.ejs', { error, username: '' }, { title: 'Sign In', shell: 'bare' });
   });
   app.post(`${R}/signin`, skipStatic, loginLimiter, csrfMiddleware, (req, res) => {
     const r = attemptLogin(db, s(req.body.username), String(req.body.password || ''), req.ip);

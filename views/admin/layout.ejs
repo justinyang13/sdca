@@ -44,5 +44,7 @@
     <%- body %>
   </main>
   <footer class="admin-foot">SDCA Admin — internal use only</footer>
+  <div data-session-timeout="<%= idleMinutes %>" data-ping="/admin/ping" data-lang="en" hidden></div>
+  <script src="/js/session-timeout.js?v=1"></script>
 </body>
 </html>

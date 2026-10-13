@@ -356,7 +356,8 @@ test('portal events: create / edit / delete show up on (and vanish from) the pub
   const ev = one("SELECT * FROM events WHERE title_en = 'Portal Test Picnic'");
   assert.ok(ev && ev.slug.startsWith('2026-11-14-portal-test-picnic') && ev.created_by);
   const pub = new Client();
-  assert.match((await pub.get('/en/events')).text, /Portal Test Picnic/);
+  assert.match((await pub.get('/en/calendar?month=2026-11')).text, /Portal Test Picnic/);
+  assert.match((await pub.get('/en/calendar?view=list')).text, /Portal Test Picnic/);
   assert.match((await pub.get(`/en/events/${ev.slug}`)).text, /Bring food/);
   assert.match((await sec.get('/en/portal/events-calendar?month=2026-11')).text, /Portal Test Picnic/);
   // the form posts date + time inputs separately
@@ -373,4 +374,21 @@ test('portal events: create / edit / delete show up on (and vanish from) the pub
   const par = new Client(); await par.login('demo.parent01');
   assert.equal((await par.get('/en/portal/manage/events')).status, 403);
   assert.equal((await par.get('/en/portal/events-calendar')).status, 403);
+});
+
+test('idle timeout: session lasts 30 minutes from the last request; ping renews it; an expired session is signed out', async () => {
+  const c = new Client(); await c.login('demo.parent01');
+  await c.get('/en/portal');
+  const sid = decodeURIComponent(c.c.sdca_sid).replace(/^s:/, '').split('.')[0];
+  const left = () => one('SELECT expires FROM sessions WHERE sid = ?', sid).expires - Date.now();
+  assert.ok(left() > 29 * 60000 && left() <= 30 * 60000 + 2000, `expires in ${left() / 60000} min`);
+  db.prepare('UPDATE sessions SET expires = ? WHERE sid = ?').run(Date.now() + 5 * 60000, sid);       // pretend 25 minutes passed
+  assert.equal((await c.get('/en/portal/ping')).status, 204);
+  assert.ok(left() > 29 * 60000, 'ping renews the session');
+  db.prepare('UPDATE sessions SET expires = ? WHERE sid = ?').run(Date.now() - 1000, sid);            // idle for 30 minutes
+  const r = await c.get('/en/portal');
+  assert.equal(r.status, 302); assert.match(r.loc, /signin/);
+  const p = await c.get('/en/portal/ping'); assert.equal(p.status, 302);
+  c.c.sdca_timedout = '1';
+  assert.match((await c.get('/en/portal/signin')).text, /inactivity/);
 });

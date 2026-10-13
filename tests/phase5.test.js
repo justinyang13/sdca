@@ -159,19 +159,21 @@ test('GET /en/news/nonexistent → 404', async () => {
 });
 
 // ---------- 2. Events routes ----------
-test('GET /en/events → 200 with events list', async () => {
-  const res = await fetch(`${base}/en/events`);
-  assert.equal(res.status, 200);
-  const text = await res.text();
-  assert.ok(text.includes('Mid-term'), 'should contain event title');
+test('/en/events and /en/events/view/month redirect to the merged Events and Calendar page', async () => {
+  const a = await fetch(`${base}/en/events`, { redirect: 'manual' });
+  assert.equal(a.status, 301); assert.match(a.headers.get('location'), /\/en\/calendar\?view=list$/);
+  const b = await fetch(`${base}/en/events/view/month?month=2026-10`, { redirect: 'manual' });
+  assert.equal(b.status, 301); assert.match(b.headers.get('location'), /\/en\/calendar\?month=2026-10$/);
 });
 
-test('GET /en/events/view/month?month=2026-10 → 200 with calendar grid', async () => {
-  const res = await fetch(`${base}/en/events/view/month?month=2026-10`);
-  assert.equal(res.status, 200);
-  const text = await res.text();
-  assert.ok(text.includes('cal-grid'), 'should contain calendar grid');
-  assert.ok(text.includes('October'), 'should contain month name');
+test('GET /en/calendar → month grid; ?view=list → all events', async () => {
+  const m = await fetch(`${base}/en/calendar?month=2026-10`);
+  assert.equal(m.status, 200);
+  const text = await m.text();
+  assert.ok(text.includes('October 2026') && text.includes('Mid-term'), 'month grid with the event');
+  assert.ok(text.includes('Events and Calendar') && text.includes('View the PDF calendar'));
+  const l = await (await fetch(`${base}/en/calendar?view=list`)).text();
+  assert.ok(l.includes('Mid-term') && l.includes('All events'));
 });
 
 test('GET /en/events/2026-10-25-midterm → 200 with detail', async () => {
@@ -446,7 +448,7 @@ test('icsForEvents() handles timed events', () => {
 const P5_ROUTES = [
   '/news', '/news?kind=all', '/news?kind=weekly', '/news?kind=press', '/news?kind=notice', '/news?kind=news',
   '/news/weekly-w01', '/news/notice-2025-halloween',
-  '/events', '/events/view/month', '/events/2026-10-25-midterm',
+  '/events/2026-10-25-midterm',
   '/calendar', '/media',
   '/parents/handbook', '/parents/volunteer', '/parents/scrip',
   '/documents', '/documents?cat=calendar', '/documents?q=test',

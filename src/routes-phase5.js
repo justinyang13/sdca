@@ -1,5 +1,5 @@
 // src/routes-phase5.js — Phase 5 public pages + platform features.
-// Routes: /news, /news/:slug, /events, /events/view/month, /events/:slug,
+// Routes: /news, /news/:slug, /events + /events/view/month (redirect to /calendar), /events/:slug,
 //         /events/:slug.ics, /calendar, /media, /parents/*, /documents,
 //         /documents/:slug, /search, /privacy, /disclaimer, /sitemap.xml.
 // Plus 301 redirects from research/wiki/url-map.md.
@@ -123,34 +123,14 @@ export function registerPhase5Routes(app, bridge) {
     return new Date(y, mo - 1, 1);
   }
 
-  function allEvents() {
-    return db.prepare('SELECT * FROM events WHERE deleted_at IS NULL AND published = 1 ORDER BY starts_at ASC, id ASC').all();
-  }
-
+  // The old /events list and /events/view/month pages are merged into /calendar ("Events and Calendar").
   app.get('/:lang/events', function (req, res) {
-    const lang = req.params.lang;
-    if (!SUPPORTED.includes(lang)) return notFound(req, res);
-    const events = allEvents();
-    page(lang, req, res, '/events', 'events.ejs',
-      { events, view: 'list' },
-      lang === 'zh' ? '活動' : 'Events',
-      lang === 'zh' ? '即將舉行的活動與學年行事曆。' : 'Upcoming events and the school-year calendar.',
-      {
-        '@context': 'https://schema.org', '@type': 'ItemList',
-        itemListElement: events.map((e, i) => ({
-          '@type': 'ListItem', position: i + 1,
-          name: pickTitle(e, lang), url: `/${lang}/events/${e.slug}`,
-        })),
-      });
+    if (!SUPPORTED.includes(req.params.lang)) return notFound(req, res);
+    res.redirect(301, `/${req.params.lang}/calendar?view=list`);
   });
-
   app.get('/:lang/events/view/month', function (req, res) {
-    const lang = req.params.lang;
-    if (!SUPPORTED.includes(lang)) return notFound(req, res);
-    page(lang, req, res, '/events/view/month', 'events.ejs',
-      { events: allEvents(), month: parseMonthParam(req), view: 'month' },
-      lang === 'zh' ? '活動 — 月曆' : 'Events — Calendar',
-      lang === 'zh' ? '以月曆檢視 SDCA 活動。' : 'Browse SDCA events on a calendar.');
+    if (!SUPPORTED.includes(req.params.lang)) return notFound(req, res);
+    res.redirect(301, `/${req.params.lang}/calendar${req.query.month ? '?month=' + encodeURIComponent(String(req.query.month)) : ''}`);
   });
 
   // ---------- /events/:slug.ics (iCal export) ----------
@@ -209,11 +189,22 @@ export function registerPhase5Routes(app, bridge) {
       `SELECT * FROM documents WHERE published = 1 AND category = 'calendar'
        ORDER BY school_year DESC, sort, id`
     ).all();
-    const events = db.prepare("SELECT * FROM events WHERE deleted_at IS NULL AND published = 1 AND date(COALESCE(ends_at, starts_at)) >= date('now','localtime') ORDER BY starts_at ASC LIMIT 12").all();
+    // full-size month calendar: every published event touching the visible weeks (events are managed in the portal)
+    const first = parseMonthParam(req);
+    const pad = (n) => String(n).padStart(2, '0');
+    const ymd = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const gridStart = new Date(first); gridStart.setDate(1 - first.getDay());
+    const last = new Date(first.getFullYear(), first.getMonth() + 1, 0);
+    const gridEnd = new Date(last); gridEnd.setDate(last.getDate() + (6 - last.getDay()));
+    const view = req.query.view === 'list' ? 'list' : 'month';
+    const events = view === 'list'
+      ? db.prepare('SELECT * FROM events WHERE deleted_at IS NULL AND published = 1 ORDER BY starts_at ASC, id ASC').all()
+      : db.prepare("SELECT * FROM events WHERE deleted_at IS NULL AND published = 1 AND date(starts_at) <= ? AND date(COALESCE(ends_at, starts_at)) >= ? ORDER BY starts_at ASC, id ASC").all(ymd(gridEnd), ymd(gridStart));
+    const mk = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
     page(lang, req, res, '/calendar', 'calendar.ejs',
-      { docs, events },
-      lang === 'zh' ? '行事曆' : 'Calendar',
-      lang === 'zh' ? '學年行事曆、教室地圖與重要日期。' : 'School-year calendars, the classroom map and key dates.');
+      { docs, events, view, month: first, gridStart, gridEnd, prevMonth: mk(new Date(first.getFullYear(), first.getMonth() - 1, 1)), nextMonth: mk(new Date(first.getFullYear(), first.getMonth() + 1, 1)), thisMonth: mk(new Date()) },
+      lang === 'zh' ? '活動與行事曆' : 'Events and Calendar',
+      lang === 'zh' ? '學年活動、行事曆與重要日期。' : 'School-year events, the calendar and key dates.');
   });
 
   // ---------- /media ----------

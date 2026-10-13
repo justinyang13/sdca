@@ -88,6 +88,7 @@ export function registerAdminRoutes(app, { db }) {
     const shell = ejs.render(fs.readFileSync(path.join(views, 'layout.ejs'), 'utf8'), {
       title: locals.title || 'SDCA Admin',
       body: html,
+      idleMinutes: config.sessionIdleMinutes,
       user: req.session.user,
       csrfToken: csrf,
       flash: locals.flash,
@@ -181,6 +182,9 @@ export function registerAdminRoutes(app, { db }) {
     }
     return next();
   });
+
+  // keep-alive for the idle-timeout "stay signed in" button
+  app.get('/admin/ping', (req, res) => res.status(204).set('Cache-Control', 'no-store').end());
 
   // ---------- Dashboard ----------
   app.get('/admin/dashboard', (req, res) => {

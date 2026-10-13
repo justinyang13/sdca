@@ -4,7 +4,7 @@
 const CORE = [
   '/', '/about', '/about/board', '/about/staff', '/about/principal',
   '/programs', '/programs/classes', '/programs/tcml', '/programs/recreational', '/programs/ta',
-  '/enroll', '/calendar', '/news', '/events', '/media',
+  '/enroll', '/calendar', '/news', '/media',
   '/parents/handbook', '/parents/volunteer', '/parents/scrip', '/documents',
   '/support', '/support/sponsors', '/contact', '/privacy', '/disclaimer',
   '/education-resource', '/adult', '/student-store-schedule', '/classroom-map',

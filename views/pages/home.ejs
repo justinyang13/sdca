@@ -95,9 +95,10 @@
         </div>
         <div class="home-upcoming-side">
           <aside class="mini-cal" data-mini-cal data-lang="<%= L %>" data-events="<%- JSON.stringify(__events).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;') %>" aria-label="<%= L === 'zh' ? '月曆' : 'Monthly calendar' %>"></aside>
-          <% if (__calFiles.length) { %>
-          <div class="home-upcoming-cal-btn"><%- __fix(renderPart('partials/blocks.ejs', { blocks: __calFiles })) %></div>
-          <% } %>
+          <div class="home-upcoming-cal-btn">
+            <p class="blk-file"><a class="btn btn-primary" href="/<%= L %>/calendar"><%= L === 'zh' ? '行事曆' : 'School Calendar' %></a></p>
+
+          </div>
         </div>
       </div>
       <% } %>

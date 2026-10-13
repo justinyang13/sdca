@@ -34,7 +34,7 @@ function tpl(name) {
 
 export function ensureCsrf(req, res) {
   let tok = req.cookies?.sdca_csrf;
-  if (!tok) { tok = crypto.randomBytes(32).toString('hex'); res.cookie('sdca_csrf', tok, { httpOnly: true, sameSite: 'Lax', path: '/' }); req.cookies = { ...(req.cookies || {}), sdca_csrf: tok }; }
+  if (!tok) { tok = crypto.randomBytes(32).toString('hex'); res.cookie('sdca_csrf', tok, { httpOnly: true, sameSite: 'Lax', path: '/', secure: !!req.secure }); req.cookies = { ...(req.cookies || {}), sdca_csrf: tok }; }
   return tok;
 }
 
@@ -114,7 +114,7 @@ export function makeRenderer({ makeRenderPart, renderShell, t, db }) {
     const gl = (label) => { const m = /^(.*?)\s*\((.*)\)\s*$/.exec(label || ''); return m ? (lang === 'zh' ? m[1] : m[2]) : (label || ''); };
     const url = (p = '') => `/${lang}/portal${p}`;
     const base = {
-      lang, t: tFn, b, one, gl, url, csrf, flash, money, esc, field: fieldRow, title: opts.title || '',
+      lang, t: tFn, b, one, gl, url, idleMinutes: config.sessionIdleMinutes, csrf, flash, money, esc, field: fieldRow, title: opts.title || '',
       csrfField: () => `<input type="hidden" name="_csrf" value="${csrf}">`,
       U: req.portal || null, can: (c) => can(req.portal?.access, c),
       ENTITIES, fmtDate: (d) => (d ? String(d).slice(0, 10) : ''), fmtDateTime: (d) => (d ? String(d).slice(0, 16) : ''),

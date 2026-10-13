@@ -8,6 +8,9 @@ export function registerHubRoutes(app, { db, page, requireLogin }) {
   const P = (req, p = '') => `/${L(req)}/portal${p}`;
   const forbidden = (req, res) => page(req, res, 'forbidden.ejs', {}, { title: 'Not allowed', status: 403 });
 
+  // keep-alive for the "stay signed in" button / activity pings (the session cookie is renewed on every response)
+  app.get(`${R}/ping`, requireLogin, (req, res) => res.status(204).set('Cache-Control', 'no-store').end());
+
   app.get(`${R}/profile`, requireLogin, (req, res) => {
     const { person, familyIds } = req.portal;
     const fid = familyIds[0];

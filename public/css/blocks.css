@@ -190,3 +190,5 @@ h3.blk-heading { font-size: 1.15rem; }
 .mc-pop-date { font-weight: 700; color: var(--gold, #C9A227); margin-bottom: 4px; }
 .mc-pop-ev + .mc-pop-ev { margin-top: 4px; padding-top: 4px; border-top: 1px solid rgba(255,255,255,.2); }
 .mc-has { cursor: pointer; }
+[data-page="home"] .home-cal-pdf { margin-top: 6px; font-size: .85rem; text-align: center; }
+[data-page="home"] .home-cal-pdf .blk-file a { background: none; border: 0; box-shadow: none; color: var(--blue, #210488); text-decoration: underline; width: auto; padding: 0; min-height: 0; font-weight: 500; }

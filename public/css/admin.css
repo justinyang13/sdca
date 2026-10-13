@@ -118,3 +118,5 @@ h2 { font-size: 1.2rem; margin: 24px 0 8px; }
   .form-grid .field { grid-column: span 12; }
   .admin-top { gap: 8px; }
 }
+
+.idle-banner { position: fixed; z-index: 1000; left: 50%; bottom: 24px; transform: translateX(-50%); display: flex; gap: 14px; align-items: center; flex-wrap: wrap; justify-content: center; padding: 14px 18px; background: #fff; border: 2px solid #210488; border-radius: 12px; box-shadow: 0 12px 34px rgba(16, 24, 40, .28); font-weight: 600; }

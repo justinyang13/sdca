@@ -5,7 +5,7 @@
 import { DatabaseSync } from 'node:sqlite';
 const BASE = process.argv[2] || process.env.SWEEP_BASE || 'http://localhost:3100';
 const db = new DatabaseSync(new URL('../data/sdca.db', import.meta.url).pathname, { readOnly: true });
-const paths = new Set(['/', '/about', '/about/board', '/about/staff', '/about/principal', '/programs/classes', '/programs/tcml', '/programs/recreational', '/programs/ta', '/enroll', '/calendar', '/news', '/events', '/media', '/media/archive', '/parents/handbook', '/parents/volunteer', '/parents/scrip', '/documents', '/support', '/support/sponsors', '/contact', '/privacy', '/disclaimer']);
+const paths = new Set(['/', '/about', '/about/board', '/about/staff', '/about/principal', '/programs/classes', '/programs/tcml', '/programs/recreational', '/programs/ta', '/enroll', '/calendar', '/news', '/media', '/media/archive', '/parents/handbook', '/parents/volunteer', '/parents/scrip', '/documents', '/support', '/support/sponsors', '/contact', '/privacy', '/disclaimer']);
 for (const r of db.prepare('SELECT slug FROM pages').all()) paths.add('/' + r.slug.replace(/-/g, '/'));
 const imgRe = /(?:src|data-full|data-src|poster)="([^"]+)"|href="([^"]+\.(?:jpe?g|png|gif|webp|svg)(?:\?[^"]*)?)"|srcset="([^"]+)"/gi;
 const seen = new Map(); const bad = [];
