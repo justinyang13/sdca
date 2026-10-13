@@ -26,15 +26,15 @@
       <%- field({ label: L('Cell Phone','緊急聯絡手機'), name: 'emergency_cell_phone', type: 'tel', value: v.emergency_cell_phone, error: e.emergency_cell_phone, required: true }) %>
     </fieldset>
     <fieldset><legend><%= b('Parent One', '家長一') %></legend>
-      <%- field({ label: L('English Last Name','姓'), name: 'p1_last', value: v.p1_last, error: e.p1_last, required: true }) %>
-      <%- field({ label: L('English First Name','名'), name: 'p1_first', value: v.p1_first, error: e.p1_first, required: true }) %>
+      <%- field({ label: L('Last Name','姓'), name: 'p1_last', value: v.p1_last, error: e.p1_last, required: true }) %>
+      <%- field({ label: L('First Name','名'), name: 'p1_first', value: v.p1_first, error: e.p1_first, required: true }) %>
       <%- field({ label: L('Chinese Name','中文姓名'), name: 'p1_chinese', value: v.p1_chinese }) %>
       <%- field({ label: L('Gender','性別'), name: 'gender', value: v.gender, options: gd }) %>
       <%- field({ label: L('Native Language','母語'), name: 'native_language', value: v.native_language, options: lg }) %>
     </fieldset>
     <fieldset><legend><%= b('Parent Two (optional)', '家長二 (選填)') %></legend>
-      <%- field({ label: L('English Last Name','姓'), name: 'p2_last', value: v.p2_last }) %>
-      <%- field({ label: L('English First Name','名'), name: 'p2_first', value: v.p2_first }) %>
+      <%- field({ label: L('Last Name','姓'), name: 'p2_last', value: v.p2_last }) %>
+      <%- field({ label: L('First Name','名'), name: 'p2_first', value: v.p2_first }) %>
       <%- field({ label: L('Chinese Name','中文姓名'), name: 'p2_chinese', value: v.p2_chinese }) %>
       <%- field({ label: L('Gender','性別'), name: 'gender2', value: v.gender2, options: gd }) %>
       <%- field({ label: L('Native Language','母語'), name: 'native_language2', value: v.native_language2, options: lg }) %>

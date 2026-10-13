@@ -96,7 +96,7 @@ test('List search + filter + paging on People', async () => {
   const f = await c.get('/en/portal/manage/persons?f_gender=F&q=Demo');
   assert.equal(f.status, 200);
   const csv = await c.get('/en/portal/manage/persons/export.csv');
-  assert.equal(csv.status, 200); assert.match(csv.text, /English Last Name/);
+  assert.equal(csv.status, 200); assert.match(csv.text, /Last Name/);
 });
 
 test('role & permission management is Admin only, and changes take effect', async () => {

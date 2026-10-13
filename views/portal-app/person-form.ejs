@@ -10,8 +10,8 @@
   <form method="post" action="<%= url(action) %>" class="pform pform-wide">
     <%- csrfField() %>
     <fieldset>
-      <%- field({ label: b('English Last Name', '姓'), name: 'english_last_name', value: v.english_last_name, error: e.english_last_name, required: true }) %>
-      <%- field({ label: b('English First Name', '名'), name: 'english_first_name', value: v.english_first_name, error: e.english_first_name, required: true }) %>
+      <%- field({ label: b('Last Name', '姓'), name: 'english_last_name', value: v.english_last_name, error: e.english_last_name, required: true }) %>
+      <%- field({ label: b('First Name', '名'), name: 'english_first_name', value: v.english_first_name, error: e.english_first_name, required: true }) %>
       <%- field({ label: b('Chinese Name', '中文姓名'), name: 'chinese_name', value: v.chinese_name }) %>
       <%- field({ label: b('Title', '職稱'), name: 'title', value: v.title }) %>
       <%- field({ label: b('Gender', '性別'), name: 'gender', value: v.gender, options: gd, required: true }) %>
