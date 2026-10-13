@@ -1,4 +1,6 @@
 <%
+  const ld = function(s){ s = String(s); return /^\d{4}-\d{2}-\d{2}$/.test(s) ? new Date(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10)) : new Date(s.replace(' ', 'T')); };   // date-only strings are local days (not UTC)
+
   // events.ejs — events list + month calendar view (no JS dependencies).
   // ctx: { events, month (Date), view ('list'|'month') }
   const L = lang;
@@ -7,10 +9,15 @@
   const calMonth = (typeof month !== 'undefined' && month) ? new Date(month) : new Date();
   const byDate = new Map();
   evts.forEach(function(e) {
-    const d = new Date(e.starts_at);
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    if (!byDate.has(key)) byDate.set(key, []);
-    byDate.get(key).push(e);
+    // date-only strings must not go through Date() (UTC parsing shifts them a day back); multi-day events fill every day
+    const a = String(e.starts_at).slice(0, 10); const z = String(e.ends_at || e.starts_at).slice(0, 10);
+    const d = new Date(Number(a.slice(0, 4)), Number(a.slice(5, 7)) - 1, Number(a.slice(8, 10)));
+    for (let n = 0; n < 31; n++, d.setDate(d.getDate() + 1)) {
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      if (key > z) break;
+      if (!byDate.has(key)) byDate.set(key, []);
+      byDate.get(key).push(e);
+    }
   });
   const monthLabel = L === 'zh'
     ? `${calMonth.getFullYear()} 年 ${calMonth.getMonth() + 1} 月`
@@ -75,7 +82,7 @@
       <div class="events-list">
         <% evts.forEach(function(e) { %>
         <%- renderPart('partials/event-row.ejs', {
-          evDate: new Date(e.starts_at),
+          evDate: ld(e.starts_at),
           evTitle: title(e),
           evHref: `/${L}/events/${e.slug}`,
           evLocation: e.location || '',

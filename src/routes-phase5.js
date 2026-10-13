@@ -124,7 +124,7 @@ export function registerPhase5Routes(app, bridge) {
   }
 
   function allEvents() {
-    return db.prepare('SELECT * FROM events WHERE published = 1 ORDER BY starts_at ASC, id ASC').all();
+    return db.prepare('SELECT * FROM events WHERE deleted_at IS NULL AND published = 1 ORDER BY starts_at ASC, id ASC').all();
   }
 
   app.get('/:lang/events', function (req, res) {
@@ -161,7 +161,7 @@ export function registerPhase5Routes(app, bridge) {
     const lang = req.params.lang;
     if (!SUPPORTED.includes(lang)) return notFound(req, res);
     const slug = req.params.slug.slice(0, -4); // strip .ics
-    const ev = db.prepare('SELECT * FROM events WHERE slug = ? AND published = 1').get(slug);
+    const ev = db.prepare('SELECT * FROM events WHERE slug = ? AND deleted_at IS NULL AND published = 1').get(slug);
     if (!ev) return notFound(req, res);
     const ics = icsForEvents([{
       title: pickTitle(ev, lang),
@@ -181,12 +181,12 @@ export function registerPhase5Routes(app, bridge) {
   app.get('/:lang/events/:slug', function (req, res) {
     const lang = req.params.lang;
     if (!SUPPORTED.includes(lang)) return notFound(req, res);
-    const ev = db.prepare('SELECT * FROM events WHERE slug = ? AND published = 1').get(req.params.slug);
+    const ev = db.prepare('SELECT * FROM events WHERE slug = ? AND deleted_at IS NULL AND published = 1').get(req.params.slug);
     if (!ev) return notFound(req, res);
     const bodyHtml = renderMarkdown(
       lang === 'zh' ? (ev.description_zh || ev.description_en) : (ev.description_en || ev.description_zh));
     const related = db.prepare(
-      `SELECT * FROM events WHERE published = 1 AND slug != ? ORDER BY starts_at DESC LIMIT 4`
+      `SELECT * FROM events WHERE deleted_at IS NULL AND published = 1 AND slug != ? ORDER BY starts_at DESC LIMIT 4`
     ).all(ev.slug);
     page(lang, req, res, `/events/${ev.slug}`, 'event-detail.ejs',
       { ev, bodyHtml, related },
@@ -209,7 +209,7 @@ export function registerPhase5Routes(app, bridge) {
       `SELECT * FROM documents WHERE published = 1 AND category = 'calendar'
        ORDER BY school_year DESC, sort, id`
     ).all();
-    const events = db.prepare('SELECT * FROM events WHERE published = 1 ORDER BY starts_at ASC LIMIT 30').all();
+    const events = db.prepare("SELECT * FROM events WHERE deleted_at IS NULL AND published = 1 AND date(COALESCE(ends_at, starts_at)) >= date('now','localtime') ORDER BY starts_at ASC LIMIT 12").all();
     page(lang, req, res, '/calendar', 'calendar.ejs',
       { docs, events },
       lang === 'zh' ? '行事曆' : 'Calendar',

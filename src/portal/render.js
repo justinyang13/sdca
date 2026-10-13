@@ -83,12 +83,13 @@ export function buildNav(portal, lang) {
     if (can(a, 'finance.record_payment')) special.push({ en: 'Enter Payment', zh: '輸入付款', href: P('/finance/payment') });
     if (can(a, 'reports.class_roster')) special.push({ en: 'Class Roster', zh: '班級人數清單', href: P('/class-roster') });
     if (can(a, 'student_list.list') || can(a, 'volunteer_list.list') || can(a, 'transactions.list')) special.push({ en: 'Reports & Exports', zh: '報表與匯出', href: P('/reports') });
+    if (can(a, 'events.list')) special.push({ en: 'Events', zh: '活動', href: P('/manage/events') }, { en: 'Event Calendar', zh: '活動行事曆', href: P('/events-calendar') });
     if (can(a, 'class.view_own')) special.push({ en: 'My Classes', zh: '我的班級', href: P('/my-classes') });
     if (can(a, 'roles.manage')) special.push({ en: 'Roles & Permissions', zh: '角色與權限', href: P('/manage/roles') });
     if (special.length) staff.push({ title: { en: 'Staff Tools', zh: '員工工具' }, items: special });
     for (const g of GROUPS) {
       const items = Object.entries(ENTITIES)
-        .filter(([key, e]) => e.group === g.key && can(a, `${e.perm}.list`) && !(e.adminOnly && !can(a, 'roles.manage')) && key !== 'roles')
+        .filter(([key, e]) => e.group === g.key && can(a, `${e.perm}.list`) && !(e.adminOnly && !can(a, 'roles.manage')) && key !== 'roles' && key !== 'events')
         .map(([key, e]) => ({ en: e.label.en, zh: e.label.zh, href: P(`/manage/${key}`) }));
       if (items.length) staff.push({ title: g.label, items });
     }

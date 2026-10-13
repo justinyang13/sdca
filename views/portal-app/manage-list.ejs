@@ -26,6 +26,7 @@
 <div class="portal-head">
   <h1><%= b(ent.label.en, ent.label.zh) %> <small class="count">(<%= result.total.toLocaleString() %>)</small></h1>
   <div class="portal-actions">
+    <% if (key === 'events') { %><a class="btn btn-ghost" href="<%= url('/events-calendar') %>">📅 <%= b('Calendar view', '行事曆檢視') %></a><% } %>
     <% if (canExport) { %><a class="btn btn-ghost" href="<%= url('/manage/' + key + '/export.csv') %>?<%= qs({ page: null }) %>"><%= b('Download CSV', '下載 CSV') %></a><% } %>
     <% if (canCreate) { %><a class="btn btn-primary" href="<%= url('/manage/' + key + '/new') %>">+ <%= b('New', '新增') %> <%= one(ent.singular.en, ent.singular.zh) %></a><% } %>
     <% if (key === 'roles') { %><span class="muted"><%= b('Open a role → Permissions to edit what it can do.', '開啟角色 → 權限，可編輯此角色權限。') %></span><% } %>
@@ -70,7 +71,7 @@
     <% result.rows.forEach(function(r){ const d = detailUrl(r); %>
     <tr class="data-row">
       <% result.cols.forEach(function(c, ci){ %>
-      <td data-col="<%= c.key %>" class="<%= colCls(c, c.type === 'money' ? 'num' : '') %>"><% if (ci === 0) { %><button type="button" class="row-toggle" aria-expanded="false" aria-label="<%= b('Show details', '顯示詳細資料') %>">▸</button><a href="<%= (d && ent.readOnly) ? '/' + lang + d : url('/manage/' + key + '/' + r.id) %>"><%= cellVal(r, c) || '—' %></a><% } else { %><%= cellVal(r, c) %><% } %></td>
+      <td data-col="<%= c.key %>" class="<%= colCls(c, c.type === 'money' ? 'num' : '') %><%= c.field && c.field.trunc ? ' trunc' : '' %>"<%- c.field && c.field.trunc ? ' style="max-width:' + c.field.trunc + 'px" title="' + esc(String(cellVal(r, c) || '')) + '"' : '' %>><% if (ci === 0) { %><button type="button" class="row-toggle" aria-expanded="false" aria-label="<%= b('Show details', '顯示詳細資料') %>">▸</button><a href="<%= (d && ent.readOnly) ? '/' + lang + d : url('/manage/' + key + '/' + r.id) %>"><%= cellVal(r, c) || '—' %></a><% } else { %><%= cellVal(r, c) %><% } %></td>
       <% }) %>
     </tr>
     <tr class="row-detail" hidden><td colspan="<%= totalCols %>"><div class="detail-inner"><dl class="kv">

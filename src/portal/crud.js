@@ -138,6 +138,10 @@ export function fromBody(ent, body, only = null) {
     if (fd.type === 'readonly') continue;
     if (only && !only.includes(fd.name)) continue;
     if (fd.type === 'bool') { out[fd.name] = coerce(fd, body[fd.name]); continue; }
+    if (fd.type === 'datetime' && body[`${fd.name}_date`] !== undefined) {   // date + time inputs → one value
+      const d = String(body[`${fd.name}_date`] || '').trim(); const t = String(body[`${fd.name}_time`] || '').trim();
+      out[fd.name] = d ? `${d}${t ? ' ' + t : ''}` : null; continue;
+    }
     if (body[fd.name] === undefined) continue;
     out[fd.name] = isVirtual(fd) ? String(body[fd.name] || '') : coerce(fd, body[fd.name]);
   }
@@ -174,7 +178,34 @@ function splitData(ent, data, existing) {
   return { own, addr, addrFk, password };
 }
 
+/** Event rows: all-day events keep a date only; a missing slug is generated (date + title) and kept unique. */
+function prepEvent(db, data, existing) {
+  const d = { ...data };
+  const allDay = 'all_day' in d ? d.all_day : existing?.all_day;
+  if (allDay) { if (d.starts_at) d.starts_at = String(d.starts_at).slice(0, 10); if (d.ends_at) d.ends_at = String(d.ends_at).slice(0, 10); }
+  if (d.ends_at === '') d.ends_at = null;
+  if (!existing || ('slug' in d && !d.slug)) {
+    const start = String(d.starts_at || existing?.starts_at || '').slice(0, 10);
+    const title = String(d.title_en || existing?.title_en || d.title_zh || existing?.title_zh || 'event');
+    const base = `${start}-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 50) || 'event'}`.replace(/-+$/g, '');
+    let slug = base; let n = 2;
+    while (db.prepare('SELECT 1 FROM events WHERE slug = ? AND id <> ?').get(slug, existing?.id || 0)) slug = `${base}-${n++}`;
+    d.slug = slug;
+  }
+  return d;
+}
+/** Keep the website search index in step with an event (published, not deleted). */
+function indexEvent(db, id) {
+  try {
+    const ev = db.prepare('SELECT * FROM events WHERE id = ?').get(Number(id));
+    if (!ev) return;
+    db.prepare("DELETE FROM search_index WHERE kind = 'event' AND slug = ?").run(ev.slug);
+    if (ev.published && !ev.deleted_at) db.prepare('INSERT INTO search_index (kind, slug, title_en, title_zh, body_en, body_zh) VALUES (?,?,?,?,?,?)').run('event', ev.slug, ev.title_en, ev.title_zh, ev.description_en, ev.description_zh);
+  } catch { /* search index is optional */ }
+}
+
 export function createRow(db, ent, data, userId, ip = '') {
+  if (ent.table === 'events') data = prepEvent(db, data, null);
   const { own, addr, password } = splitData(ent, data, null);
   for (const [fk, parts] of Object.entries(addr)) { const id = upsertAddress(db, null, parts, userId); if (id) own[fk] = id; }
   if (ent.table === 'users' && password) own.password_hash = hashPassword(password);
@@ -183,12 +214,14 @@ export function createRow(db, ent, data, userId, ip = '') {
   const r = db.prepare(`INSERT INTO ${q(ent.table)} (${cols.map(q).join(',')}) VALUES (${cols.map(() => '?').join(',')})`).run(...Object.values(own));
   const id = Number(r.lastInsertRowid);
   audit(db, ent.table, id, 'create', null, { ...own, password_hash: undefined }, userId, ip);
+  if (ent.table === 'events') indexEvent(db, id);
   return id;
 }
 
 export function updateRow(db, ent, id, data, userId, ip = '') {
   const before = db.prepare(`SELECT * FROM ${q(ent.table)} WHERE id = ?`).get(Number(id));
   if (!before) return false;
+  if (ent.table === 'events') data = prepEvent(db, data, before);
   const { own, addr, password } = splitData(ent, data, before);
   for (const [fk, parts] of Object.entries(addr)) { const aid = upsertAddress(db, before[fk], parts, userId); if (aid) own[fk] = aid; }
   if (ent.table === 'users' && password) own.password_hash = hashPassword(password);
@@ -196,6 +229,7 @@ export function updateRow(db, ent, id, data, userId, ip = '') {
   const cols = Object.keys(own);
   db.prepare(`UPDATE ${q(ent.table)} SET ${cols.map((c) => `${q(c)} = ?`).join(', ')} WHERE id = ?`).run(...Object.values(own), Number(id));
   audit(db, ent.table, Number(id), 'update', { ...before, password_hash: undefined }, { ...own, password_hash: undefined }, userId, ip);
+  if (ent.table === 'events') indexEvent(db, id);
   return true;
 }
 
@@ -205,6 +239,7 @@ export function softDelete(db, ent, id, userId, ip = '') {
   if (!before || before.deleted_at) return false;
   db.prepare(`UPDATE ${q(ent.table)} SET deleted_at = ?, updated_at = ?, updated_by = ? WHERE id = ?`).run(now(), now(), userId || null, Number(id));
   audit(db, ent.table, Number(id), 'delete', { ...before, password_hash: undefined }, null, userId, ip);
+  if (ent.table === 'events') indexEvent(db, id);
   return true;
 }
 

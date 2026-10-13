@@ -347,3 +347,30 @@ test('a family can have only two parents', async () => {
   const home = await c.get(`/en/portal/families/${fid}`);
   assert.doesNotMatch(home.text, /add-parent/);
 });
+
+test('portal events: create / edit / delete show up on (and vanish from) the public website', async () => {
+  const sec = new Client(); await sec.login('demo.secretary');
+  assert.equal((await sec.get('/en/portal/events-calendar?month=2026-11')).status, 200);
+  const r = await sec.post('/en/portal/manage/events', { title_en: 'Portal Test Picnic', title_zh: '測試野餐', starts_at: '2026-11-14T10:30', ends_at: '', all_day: '', location: 'Park', category: 'meeting', published: '1', description_en: 'Bring food', description_zh: '', slug: '' });
+  assert.equal(r.status, 302, r.text.slice(0, 300));
+  const ev = one("SELECT * FROM events WHERE title_en = 'Portal Test Picnic'");
+  assert.ok(ev && ev.slug.startsWith('2026-11-14-portal-test-picnic') && ev.created_by);
+  const pub = new Client();
+  assert.match((await pub.get('/en/events')).text, /Portal Test Picnic/);
+  assert.match((await pub.get(`/en/events/${ev.slug}`)).text, /Bring food/);
+  assert.match((await sec.get('/en/portal/events-calendar?month=2026-11')).text, /Portal Test Picnic/);
+  // the form posts date + time inputs separately
+  const r2 = await sec.post('/en/portal/manage/events', { title_en: 'Split Inputs Event', starts_at_date: '2026-11-20', starts_at_time: '09:15', ends_at_date: '', ends_at_time: '', category: 'class', published: '1', slug: '' });
+  assert.equal(r2.status, 302);
+  assert.equal(one("SELECT starts_at FROM events WHERE title_en = 'Split Inputs Event'").starts_at, '2026-11-20 09:15');
+  // unpublish hides it from the public site but not from staff
+  await sec.post(`/en/portal/manage/events/${ev.id}`, { title_en: 'Portal Test Picnic', title_zh: '測試野餐', starts_at: '2026-11-14T10:30', location: 'Park', category: 'meeting', published: '', description_en: 'Bring food', slug: ev.slug });
+  assert.equal((await pub.get(`/en/events/${ev.slug}`)).status, 404);
+  assert.match((await sec.get('/en/portal/manage/events')).text, /Portal Test Picnic/);
+  await sec.post(`/en/portal/manage/events/${ev.id}/delete`, {});
+  assert.doesNotMatch((await sec.get('/en/portal/events-calendar?month=2026-11')).text, /Portal Test Picnic/);
+  // parents cannot manage events
+  const par = new Client(); await par.login('demo.parent01');
+  assert.equal((await par.get('/en/portal/manage/events')).status, 403);
+  assert.equal((await par.get('/en/portal/events-calendar')).status, 403);
+});

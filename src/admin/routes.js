@@ -186,7 +186,7 @@ export function registerAdminRoutes(app, { db }) {
   app.get('/admin/dashboard', (req, res) => {
     const counts = {
       announcements: db.prepare('SELECT COUNT(*) c FROM announcements').get().c,
-      events: db.prepare('SELECT COUNT(*) c FROM events').get().c,
+      events: db.prepare('SELECT COUNT(*) c FROM events WHERE deleted_at IS NULL').get().c,
       pages: db.prepare('SELECT COUNT(*) c FROM pages').get().c,
       programs: db.prepare('SELECT COUNT(*) c FROM programs').get().c,
       people: db.prepare('SELECT COUNT(*) c FROM people').get().c,
@@ -209,7 +209,7 @@ export function registerAdminRoutes(app, { db }) {
 
   // ---------- Generic list helper ----------
   function listRows(table, orderBy) {
-    return db.prepare(`SELECT * FROM ${table} ORDER BY ${orderBy}`).all();
+    return db.prepare(`SELECT * FROM ${table}${table === 'events' ? ' WHERE deleted_at IS NULL' : ''} ORDER BY ${orderBy}`).all();
   }
   function getRow(table, id) {
     return db.prepare(`SELECT * FROM ${table} WHERE id = ?`).get(id);

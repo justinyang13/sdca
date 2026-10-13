@@ -161,7 +161,7 @@ export function upcomingEvents(db, { limit = 5 } = {}) {
   const d = new Date();
   const today = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   return db.prepare(
-    'SELECT * FROM events WHERE published = 1 AND (all_day = 1 OR date(starts_at) >= ?) ORDER BY starts_at DESC LIMIT ?'
+    'SELECT * FROM events WHERE deleted_at IS NULL AND published = 1 AND (all_day = 1 OR date(starts_at) >= ?) ORDER BY starts_at DESC LIMIT ?'
   ).all(today, limit);
 }
 

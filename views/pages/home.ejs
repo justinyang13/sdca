@@ -58,6 +58,30 @@
       Object.values(x).forEach(walk);
     }
   })(__up);
+  // events table (managed in the portal) drives the upcoming list and the mini calendar
+  (function fromDb(){
+    const ev = (typeof calEvents !== 'undefined' && calEvents) ? calEvents : [];
+    if (!ev.length) return;
+    const day = function(e){ return String(e.starts_at).slice(0, 10); };
+    const endDay = function(e){ return String(e.ends_at || e.starts_at).slice(0, 10); };
+    const d0 = new Date(); const today = d0.getFullYear() + '-' + String(d0.getMonth() + 1).padStart(2, '0') + '-' + String(d0.getDate()).padStart(2, '0');
+    const byDay = new Map();
+    ev.filter(function(e){ return endDay(e) >= today; }).forEach(function(e){ const k = day(e) < today ? today : day(e); if (!byDay.has(k)) byDay.set(k, []); byDay.get(k).push(e); });
+    const lines = [...byDay.keys()].sort().slice(0, 6).map(function(k){
+      const a = byDay.get(k); const zh = a.map(function(e){ return e.title_zh || e.title_en; }).join('、'); const en = a.map(function(e){ return e.title_en || e.title_zh; }).join(', ');
+      return k.slice(5, 7) + '/' + k.slice(8, 10) + '/' + k.slice(0, 4) + ' ' + (L === 'zh' ? zh : en);
+    });
+    if (lines.length) (function put(x){
+      if (Array.isArray(x)) return x.forEach(put);
+      if (x && typeof x === 'object') { if (x.list && Array.isArray(x.list.items) && x.list.items.some(function(i){ return /^\s*\d{1,2}\/\d{1,2}\/\d{4}/.test(i); })) x.list.items = lines; Object.values(x).forEach(put); }
+    })(__up);
+    __events.length = 0;
+    ev.forEach(function(e){
+      const t = (L === 'zh' ? (e.title_zh || e.title_en) : (e.title_en || e.title_zh));
+      let d = new Date(day(e) + 'T00:00:00'); const end = new Date(endDay(e) + 'T00:00:00'); let n = 0;
+      for (; d <= end && n < 21; d.setDate(d.getDate() + 1), n++) __events.push({ date: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'), title: t });
+    });
+  })();
   const __fix = function(h){ return h.replace(/href="\/en\//g, 'href="/' + L + '/'); };
 %>
 <section class="section home-blocks" aria-label="<%= L === 'zh' ? '首頁內容' : 'Home page content' %>" data-page="home">

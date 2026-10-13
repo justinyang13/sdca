@@ -1,11 +1,13 @@
 <%
+  const ld = function(s){ s = String(s); return /^\d{4}-\d{2}-\d{2}$/.test(s) ? new Date(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10)) : new Date(s.replace(' ', 'T')); };   // date-only strings are local days (not UTC)
+
   // event-detail.ejs — single event with iCal export + location.
   // ctx: { ev, related, bodyHtml }
   const L = lang;
   const e = ev;
   const title = L === 'zh' ? (e.title_zh || e.title_en || '') : (e.title_en || e.title_zh || '');
   const desc = L === 'zh' ? (e.description_zh || e.description_en || '') : (e.description_en || e.description_zh || '');
-  const start = new Date(e.starts_at);
+  const start = ld(e.starts_at);
   const months = L === 'zh' ? ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
                             : ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const relatedArr = (typeof related !== 'undefined' && related) ? related : [];
@@ -39,7 +41,7 @@
     <div class="events-list">
       <% relatedArr.forEach(function(r) { %>
       <%- renderPart('partials/event-row.ejs', {
-        evDate: new Date(r.starts_at),
+        evDate: ld(r.starts_at),
         evTitle: L === 'zh' ? (r.title_zh || r.title_en) : (r.title_en || r.title_zh),
         evHref: `/${L}/events/${r.slug}`,
         evLocation: r.location || '',

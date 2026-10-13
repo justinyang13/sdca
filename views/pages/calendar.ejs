@@ -1,4 +1,6 @@
 <%
+  const ld = function(s){ s = String(s); return /^\d{4}-\d{2}-\d{2}$/.test(s) ? new Date(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10)) : new Date(s.replace(' ', 'T')); };   // date-only strings are local days (not UTC)
+
   // calendar.ejs — school-year PDFs + current-year event list.
   // ctx: { docs, events }
   const L = lang;
@@ -50,7 +52,7 @@
     <div class="events-list">
       <% eventsArr.forEach(function(e) { %>
       <%- renderPart('partials/event-row.ejs', {
-        evDate: new Date(e.starts_at),
+        evDate: ld(e.starts_at),
         evTitle: title(e),
         evHref: `/${L}/events/${e.slug}`,
         evLocation: e.location || '',

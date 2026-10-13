@@ -148,8 +148,10 @@ export function registerPublicRoutes(app, bridge) {
         + 'WHERE a.published = 1 ORDER BY a.published_at DESC LIMIT 5'
       ).all(),
       events: db.prepare(
-        'SELECT * FROM events WHERE published = 1 ORDER BY starts_at DESC LIMIT 5'
+        'SELECT * FROM events WHERE deleted_at IS NULL AND published = 1 ORDER BY starts_at DESC LIMIT 5'
       ).all(),
+      // home page: "Upcoming Event" list + mini calendar come from the same events the portal manages
+      calEvents: db.prepare('SELECT title_en, title_zh, starts_at, ends_at FROM events WHERE deleted_at IS NULL AND published = 1 ORDER BY starts_at, id').all(),
       programs: db.prepare('SELECT * FROM programs ORDER BY sort, name_en LIMIT 8').all(),
       sponsors: db.prepare('SELECT * FROM sponsors ORDER BY sort, name').all(),
       portalUrl: setting(db, 'registration_portal', lang),

@@ -28,11 +28,16 @@
       <input type="hidden" id="h_<%= fd.name %>" name="<%= fd.name %>" value="<%= val(fd.name) %>">
       <% } %>
       <% if (err) { %><span class="ferr"><%= err %></span><% } %></div></div>
+  <%   } else if (fd.type === 'datetime') { const dv = String(val(fd.name)).replace('T', ' '); %>
+    <div class="frow<%= err ? ' has-error' : '' %>"><label for="f_<%= fd.name %>_date"><%- fd.required ? '<span class="req">*</span> ' : '' %><%= ownLabel(fd) %></label><div class="fctl dt-pair">
+      <input type="date" id="f_<%= fd.name %>_date" name="<%= fd.name %>_date" value="<%= dv.slice(0, 10) %>"<%= dis %>>
+      <input type="time" id="f_<%= fd.name %>_time" name="<%= fd.name %>_time" value="<%= dv.length > 10 ? dv.slice(11, 16) : '' %>" data-time-for="<%= fd.name %>" aria-label="<%= b('Time', '時間') %>"<%= dis %>>
+      <% if (err) { %><span class="ferr"><%= err %></span><% } %></div></div>
   <%   } else {
          const opts = fd.type === 'select' ? fd.options.map(function(o){ return { v: o.v, label: one(o.en, o.zh) }; })
            : fd.type === 'yn' ? [{v:'Y',label:b('Yes','是')},{v:'N',label:b('No','否')}] : fd.type === 'gender' ? [{v:'M',label:b('Male','男')},{v:'F',label:b('Female','女')}] : null;
          const type = ['email','tel','number','date'].includes(fd.type) ? fd.type : fd.type === 'password' ? 'password' : fd.type === 'datetime' ? 'datetime-local' : fd.type === 'money' ? 'number' : 'text';
-         const v = fd.type === 'money' ? cents(fd.name) : fd.type === 'datetime' ? String(val(fd.name)).replace(' ', 'T').slice(0, 16) : val(fd.name);
+         const v = fd.type === 'money' ? cents(fd.name) : fd.type === 'datetime' ? (String(val(fd.name)).length === 10 ? val(fd.name) + 'T00:00' : String(val(fd.name)).replace(' ', 'T').slice(0, 16)) : val(fd.name);
          const attrs = (fd.type === 'money' ? 'step="0.01" ' : '') + (fd.step ? 'step="' + fd.step + '" ' : '') + (dis ? 'disabled' : '');
   %>
     <%- field({ label: ownLabel(fd), name: fd.name, type: fd.type === 'textarea' ? 'textarea' : type, value: v, options: opts, error: err, required: fd.required && fd.type !== 'password', attrs: attrs, help: fd.type === 'money' ? b('dollars', '美元') : '' }) %>

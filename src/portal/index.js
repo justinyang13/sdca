@@ -11,6 +11,7 @@ import { registerFinanceRoutes } from './r-finance.js';
 import { registerVolunteerRoutes } from './r-volunteer.js';
 import { registerStaffRoutes } from './r-staff.js';
 import { registerHubRoutes } from './r-hubs.js';
+import { registerEventRoutes } from './r-events.js';
 
 export function registerPortalRoutes(app, { db, makeRenderPart, renderShell, t }) {
   const page = makeRenderer({ makeRenderPart, renderShell, t, db });
@@ -37,5 +38,6 @@ export function registerPortalRoutes(app, { db, makeRenderPart, renderShell, t }
   registerVolunteerRoutes(app, deps);
   registerStaffRoutes(app, deps);
   registerHubRoutes(app, deps);
+  registerEventRoutes(app, deps);
   registerManageRoutes(app, deps);   // last: its /manage/:entity/:id patterns are the most generic
 }

@@ -16,10 +16,10 @@ export const ROLE_DEFS = [
   { code: 'principal', en: 'Principal', zh: '校長', staff: 1, sort: 2, type: 'staff', desc: 'Oversees classes, staff, rosters and reports.', grants: [
     ...S('portal.staff', 'dashboard.principal', 'reports.class_roster'),
     ...['persons', 'families', 'enrollments', 'classes', 'registrations', 'volunteer_signups', 'student_school_info', 'credit_grades', 'transactions', 'withdrawals'].flatMap((p) => E(p, READ)),
-    ...E('assignments', CRUD), ...E('student_list', READ), ...E('volunteer_list', READ), ...SETUP_READ] },
+    ...E('assignments', CRUD), ...E('events', CRUD), ...E('student_list', READ), ...E('volunteer_list', READ), ...SETUP_READ] },
   { code: 'secretary', en: 'Secretary / Registrar', zh: '秘書/註冊組', staff: 1, sort: 3, type: 'staff', desc: 'Registration desk: people, families, enrollments, payments, exports.', grants: [
     ...S('portal.staff', 'dashboard.secretary', 'finance.record_payment', 'placement.assign', 'withdrawal.process', 'reports.class_roster'),
-    ...['persons', 'families', 'family_members', 'parent_students', 'enrollments', 'student_school_info', 'assignments', 'volunteer_signups', 'withdrawals'].flatMap((p) => E(p, CRUD)),
+    ...['persons', 'families', 'family_members', 'parent_students', 'enrollments', 'student_school_info', 'assignments', 'volunteer_signups', 'withdrawals', 'events'].flatMap((p) => E(p, CRUD)),
     ...['registrations', 'transactions', 'classes', 'credit_grades', 'users', 'student_list', 'volunteer_list'].flatMap((p) => E(p, READ)), ...E('registrations', ['update']), ...SETUP_READ] },
   { code: 'accountant', en: 'Accountant / Treasurer', zh: '財務', staff: 1, sort: 4, type: 'staff', desc: 'Payments, fees and receipts.', grants: [
     ...S('portal.staff', 'dashboard.finance', 'finance.record_payment', 'finance.void', 'fees.configure'),
@@ -28,7 +28,7 @@ export const ROLE_DEFS = [
   { code: 'teacher', en: 'Teacher / Instructor', zh: '老師', staff: 1, sort: 5, type: 'staff', desc: 'Sees the class list of own classes; enters credit grades.', grants: [
     ...own('class.view_own', 'own_classes'), ...own('grades.enter_own_classes', 'own_classes'), ...S('portal.staff')] },
   { code: 'pta_coordinator', en: 'PTA / Volunteer Coordinator', zh: '家長會義工組', staff: 1, sort: 6, type: 'staff', desc: 'Volunteer jobs, sign-ups and the volunteer list.', grants: [
-    ...S('portal.staff', 'dashboard.pta'), ...E('volunteer_jobs', CRUD), ...E('volunteer_signups', CRUD), ...E('volunteer_list', READ),
+    ...S('portal.staff', 'dashboard.pta'), ...E('volunteer_jobs', CRUD), ...E('volunteer_signups', CRUD), ...E('volunteer_list', READ), ...E('events', READ),
     ...E('persons', ['list', 'view']), ...E('families', ['list', 'view']), ...E('school_years', READ)] },
   { code: 'room_parent', en: 'Room Parent', zh: '班媽/班爸', staff: 0, sort: 7, type: 'room_parent', desc: 'A parent who also helps a classroom.', grants: [...own('class.view_own', 'own_classes')] },
   { code: 'parent', en: 'Parent', zh: '家長', staff: 0, sort: 8, type: 'parent', desc: 'Manages own family, registers children, volunteers, sees payments.', grants: [

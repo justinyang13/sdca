@@ -30,7 +30,7 @@ function rebuildSearch(db) {
   for (const r of db.prepare('SELECT slug, title_en, title_zh, body_en, body_zh FROM announcements').all()) {
     ins.run('announcement', r.slug, r.title_en, r.title_zh, r.body_en, r.body_zh);
   }
-  for (const r of db.prepare('SELECT slug, title_en, title_zh, description_en, description_zh FROM events').all()) {
+  for (const r of db.prepare('SELECT slug, title_en, title_zh, description_en, description_zh FROM events WHERE deleted_at IS NULL AND published = 1').all()) {
     ins.run('event', r.slug, r.title_en, r.title_zh, r.description_en, r.description_zh);
   }
   const n = db.prepare('SELECT count(*) n FROM search_index').get().n;

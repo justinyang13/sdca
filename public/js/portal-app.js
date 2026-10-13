@@ -73,3 +73,9 @@ document.querySelectorAll('form[data-instant-filters]').forEach((f) => {
   f.querySelectorAll('select').forEach((sel) => sel.addEventListener('change', () => f.submit()));
   f.querySelectorAll('input[type=search], input[type=text]').forEach((i) => i.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); f.submit(); } }));
 });
+
+// all-day events: the time inputs are not needed
+document.querySelectorAll('input[name=all_day][type=checkbox]').forEach((cb) => {
+  const sync = () => document.querySelectorAll('input[data-time-for]').forEach((t) => { t.disabled = cb.checked; if (cb.checked) t.value = ''; });
+  cb.addEventListener('change', sync); sync();
+});

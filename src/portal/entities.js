@@ -4,6 +4,7 @@
 //
 // field.type: text | textarea | email | tel | number | money (stored in cents, typed in dollars) | date | datetime
 //             | bool | yn | gender | select | ref (foreign key) | password (users only) | readonly
+// field.trunc: max column width in px in list tables (long text is cut with "…", full text on hover and in the row details)
 // field.addr: { fk: '<column on this table pointing at addresses.id>', col: 'street|city|state|zipcode' }  (virtual field)
 
 const L = (en, zh) => ({ en, zh });
@@ -17,6 +18,8 @@ export const LANGUAGES = ['Mandarin', 'English', 'Cantonese', 'Japanese', 'Korea
 const STATES = ['CA', 'AZ', 'NV', 'OR', 'WA', 'TX', 'NY', 'Other'].map((v) => ({ v, en: v, zh: v }));
 
 const PERSON_LABEL = "r.english_last_name || ', ' || r.english_first_name || CASE WHEN r.chinese_name <> '' THEN ' ' || r.chinese_name ELSE '' END";
+
+export const EVENT_CATEGORIES = opts(['class', 'Class', '上課'], ['exam', 'Exam', '考試'], ['contest', 'Contest', '比賽'], ['meeting', 'Meeting', '會議'], ['deadline', 'Deadline', '截止日'], ['holiday', 'Holiday / No school', '放假'], ['performance', 'Performance', '表演'], ['other', 'Other', '其他']);
 
 export const ENTITIES = {
   persons: {
@@ -58,6 +61,25 @@ export const ENTITIES = {
     ],
     listOrder: ['english_last_name', 'english_first_name', 'chinese_name', 'class_code', 'textbook', 'gender', 'birth_date', 'allergy', 'special_medical_needs', 'id', 'username'],
     detail: '/portal/people/:id',
+  },
+  events: {
+    table: 'events', perm: 'events', group: 'setup',
+    label: L('Events', '活動'), singular: L('Event', '活動'), defaultSort: 'starts_at', defaultDir: 'desc',
+    defaultCols: ['title_en', 'title_zh', 'starts_at', 'ends_at', 'category', 'published'],
+    note: L('Events marked "On website" appear on the public events page, calendar and home page.', '活動會顯示在公開網站的活動頁、行事曆與首頁。'),
+    fields: [
+      f('title_en', 'Title (EN)', '標題 (英文)', 'text', { required: true, list: true, search: true, trunc: 260 }),
+      f('title_zh', 'Title (中文)', '標題 (中文)', 'text', { list: true, search: true, trunc: 180 }),
+      f('starts_at', 'Starts', '開始', 'datetime', { required: true, list: true }),
+      f('ends_at', 'Ends', '結束', 'datetime', { list: true }),
+      f('all_day', 'All day', '全天', 'bool', { list: true, filter: true }),
+      f('location', 'Location', '地點', 'text', { list: true, search: true, trunc: 160 }),
+      f('category', 'Category', '類別', 'select', { list: true, filter: true, options: EVENT_CATEGORIES }),
+      f('description_en', 'Description (EN)', '說明 (英文)', 'textarea'),
+      f('description_zh', 'Description (中文)', '說明 (中文)', 'textarea'),
+      f('published', 'On website', '顯示於網站', 'bool', { list: true, filter: true }),
+      f('slug', 'Web address name (auto if empty)', '網址代稱 (空白則自動產生)', 'text'),
+    ],
   },
   families: {
     table: 'families', perm: 'families', group: 'people',
