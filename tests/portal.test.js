@@ -392,3 +392,36 @@ test('idle timeout: session lasts 30 minutes from the last request; ping renews 
   c.c.sdca_timedout = '1';
   assert.match((await c.get('/en/portal/signin')).text, /inactivity/);
 });
+
+test('public pages: portal buttons sign the portal user out first; footer shows Portal Logout only when signed in', async () => {
+  const c = new Client(); await c.login('demo.parent01');
+  // signed in: footer has the logout button, and the public buttons carry ?logout=1 (but not the footer sign-in button)
+  const home = (await c.get('/en/')).text;
+  assert.match(home, /Portal Sign Out/);
+  assert.match(home, /class="footer-portal" href="\/en\/portal\/signin"/);       // the footer sign-in button is left alone
+  const { markPortalButtons } = await import('../src/portal/public-links.js');
+  const out0 = markPortalButtons('<a class="btn" href="/en/portal/signin">A</a> <a href="/zh/portal/register">B</a> <a class="footer-portal" href="/en/portal/signin">C</a> <a href="/en/portal/forgot-password">D</a> <a href="/en/enroll">E</a>');
+  assert.equal(out0, '<a class="btn" href="/en/portal/signin?logout=1">A</a> <a href="/zh/portal/register?logout=1">B</a> <a class="footer-portal" href="/en/portal/signin">C</a> <a href="/en/portal/forgot-password">D</a> <a href="/en/enroll">E</a>');
+  // anonymous: no logout button
+  assert.doesNotMatch((await new Client().get('/en/enroll')).text, /Portal Sign Out/);
+  // clicking the returning-student button ends the session and shows the sign-in form with a notice
+  const hit = await c.get('/en/portal/signin?logout=1');
+  assert.equal(hit.status, 302); assert.equal(hit.loc, '/en/portal/signin');
+  const form = await c.get('/en/portal/signin');
+  assert.equal(form.status, 200); assert.match(form.text, /signed out of the portal/);
+  assert.equal((await c.get('/en/portal/manage/persons')).status, 302);          // really signed out
+  // footer logout returns to the public page, and only same-site paths are honoured
+  const d = new Client(); await d.login('demo.parent01');
+  const out = await d.get('/en/portal/signin?logout=1&next=%2Fen%2Fenroll');
+  assert.equal(out.loc, '/en/enroll');
+  const e = new Client(); await e.login('demo.parent01');
+  assert.equal((await e.get('/en/portal/signin?logout=1&next=https%3A%2F%2Fevil.example%2F')).loc, '/en/portal/signin');
+  assert.equal((await e.get('/en/portal/signin?logout=1&next=%2F%2Fevil.example')).loc, '/en/portal/signin');
+  // new-family sign-up page does the same
+  const f = new Client(); await f.login('demo.parent01');
+  assert.equal((await f.get('/en/portal/register?logout=1')).loc, '/en/portal/register');
+  assert.equal((await f.get('/en/portal/manage/persons')).status, 302);
+  // portal pages themselves are not rewritten
+  const g = new Client(); await g.login('demo.parent01');
+  assert.doesNotMatch((await g.get("/en/portal")).text, /href="\/en\/portal\/(signin|register)\?logout=1"/);
+});

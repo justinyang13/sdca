@@ -22,6 +22,21 @@ export function registerPortalRoutes(app, { db, makeRenderPart, renderShell, t }
   app.use('/:lang/portal', portalSession(db));
   app.use('/:lang/portal', (req, res, next) => { ensureCsrf(req, res); next(); });
 
+  // Public-page buttons (and the footer "Portal Logout") arrive with ?logout=1: end the portal session first, then show the
+  // page clean (or go back to the public page in `next`). A short notice is shown on the sign-in / sign-up page.
+  app.use('/:lang/portal', (req, res, next) => {
+    if (req.method !== 'GET' || req.query.logout !== '1' || !['/signin', '/register'].includes(req.path)) return next();
+    const lang = req.params.lang;
+    const back = /^\/(en|zh)(\/[A-Za-z0-9_\-.\/]*)?$/.test(String(req.query.next || '')) ? String(req.query.next) : `/${lang}/portal${req.path}`;
+    const wasIn = !!req.session?.portalUserId;
+    const finish = () => {
+      res.clearCookie('sdca_sid', { path: '/' });
+      if (wasIn && back.includes('/portal/')) res.cookie('sdca_loggedout', '1', { path: '/', maxAge: 60000, sameSite: 'Lax', httpOnly: true });
+      res.redirect(302, back);
+    };
+    if (req.session) req.session.destroy(finish); else finish();
+  });
+
   const requireLogin = (req, res, next) => {
     if (req.portal) return next();
     if (req.method !== 'GET') return res.redirect(`/${req.params.lang}/portal/signin`);

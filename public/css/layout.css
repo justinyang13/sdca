@@ -450,3 +450,5 @@ html[lang="en"] .brand-en { color: var(--gray-500); }
 .hero-carousel-slide.is-intro .hero-carousel-media { z-index: 0; }
 .hero-carousel-slide.is-intro .hero-intro { position: relative; z-index: 1; }
 .hero-carousel:has(.is-intro.is-current) { background: #fffaf2; }
+.footer-portal + .footer-portal { display: flex; width: max-content; margin-top: 10px; background: transparent; border: 1px solid rgba(255, 255, 255, .6); }
+.footer-portal + .footer-portal:hover { background: rgba(255, 255, 255, .14); }

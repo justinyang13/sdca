@@ -1,6 +1,7 @@
 // src/app.js — Express app factory
 import express from 'express';
 import path from 'node:path';
+import { AsyncLocalStorage } from 'node:async_hooks';
 import fs from 'node:fs';
 import ejs from 'ejs';
 import { config } from './config.js';
@@ -14,6 +15,7 @@ import { registerPublicRoutes } from './routes-public.js';
 import { registerPhase5Routes } from './routes-phase5.js';
 import { registerAdminRoutes } from './admin/routes.js';
 import { registerPortalRoutes } from './portal/index.js';
+import { markPortalButtons } from './portal/public-links.js';
 import { lookupRedirect } from './redirects.js';
 import { portedCtx } from './ported.js';
 import { buildSitemap } from './sitemap.js';
@@ -29,6 +31,9 @@ function renderError(app, res, status, lang, opts = {}) {
     message: opts.message,
   });
 }
+
+// per-request flags the shared header/footer partials need (is a portal user signed in?)
+const requestFlags = new AsyncLocalStorage();
 
 export function createApp({ db = openDb() } = {}) {
   const app = express();
@@ -50,7 +55,7 @@ export function createApp({ db = openDb() } = {}) {
       // Block renderer partials (views/blocks/*.ejs) get the DP text helpers as L.h.
       const L = locals || {};
       if (file.startsWith('blocks/')) L.h = blockHelpers;
-      return ejs.render(src, { lang, langPath: L.langPath, t: tFn, renderPart, L, imageManifest, assetUrl });
+      return ejs.render(src, { lang, langPath: L.langPath, portalIn: L.portalIn, t: tFn, renderPart, L, imageManifest, assetUrl });
     }
     return renderPart;
   }
@@ -58,7 +63,7 @@ export function createApp({ db = openDb() } = {}) {
   // Helper for pages: pre-render header + footer partials for the layout.
   function renderShell(lang, locals) {
     const rp = makeRenderPart(lang);
-    const ctx = { langPath: (locals && locals.langPath) || '/' };
+    const ctx = { langPath: (locals && locals.langPath) || '/', portalIn: !!requestFlags.getStore()?.portalIn };
     return {
       header: rp('partials/header.ejs', ctx),
       footer: rp('partials/footer.ejs', ctx),
@@ -90,6 +95,24 @@ export function createApp({ db = openDb() } = {}) {
   app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
   applyBaseMiddleware(app);
+
+  // Public pages: remember whether a portal user is signed in (footer shows "Portal Logout"), and make every
+  // public button that goes to the portal sign-in / new-family pages sign the current portal user out first
+  // (adds ?logout=1) so nobody lands in the wrong account. Not applied inside the portal itself or in the static build.
+  app.use((req, res, next) => {
+    const portalIn = !!req.session?.portalUserId;
+    const inPortal = /^\/(en|zh)\/portal(\/|$)/.test(req.path);
+    if (!inPortal && req.get('x-static-build') !== '1') {
+      const send = res.send;
+      res.send = function (body) {
+        if (typeof body === 'string' && /text\/html/.test(String(res.get('Content-Type') || 'text/html'))) {
+          body = markPortalButtons(body);
+        }
+        return send.call(this, body);
+      };
+    }
+    requestFlags.run({ portalIn }, next);
+  });
 
   app.use(express.static(config.publicDir, { maxAge: '1h', etag: true }));
 

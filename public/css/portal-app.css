@@ -230,3 +230,9 @@ a.pcal-day:hover { background: var(--blue, #210488); color: #fff; }
 
 /* idle sign-out warning */
 .idle-banner { position: fixed; z-index: 1000; left: 50%; bottom: 24px; transform: translateX(-50%); display: flex; gap: 14px; align-items: center; flex-wrap: wrap; justify-content: center; max-width: calc(100vw - 32px); padding: 14px 18px; background: #fff; border: 2px solid var(--blue, #210488); border-radius: 12px; box-shadow: 0 12px 34px rgba(16, 24, 40, .28); font-weight: 600; }
+
+/* announcement PDFs rendered on the page */
+.pdf-embed iframe { display: block; width: 100%; height: max(88vh, 760px); min-height: 520px; border: 1px solid var(--gray-200, #e5e7eb); border-radius: 12px; background: #f3f4f6; }
+.pdf-embed-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 12px 0 0; }
+
+.container-pdf { max-width: min(1560px, 96vw); }

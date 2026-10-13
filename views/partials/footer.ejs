@@ -15,6 +15,12 @@
         <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style="margin-right:6px" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 8h8M8 4l4 4-4 4"/><rect x="10" y="3" width="4" height="10" rx="1"/></svg>
         <%= t('footer.portal') %>
       </a>
+      <% if (typeof portalIn !== 'undefined' && portalIn) { %>
+      <a class="footer-portal footer-portal-out" href="/<%= L %>/portal/signin?logout=1&next=<%= encodeURIComponent('/' + L + ((typeof langPath !== 'undefined' && langPath && langPath !== '/') ? langPath : '/')) %>">
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style="margin-right:6px" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 8H2M4 4L0 8l4 4" transform="translate(2 0)"/><rect x="2" y="3" width="4" height="10" rx="1" transform="translate(8 0)"/></svg>
+        <%= L === 'zh' ? '登出入口網站' : 'Portal Sign Out' %>
+      </a>
+      <% } %>
     </div>
 
     <div class="footer-col">

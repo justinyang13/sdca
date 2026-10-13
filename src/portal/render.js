@@ -106,7 +106,8 @@ export function makeRenderer({ makeRenderPart, renderShell, t, db }) {
     const lang = req.params.lang || req.lang || 'en';
     const tFn = (k) => t(lang, k);
     const csrf = ensureCsrf(req, res);
-    const flash = req.session?.portalFlash || null;
+    let flash = req.session?.portalFlash || null;
+    if (!flash && req.cookies?.sdca_loggedout) { flash = { type: 'ok', msg: lang === 'zh' ? '您已登出入口網站。' : 'You have been signed out of the portal.' }; res.clearCookie('sdca_loggedout', { path: '/' }); }
     if (req.session?.portalFlash) delete req.session.portalFlash;
     const b = (en, zh) => (lang === 'zh' ? zh || en : en);
     const one = (en, zh) => (lang === 'zh' ? zh || en : en);

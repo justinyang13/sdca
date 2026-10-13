@@ -5,6 +5,7 @@
   const a = ann;
   const title = L === 'zh' ? (a.title_zh || a.title_en || '') : (a.title_en || a.title_zh || '');
   const summary = L === 'zh' ? (a.summary_zh || a.summary_en || '') : (a.summary_en || a.summary_zh || '');
+  const hasPdf = !!(doc && /\.pdf$/i.test(doc.file_path || ''));
   const relatedArr = (typeof related !== 'undefined' && related) ? related : [];
   const dateFmt = (iso) => {
     if (!iso) return '';
@@ -21,7 +22,7 @@
 }) %>
 
 <section class="section" aria-labelledby="ann-h">
-  <div class="container container-narrow">
+  <div class="container<%= hasPdf ? ' container-pdf' : ' container-narrow' %>">
     <div class="detail-meta">
       <span class="chip <%= { weekly: 'chip-weekly', news: 'chip-news', press: 'chip-press', notice: 'chip-notice' }[a.kind] || '' %>">
         <%= t('tabs.' + a.kind) %>
@@ -29,11 +30,23 @@
       <time datetime="<%= a.published_at %>"><%= dateFmt(a.published_at) %></time>
     </div>
 
+    <% if (!hasPdf) { %>
     <div class="detail-body markdown">
       <%- bodyHtml %><% if (!bodyHtml) { %><p><%= L === 'zh' ? '（無內容）' : '(No content.)' %></p><% } %>
     </div>
+    <% } %>
 
-    <% if (doc) { %>
+    <% if (doc) { const isPdf = /\.pdf$/i.test(doc.file_path || ''); const dTitle = L === 'zh' ? (doc.title_zh || doc.title_en) : (doc.title_en || doc.title_zh); %>
+    <% if (isPdf) { %>
+    <section class="pdf-embed" aria-label="<%= dTitle %>">
+      <iframe src="/pdf/<%= doc.slug %>#view=FitH&navpanes=0" title="<%= dTitle %>" loading="lazy"></iframe>
+      <p class="pdf-embed-actions">
+        <a class="btn btn-primary" href="/pdf/<%= doc.slug %>" target="_blank" rel="noopener"><%= L === 'zh' ? '在新分頁開啟 PDF' : 'Open PDF in a new tab' %></a>
+        <a class="btn btn-ghost" href="/pdf/<%= doc.slug %>/download"><%= L === 'zh' ? '下載 PDF' : 'Download PDF' %></a>
+        <span class="muted"><%= dTitle %> · <%= Math.max(1, Math.round(doc.bytes / 1024)) %> KB</span>
+      </p>
+    </section>
+    <% } else { %>
     <aside class="doc-card" aria-label="<%= t('news.pdf') %>">
       <div class="doc-card-icon" aria-hidden="true">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
@@ -41,14 +54,12 @@
         </svg>
       </div>
       <div class="doc-card-body">
-        <div class="doc-card-title"><%= L === 'zh' ? (doc.title_zh || doc.title_en) : (doc.title_en || doc.title_zh) %></div>
-        <div class="doc-card-meta">PDF · <%= Math.max(1, Math.round(doc.bytes / 1024)) %> KB</div>
+        <div class="doc-card-title"><%= dTitle %></div>
+        <div class="doc-card-meta"><%= Math.max(1, Math.round(doc.bytes / 1024)) %> KB</div>
       </div>
-      <a class="btn btn-primary" href="/pdf/<%= doc.slug %>" target="_blank" rel="noopener">
-        <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 11L11 4M6 4h5v5M4 8v5h6"/></svg>
-        <%= t('news.pdf') %>
-      </a>
+      <a class="btn btn-primary" href="/pdf/<%= doc.slug %>/download"><%= L === 'zh' ? '下載' : 'Download' %></a>
     </aside>
+    <% } %>
     <% } else if (a.external_url) { %>
     <a class="btn btn-primary" href="<%= a.external_url %>" target="_blank" rel="noopener"><%= t('button.learn_more') %></a>
     <% } else { %>
