@@ -54,7 +54,7 @@
       <a class="btn btn-primary" href="/pdf/<%= doc.slug %>/download"><%= L === 'zh' ? '下載' : 'Download' %></a>
     </aside>
     <% } %>
-    <% } else if (a.external_url) { %>
+    <% } else if (a.external_url && /^(https?:\/\/|mailto:|tel:|\/(?!\/))/i.test(a.external_url)) { %>
     <a class="btn btn-primary" href="<%= a.external_url %>" target="_blank" rel="noopener"><%= t('button.learn_more') %></a>
     <% } else { %>
     <p class="doc-missing"><%= t('news.no_doc') %></p>

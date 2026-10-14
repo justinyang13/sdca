@@ -1,4 +1,6 @@
 // src/config.js — central configuration from env
+import fs from 'node:fs';
+import crypto from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -8,6 +10,16 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 // mean school time whatever the host's own zone is (see src/datetime.js and ARCHITECTURE.md → Dates and times).
 export const SCHOOL_TZ = process.env.SCHOOL_TZ || 'America/Los_Angeles';
 process.env.TZ = SCHOOL_TZ;
+
+/** Session-signing secret: SESSION_SECRET if set, else a random one created once and kept in data/.session-secret (never the repo's default). */
+function loadSessionSecret(dataDir) {
+  if (process.env.SESSION_SECRET) return process.env.SESSION_SECRET;
+  const file = path.join(dataDir, '.session-secret');
+  try { const v = fs.readFileSync(file, 'utf8').trim(); if (v.length >= 32) return v; } catch { /* first run */ }
+  const v = crypto.randomBytes(48).toString('hex');
+  try { fs.mkdirSync(dataDir, { recursive: true }); fs.writeFileSync(file, v, { mode: 0o600 }); } catch { /* read-only disk: fall back to a per-process secret */ }
+  return v;
+}
 
 export const config = {
   env: process.env.NODE_ENV || 'development',
@@ -29,7 +41,7 @@ export const config = {
   viewsDir: path.join(root, 'views'),
   storageDir: path.join(root, 'storage'),
   logDir: path.join(root, 'logs'),
-  sessionSecret: process.env.SESSION_SECRET || 'sdca-dev-secret-change-me',
+  sessionSecret: loadSessionSecret(process.env.DATA_DIR || path.join(root, 'data')),
   baseLangs: ['en', 'zh'],
   defaultLang: 'en',
 };

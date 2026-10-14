@@ -22,7 +22,7 @@
     }
     return /^\//.test(name) ? { src: name, srcset: '', w: null, h: null } : null;
   };
-  const href = (u) => (!u ? '' : (/^\/(en|zh)(\/|$)/.test(u) || !/^\//.test(u)) ? u : '/' + lang + u);
+  const href = (u) => (!u ? '' : !/^(\/(?!\/)|https?:\/\/|mailto:|tel:)/i.test(u) ? '#' : (/^\/(en|zh)(\/|$)/.test(u) || !/^\//.test(u)) ? u : '/' + lang + u);
   const pickT = (s) => (lang === 'zh' ? (s.caption_zh || s.caption_en || '') : (s.caption_en || s.caption_zh || ''));
   const pickD = (s) => (lang === 'zh' ? (s.html_zh || s.html_en || '') : (s.html_en || s.html_zh || ''));
   const label = (s, n, fallbackEn, fallbackZh) => (n === 2

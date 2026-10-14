@@ -14,11 +14,6 @@ const ALLOWED_MIME = new Set([
 ]);
 const MAX_BYTES = 25 * 1024 * 1024;
 
-export function safeName(original) {
-  const base = path.basename(String(original || '')).replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 200);
-  return base;
-}
-
 function extOf(name) {
   const i = String(name || '').lastIndexOf('.');
   return i < 0 ? '' : String(name).slice(i).toLowerCase();

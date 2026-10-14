@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { makeClient } from './support/client.js';
 
 let dir, base, server, db, creds;
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
@@ -29,25 +30,7 @@ before(async () => {
 });
 after(() => { server?.close(); db?.close(); fs.rmSync(dir, { recursive: true, force: true }); });
 
-class Client {
-  constructor() { this.c = {}; }
-  absorb(res) { for (const h of res.headers.getSetCookie?.() || []) { const [kv] = h.split(';'); const i = kv.indexOf('='); this.c[kv.slice(0, i)] = kv.slice(i + 1); } }
-  get cookie() { return Object.entries(this.c).map(([k, v]) => `${k}=${v}`).join('; '); }
-  async req(method, p, form) {
-    const headers = { cookie: this.cookie }; let body;
-    if (form) { headers['content-type'] = 'application/x-www-form-urlencoded'; body = (form instanceof URLSearchParams ? form : new URLSearchParams(form)).toString(); }
-    const res = await fetch(base + p, { method, headers, body, redirect: 'manual' });
-    this.absorb(res);
-    return { status: res.status, loc: res.headers.get('location'), text: await res.text() };
-  }
-  get(p) { return this.req('GET', p); }
-  async post(p, form) {
-    if (!this.c.sdca_csrf) await this.get('/en/portal/signin');
-    const f = form instanceof URLSearchParams ? form : new URLSearchParams(form); f.set('_csrf', this.c.sdca_csrf);
-    return this.req('POST', p, f);
-  }
-  async login(user) { await this.get('/en/portal/signin'); const r = await this.post('/en/portal/signin', { username: user, password: creds[user] }); assert.equal(r.status, 302, `login ${user}`); return this; }
-}
+const Client = makeClient({ base: () => base, creds: () => creds });
 
 
 const as = async (u) => new Client().login(u);
@@ -139,4 +122,29 @@ test('admin dashboard has the school overview (tiles A-Z, charts) plus its setup
   for (const h of ['Enrollment by class', 'Students by school year', 'Registration status', 'Volunteer jobs', 'Set up the school', 'Recent activity']) assert.match(t, new RegExp(`<h2>${h.replace(/[()]/g, '\\$&')}`), h);
   assert.ok(t.indexOf('School overview') < t.indexOf('Admin dashboard'));
   assert.equal((t.match(/class="stat-grid"/g) || []).length, 1, 'no second tile grid');
+});
+
+// ---- security regressions
+test('security: admin sign-in only redirects to /admin paths (no open redirect)', async () => {
+  const { safeNext } = await import('../src/admin/routes.js');
+  for (const bad of ['https://evil.example/', '//evil.example', '/\\evil.example', 'javascript:alert(1)', '/en/portal', '/admin/../x@y', undefined, '']) assert.equal(safeNext(bad), '/admin/dashboard', String(bad));
+  assert.equal(safeNext('/admin/inbox'), '/admin/inbox');
+});
+test('security: the session secret is never the old repo default and is at least 32 characters', async () => {
+  const { config } = await import('../src/config.js');
+  assert.ok(config.sessionSecret.length >= 32); assert.doesNotMatch(config.sessionSecret, /change-me|sdca-dev/);
+});
+test('security: contact form is rate limited and its fields are length capped', async () => {
+  const body = (n) => new URLSearchParams({ name: 'Pat Chen', email: 'pat@example.com', topic: 'general', message: 'x'.repeat(9000) + n });
+  let last;
+  for (let i = 0; i < 8; i++) last = await fetch(`${base}/en/contact`, { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: body(i) });
+  assert.equal(last.status, 429, 'after the hourly cap');
+  const row = db.prepare('SELECT length(message) n FROM contact_messages ORDER BY id DESC LIMIT 1').get();
+  assert.ok(!row || row.n <= 5000);
+});
+test('security: portal pages set no-leak headers and the sign-in cookie is HttpOnly', async () => {
+  const r = await fetch(`${base}/en/portal/signin`);
+  assert.equal(r.headers.get('x-content-type-options'), 'nosniff'); assert.match(r.headers.get('content-security-policy'), /script-src 'self'/); assert.match(r.headers.get('content-security-policy'), /object-src 'none'/);
+  for (const c of r.headers.getSetCookie()) assert.match(c, /HttpOnly/i);
+  assert.equal(r.headers.get('x-powered-by'), null);
 });

@@ -20,17 +20,6 @@ export function detectLang(req) {
   return 'en';
 }
 
-/** Map the current path to its equivalent in the other language. */
-export function otherLangPath(req, lang) {
-  const current = req.path;
-  const m = current.match(LANG_REGEX);
-  if (m) {
-    return current.replace(`^/${m[1]}`, `/${lang}`);
-  }
-  // no prefix: keep path, add prefix
-  return `/${lang}${current === '/' ? '' : current}` + (req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : '');
-}
-
 /**
  * Middleware: attach req.lang, req.langPath (path without the /en|/zh prefix).
  * For requests to the bare root `/`, 302 to /en/ or /zh/ (cookie → Accept-Language).

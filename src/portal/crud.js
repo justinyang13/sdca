@@ -6,7 +6,6 @@ import { syncBoardRoles } from './board.js';
 
 const now = () => nowUtc();
 const q = (s) => `"${String(s).replace(/"/g, '')}"`;       // identifier quoting (names come from our own definitions)
-export const getEntity = (key) => ENTITIES[key] || null;
 const isAddr = (fd) => !!fd.addr;
 const isVirtual = (fd) => !!fd.virtual;
 
@@ -124,6 +123,9 @@ export function coerce(fd, raw) {
   }
 }
 
+/** Links staff may enter: a site path, http(s), mailto or tel (never javascript: / data:). */
+export const SAFE_URL = /^(\/(?!\/)|https?:\/\/|mailto:|tel:)/i;
+
 export function validate(ent, data, { creating = false } = {}) {
   const errors = {};
   for (const fd of ent.fields) {
@@ -133,6 +135,7 @@ export function validate(ent, data, { creating = false } = {}) {
       if (v === null || v === undefined || v === '') errors[fd.name] = 'required';
     }
     if (fd.type === 'email' && data[fd.name] && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(data[fd.name])) errors[fd.name] = 'invalid email';
+    if (/(^|_)url$/.test(fd.name) && data[fd.name] && !SAFE_URL.test(String(data[fd.name]).trim())) errors[fd.name] = 'use a page path like /about or a full https:// address';
     if (fd.type === 'number' && data[fd.name] !== null && data[fd.name] !== undefined && data[fd.name] !== '' && !Number.isFinite(data[fd.name])) errors[fd.name] = 'must be a number';
   }
   if (creating && ent.table === 'users' && !data.password) errors.password = 'required';
@@ -310,6 +313,7 @@ export function refLabel(db, refKey, id) {
 }
 
 export function csvEscape(v) {
-  const s = String(v ?? '');
+  let s = String(v ?? '');
+  if (/^[=+\-@\t\r]/.test(s) && !/^[+-]?\d+(\.\d+)?$/.test(s)) s = `'${s}`;   // spreadsheet formula injection: Excel / Sheets would run =HYPERLINK(...) etc.
   return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }

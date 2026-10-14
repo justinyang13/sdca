@@ -1,6 +1,5 @@
 // src/helpers.js — shared render/query helpers for public pages
 import fs from 'node:fs';
-import { todayLocal } from './datetime.js';
 import path from 'node:path';
 import { marked } from 'marked';
 import sanitizeHtml from 'sanitize-html';
@@ -22,26 +21,6 @@ export function imageManifest() {
     manifestCache = {};
   }
   return manifestCache;
-}
-
-/**
- * Build an <img> tag with srcset/sizes/width/height from a manifest entry name.
- * Falls back to a plain file if the name is not in the manifest.
- */
-export function imgTag({ name, file, altEn, altZh, lang, cls, loading = 'lazy' }) {
-  const m = (name && imageManifest()[name]) || null;
-  const alt = lang === 'zh' ? (altZh || m?.alt_zh || altEn || '') : (altEn || m?.alt_en || altZh || '');
-  const classes = cls ? ` class="${cls}"` : '';
-  const load = loading === 'eager' ? '' : ' loading="lazy"';
-  if (!m || !m.files || m.files.length === 0) {
-    if (!file) return '';
-    return `<img src="${file.startsWith('/') ? file : '/' + file}" alt="${escapeAttr(alt)}"${classes}${load}>`;
-  }
-  const srcset = m.files.map(f => `${f.file.startsWith('/') ? f.file : '/' + f.file} ${f.w}w`).join(', ');
-  const best = m.files[m.files.length - 1];
-  const bestSrc = best.file.startsWith('/') ? best.file : '/' + best.file;
-  return `<img src="${bestSrc}" srcset="${srcset}" sizes="(max-width: 768px) 100vw, 1600px" `
-    + `width="${best.w}" height="${best.h}" alt="${escapeAttr(alt)}"${classes}${load}>`;
 }
 
 function escapeAttr(s) {
@@ -153,40 +132,6 @@ export function bodyFor(page, lang) {
   if (en) return { html: mdToHtml(en), note: null };
   if (zh) return { html: mdToHtml(zh), note: 'meta.lang_note_en' };
   return { html: '', note: null };
-}
-
-/**
- * Upcoming events starting from today, newest first, capped at `limit`.
- */
-export function upcomingEvents(db, { limit = 5 } = {}) {
-  const today = todayLocal();
-  return db.prepare(
-    'SELECT * FROM events WHERE deleted_at IS NULL AND published = 1 AND (all_day = 1 OR date(starts_at) >= ?) ORDER BY starts_at DESC LIMIT ?'
-  ).all(today, limit);
-}
-
-/** Latest N published announcements, newest first. */
-export function latestAnnouncements(db, { limit = 5 } = {}) {
-  return db.prepare(
-    'SELECT a.*, d.title_en AS doc_title_en, d.title_zh AS doc_title_zh, d.file_path AS doc_path '
-    + 'FROM announcements a LEFT JOIN documents d ON d.id = a.document_id '
-    + 'WHERE a.published = 1 AND a.deleted_at IS NULL ORDER BY a.published_at DESC LIMIT ?'
-  ).all(limit);
-}
-
-/** Programs ordered by sort. */
-export function allPrograms(db) {
-  return db.prepare('SELECT * FROM programs ORDER BY sort, name_en').all();
-}
-
-/** Sponsors ordered by sort. */
-export function allSponsors(db) {
-  return db.prepare('SELECT * FROM sponsors ORDER BY sort, name').all();
-}
-
-/** People in a group. */
-export function peopleByGroup(db, group) {
-  return db.prepare('SELECT * FROM people WHERE "group" = ? ORDER BY sort, name_en').all(group);
 }
 
 /**

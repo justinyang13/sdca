@@ -39,8 +39,3 @@ export function syncBoardRoles(db, today = todayLocal()) {
   return { granted, revoked };
 }
 
-/** The board positions a person holds today (for badges / lists). */
-export function boardPositionsOf(db, personId, today = todayLocal()) {
-  return db.prepare(`SELECT bp.name_en, bp.name_zh, bp.role_code FROM board_members bm JOIN board_positions bp ON bp.id = bm.board_position_id
-    WHERE bm.person_id = ? AND bm.deleted_at IS NULL AND (bm.start_date IS NULL OR bm.start_date <= ?) AND (bm.end_date IS NULL OR bm.end_date >= ?) ORDER BY bp.sort`).all(personId, today, today);
-}

@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import ejs from 'ejs';
 import { config } from './config.js';
+import { createLimiter } from './middleware/index.js';
 import { imgUrl } from './helpers.js';
 import { portedCtx, usePorted } from './ported.js';
 
@@ -345,7 +346,7 @@ export function registerPublicRoutes(app, bridge) {
   }));
 
   // ---------- Contact (POST) ----------
-  app.post('/:lang/contact', (req, res) => {
+  app.post('/:lang/contact', createLimiter({ max: Number(process.env.CONTACT_RATE_LIMIT || 5), windowMs: 60 * 60 * 1000 }), (req, res) => {
     const lang = req.params.lang;
     if (!SUPPORTED.includes(lang)) return res.status(404).send('Not found');
     const tFn = (k) => t(lang, k);
@@ -354,11 +355,11 @@ export function registerPublicRoutes(app, bridge) {
     const errors = {};
 
     const honeypotTriggered = Boolean(b.website);
-    const name = String(b.name || '').trim();
-    const email = String(b.email || '').trim();
-    const phone = String(b.phone || '').trim();
-    const topic = String(b.topic || '').trim();
-    const message = String(b.message || '').trim();
+    const name = String(b.name || '').trim().slice(0, 120);
+    const email = String(b.email || '').trim().slice(0, 254);
+    const phone = String(b.phone || '').trim().slice(0, 40);
+    const topic = String(b.topic || '').trim().slice(0, 80);
+    const message = String(b.message || '').trim().slice(0, 5000);
 
     if (!honeypotTriggered) {
       if (name.length < 2) errors.name = tFn('form.required');

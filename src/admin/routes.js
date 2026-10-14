@@ -76,6 +76,9 @@ function text(s) {
  * Register /admin routes on the given express app.
  * `db` is required.
  */
+/** Only same-site /admin paths are allowed after sign-in (no open redirect). */
+export const safeNext = (n) => (/^\/admin(\/[A-Za-z0-9_\-./]*)?$/.test(String(n || '')) ? String(n) : '/admin/dashboard');
+
 export function registerAdminRoutes(app, { db }) {
   const views = path.join(config.viewsDir, 'admin');
   const renderAdmin = (req, res, file, locals = {}, status = 200) => {
@@ -126,7 +129,7 @@ export function registerAdminRoutes(app, { db }) {
       csrf = crypto.randomBytes(32).toString('hex');
       res.cookie('sdca_csrf', csrf, { sameSite: 'Lax', path: '/' });
     }
-    renderAdmin(req, res, 'login.ejs', { error: null, nextPath: req.query.next || '/admin/dashboard' });
+    renderAdmin(req, res, 'login.ejs', { error: null, nextPath: safeNext(req.query.next) });
   });
 
   app.post('/admin/login', loginLimiter, csrfMiddleware, (req, res) => {
@@ -135,7 +138,7 @@ export function registerAdminRoutes(app, { db }) {
     const user = db.prepare('SELECT * FROM admin_users WHERE username = ?').get(username);
     if (!user || !verifyPassword(password, user.password_hash)) {
       const err = 'Invalid username or password';
-      return renderAdmin(req, res, 'login.ejs', { error: err, nextPath: req.body?.next || '/admin/dashboard' }, 401);
+      return renderAdmin(req, res, 'login.ejs', { error: err, nextPath: safeNext(req.body?.next) }, 401);
     }
     req.session.user = { id: user.id, username: user.username, role: user.role };
     // Explicitly persist the session to the SQLite store.
@@ -150,7 +153,7 @@ export function registerAdminRoutes(app, { db }) {
     `).run(sid, data, expires);
     db.prepare('UPDATE admin_users SET last_login = ? WHERE id = ?').run(nowUtc(), user.id);
     audit(db, user.username, 'login', 'admin_users', String(user.id));
-    res.redirect(req.body?.next || '/admin/dashboard');
+    res.redirect(safeNext(req.body?.next));
   });
 
   app.post('/admin/logout', csrfMiddleware, (req, res) => {

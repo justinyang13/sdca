@@ -15,6 +15,7 @@ export function createLimiter({ windowMs, max, message } = {}) {
     limit: max || 30,
     standardHeaders: 'draft-8',
     legacyHeaders: false,
+    validate: { creationStack: false },   // the login limiter is built on first use (it reads LOGIN_RATE_LIMIT then)
     message: message || { error: 'Too many requests, please try again later.' },
   });
 }
@@ -25,7 +26,6 @@ export function createLimiter({ windowMs, max, message } = {}) {
 const GENERAL_MAX = Number(process.env.RATE_LIMIT || 300);
 export const generalLimiter = createLimiter({ max: GENERAL_MAX });
 /** Contact form / login limiter (strict). */
-export const strictLimiter = createLimiter({ max: 10 });
 /** Admin login limiter (very strict). */
 // Login rate limiter. Reads LOGIN_RATE_LIMIT at call time (not module load)
 // so tests can override it via process.env after import.
@@ -101,7 +101,7 @@ export function applyBaseMiddleware(app) {
   const db = openDb();
   app.use(session({
     store: createSessionStore(db),
-    secret: process.env.SESSION_SECRET || 'sdca-dev-secret',
+    secret: config.sessionSecret,
     resave: false,
     saveUninitialized: false,
     rolling: true,                      // idle timeout: the cookie / store expiry restarts on every response

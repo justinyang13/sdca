@@ -30,25 +30,7 @@ before(async () => {
 });
 after(() => { server?.close(); db?.close(); fs.rmSync(dir, { recursive: true, force: true }); });
 
-class Client {
-  constructor() { this.c = {}; }
-  absorb(res) { for (const h of res.headers.getSetCookie?.() || []) { const [kv] = h.split(';'); const i = kv.indexOf('='); this.c[kv.slice(0, i)] = kv.slice(i + 1); } }
-  get cookie() { return Object.entries(this.c).map(([k, v]) => `${k}=${v}`).join('; '); }
-  async req(method, p, form) {
-    const headers = { cookie: this.cookie }; let body;
-    if (form) { headers['content-type'] = 'application/x-www-form-urlencoded'; body = (form instanceof URLSearchParams ? form : new URLSearchParams(form)).toString(); }
-    const res = await fetch(base + p, { method, headers, body, redirect: 'manual' });
-    this.absorb(res);
-    return { status: res.status, loc: res.headers.get('location'), text: await res.text() };
-  }
-  get(p) { return this.req('GET', p); }
-  async post(p, form) {
-    if (!this.c.sdca_csrf) await this.get('/en/portal/signin');
-    const f = form instanceof URLSearchParams ? form : new URLSearchParams(form); f.set('_csrf', this.c.sdca_csrf);
-    return this.req('POST', p, f);
-  }
-  async login(user) { await this.get('/en/portal/signin'); const r = await this.post('/en/portal/signin', { username: user, password: creds[user] }); assert.equal(r.status, 302, `login ${user}`); return this; }
-}
+const Client = makeClient({ base: () => base, creds: () => creds });
 const sql = (q, ...a) => db.prepare(q).all(...a);
 const one = (q, ...a) => db.prepare(q).get(...a);
 const run = (q, ...a) => db.prepare(q).run(...a);
@@ -58,6 +40,7 @@ const txType = (code) => one('SELECT id FROM transaction_types WHERE code = ?', 
 
 // every call creates a new family (parent + child + parent login), so each test controls its own money
 import { createFamily, createPerson, addFamilyMember, createUser } from '../src/portal/creators.js';
+import { makeClient } from './support/client.js';
 let famSeq = 0;
 function freshFamily() {
   famSeq += 1;

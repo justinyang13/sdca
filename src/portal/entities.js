@@ -12,8 +12,6 @@ const L = (en, zh) => ({ en, zh });
 const f = (name, en, zh, type = 'text', o = {}) => ({ name, label: L(en, zh), type, ...o });
 const opts = (...pairs) => pairs.map(([v, en, zh]) => ({ v, en, zh: zh || en }));
 
-export const YN = opts(['Y', 'Yes', '是'], ['N', 'No', '否']);
-export const GENDER = opts(['M', 'M 男'], ['F', 'F 女']);
 export const LANGUAGES = ['Mandarin', 'English', 'Cantonese', 'Japanese', 'Korean', 'Vietnamese', 'Russian', 'Swedish', 'Other']
   .map((v) => ({ v, en: v, zh: v }));
 const STATES = ['CA', 'AZ', 'NV', 'OR', 'WA', 'TX', 'NY', 'Other'].map((v) => ({ v, en: v, zh: v }));
@@ -730,4 +728,3 @@ export const SPECIAL_PERMISSIONS = [
   ['dashboard.pta', 'dashboard', 'pta', 'Volunteer coordinator dashboard'],
 ].map(([code, resource, action, description]) => ({ code, resource, action, description }));
 
-export function entityByPerm(perm) { return Object.values(ENTITIES).find((e) => e.perm === perm); }
