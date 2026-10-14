@@ -2,7 +2,8 @@
 // One definition drives: the list page (search / filter / sort / paging), the create+edit form,
 // the permission codes (<perm>.list|view|create|update|delete|export) and CSV export.
 //
-// field.type: text | textarea | email | tel | number | money (stored in cents, typed in dollars) | date | datetime
+// field.type: text | textarea | email | tel | number | money (stored in cents, typed in dollars) | date | datetime (a moment: stored UTC, shown / typed in school time)
+//             | localdt (school wall-clock time, e.g. an event's start; stored as typed)
 //             | bool | yn | gender | select | ref (foreign key) | password (users only) | readonly
 // field.trunc: max column width in px in list tables (long text is cut with "…", full text on hover and in the row details)
 // field.addr: { fk: '<column on this table pointing at addresses.id>', col: 'street|city|state|zipcode' }  (virtual field)
@@ -25,7 +26,7 @@ export const ENTITIES = {
   persons: {
     table: 'persons', perm: 'persons', group: 'people',
     defaultCols: ['english_last_name', 'english_first_name', 'chinese_name', 'class_code', 'gender', 'birth_date', 'username'],
-    label: L('People', '人員'), singular: L('Person', '人員'),
+    label: L('Directory', '通訊錄'), singular: L('Person', '人員'),
     labelSql: PERSON_LABEL, defaultSort: 'english_last_name', icon: 'person',
     fields: [
       f('english_last_name', 'Last Name', '姓', 'text', { required: true, list: true, search: true }),
@@ -70,8 +71,8 @@ export const ENTITIES = {
     fields: [
       f('title_en', 'Title (EN)', '標題 (英文)', 'text', { required: true, list: true, search: true, trunc: 260 }),
       f('title_zh', 'Title (中文)', '標題 (中文)', 'text', { list: true, search: true, trunc: 180 }),
-      f('starts_at', 'Starts', '開始', 'datetime', { required: true, list: true }),
-      f('ends_at', 'Ends', '結束', 'datetime', { list: true }),
+      f('starts_at', 'Starts', '開始', 'localdt', { required: true, list: true }),
+      f('ends_at', 'Ends', '結束', 'localdt', { list: true }),
       f('all_day', 'All day', '全天', 'bool', { list: true, filter: true }),
       f('location', 'Location', '地點', 'text', { list: true, search: true, trunc: 160 }),
       f('category', 'Category', '類別', 'select', { list: true, filter: true, options: EVENT_CATEGORIES }),
@@ -81,9 +82,104 @@ export const ENTITIES = {
       f('slug', 'Web address name (auto if empty)', '網址代稱 (空白則自動產生)', 'text'),
     ],
   },
+  slides: {
+    table: 'slides', perm: 'slides', group: 'setup',
+    label: L('Hero Slides', '首頁橫幅'), singular: L('Slide', '橫幅'), defaultSort: 'sort',
+    defaultCols: ['sort', 'image', 'caption_en', 'caption_zh', 'layout', 'link_url', 'published'],
+    note: L('The slides of the home page banner, in order. Each has a title, description, image and a link.', '首頁橫幅依序播放；每張有標題、說明、圖片與連結。'),
+    fields: [
+      f('sort', 'Order', '順序', 'number', { required: true, list: true }),
+      f('image', 'Image', '圖片', 'image', { list: true }),
+      f('caption_en', 'Title (EN)', '標題 (英文)', 'text', { list: true, search: true, trunc: 240 }),
+      f('caption_zh', 'Title (中文)', '標題 (中文)', 'text', { list: true, search: true, trunc: 180 }),
+      f('description_en', 'Description (EN)', '說明 (英文)', 'textarea', { help: 'Short text; **bold** and [links](/about) work.' }),
+      f('description_zh', 'Description (中文)', '說明 (中文)', 'textarea'),
+      f('layout', 'Layout', '版型', 'select', { required: true, list: true, filter: true, options: opts(['photo', 'Photo with caption bar', '圖片加說明列'], ['feature', 'Headline with buttons', '標題與按鈕'], ['intro', 'Welcome text (two columns)', '歡迎文字 (雙欄)']) }),
+      f('link_url', 'Link (find out more)', '連結 (了解更多)', 'text', { list: true, trunc: 160, help: 'A page of this site such as /about, or a full https:// address.' }),
+      f('link_label_en', 'Button text (EN)', '按鈕文字 (英文)', 'text'), f('link_label_zh', 'Button text (中文)', '按鈕文字 (中文)', 'text'),
+      f('link2_url', 'Second link (optional)', '第二個連結 (選填)', 'text'),
+      f('link2_label_en', 'Second button text (EN)', '第二按鈕 (英文)', 'text'), f('link2_label_zh', 'Second button text (中文)', '第二按鈕 (中文)', 'text'),
+      f('image_left', 'Left banner (welcome layout)', '左側圖 (歡迎版型)', 'image'), f('image_right', 'Right banner (welcome layout)', '右側圖 (歡迎版型)', 'image'),
+      f('published', 'Show on the home page', '顯示於首頁', 'bool', { list: true, filter: true }),
+    ],
+  },
+  announcements: {
+    table: 'announcements', perm: 'announcements', group: 'setup',
+    label: L('Public Announcements', '公開通告'), singular: L('Announcement', '通告'), defaultSort: 'published_at', defaultDir: 'desc',
+    defaultCols: ['published_at', 'kind', 'title_en', 'title_zh', 'week_no', 'pinned', 'published'],
+    note: L('These appear in News & Announcements on the public website (and the newest on the home page).', '這些會顯示在公開網站的「新聞與通告」(最新的也會顯示在首頁)。'),
+    fields: [
+      f('kind', 'Kind', '類別', 'select', { required: true, list: true, filter: true, options: opts(['weekly', 'Weekly announcement', '每週通告'], ['news', 'News', '新聞'], ['press', 'Press', '媒體報導'], ['notice', 'Notice', '通知']) }),
+      f('title_en', 'Title (EN)', '標題 (英文)', 'text', { list: true, search: true, trunc: 260 }),
+      f('title_zh', 'Title (中文)', '標題 (中文)', 'text', { list: true, search: true, trunc: 180 }),
+      f('published_at', 'Date', '日期', 'date', { list: true, defaultToday: true }),
+      f('week_no', 'Week number', '週別', 'number', { list: true, help: 'Weekly announcements only.' }),
+      f('school_year', 'School year', '學年', 'text', { help: 'For example 2026-2027.' }),
+      f('summary_en', 'Summary (EN)', '摘要 (英文)', 'textarea'), f('summary_zh', 'Summary (中文)', '摘要 (中文)', 'textarea'),
+      f('body_en', 'Text (EN)', '內容 (英文)', 'textarea', { help: 'Markdown: **bold**, [links](https://…), lists.' }), f('body_zh', 'Text (中文)', '內容 (中文)', 'textarea'),
+      f('document_id', 'Attached PDF', '附件 PDF', 'ref', { ref: 'documents', uploadPdf: true, help: 'Shown on the page itself.' }),
+      f('external_url', 'External link', '外部連結', 'text'),
+      f('pinned', 'Pin to the top', '置頂', 'bool', { list: true, filter: true }),
+      f('published', 'Show on the public website', '顯示於公開網站', 'bool', { list: true, filter: true }),
+      f('slug', 'Web address name (auto if empty)', '網址代稱 (空白則自動產生)', 'text'),
+    ],
+  },
+  documents: {
+    table: 'documents', perm: 'documents', group: 'setup', readOnly: true,
+    label: L('Documents (PDF library)', '文件庫'), singular: L('Document', '文件'), defaultSort: 'id', defaultDir: 'desc',
+    labelSql: "COALESCE(NULLIF(r.title_en, ''), r.title_zh, r.slug)",
+    fields: [
+      f('title_en', 'Title (EN)', '標題 (英文)', 'text', { list: true, search: true }), f('title_zh', 'Title (中文)', '標題 (中文)', 'text', { list: true, search: true }),
+      f('category', 'Category', '類別', 'text', { list: true, filter: true }), f('school_year', 'School year', '學年', 'text', { list: true }),
+      f('file_path', 'File', '檔案', 'text'), f('bytes', 'Size (bytes)', '大小', 'number'), f('published', 'Published', '已發佈', 'bool', { list: true, filter: true }),
+    ],
+  },
+  board_positions: {
+    table: 'board_positions', perm: 'board_positions', group: 'people',
+    label: L('Board Positions', '理事職務'), singular: L('Board position', '理事職務'), defaultSort: 'sort',
+    labelSql: 'r.name_en',
+    note: L('The titles on the public Board of Directors page. Each gives its holder a portal role.', '公開「理事會」頁面上的職稱；擔任者會獲得對應的入口網站角色。'),
+    fields: [
+      f('sort', 'Order', '順序', 'number', { required: true, list: true }),
+      f('name_en', 'Title (as on the public Board page)', '職稱 (英文，同公開頁面)', 'text', { required: true, list: true, search: true }),
+      f('name_zh', 'Title (中文)', '職稱 (中文)', 'text', { list: true }),
+      f('code', 'Code', '代碼', 'text', { required: true, list: true }),
+      f('role_code', 'Portal role given', '給予的入口角色', 'text', { list: true }),
+      f('description', 'Responsibilities', '職責', 'textarea'),
+    ],
+    listExtra: [
+      { key: 'public_name', label: L('Name on the public page', '公開頁面姓名'), sql: "(SELECT p.name_en FROM people p WHERE p.\"group\" = 'board' AND p.role_en = t.name_en LIMIT 1)" },
+      { key: 'holders', label: L('Current holder(s) in the portal', '目前擔任者 (入口網站)'), sql: "(SELECT group_concat(pe.english_first_name || ' ' || pe.english_last_name, ', ') FROM board_members bm JOIN persons pe ON pe.id = bm.person_id WHERE bm.board_position_id = t.id AND bm.deleted_at IS NULL AND (bm.end_date IS NULL OR bm.end_date >= date('now','localtime')))" },
+    ],
+  },
+  board_members: {
+    table: 'board_members', perm: 'board_members', group: 'people',
+    label: L('Board Members', '理事'), singular: L('Board member', '理事'), defaultSort: 'board_position_id',
+    note: L('Who holds each board position. Saving a membership gives that person the position\'s portal role (and removes it when the term ends).', '各理事職務的擔任者。儲存後該人員會獲得該職務的入口網站角色；任期結束後自動移除。'),
+    fields: [
+      f('board_position_id', 'Position', '職務', 'ref', { ref: 'board_positions', required: true, list: true, filter: true }),
+      f('person_id', 'Person', '人員', 'ref', { ref: 'persons', required: true, list: true }),
+      f('school_year_id', 'School year', '學年', 'ref', { ref: 'school_years', list: true, filter: true, defaultCurrentYear: true }),
+      f('start_date', 'Term starts', '任期開始', 'date', { list: true }), f('end_date', 'Term ends', '任期結束', 'date', { list: true }),
+      f('notes', 'Notes', '備註', 'textarea'),
+    ],
+  },
+  class_announcements: {
+    table: 'class_announcements', perm: 'class_announcements', group: 'academics',
+    label: L('Class Announcements', '班級通告'), singular: L('Class announcement', '班級通告'), defaultSort: 'id', defaultDir: 'desc',
+    defaultCols: ['school_class_id', 'title_en', 'title_zh', 'pinned', 'created_at'],
+    note: L('Posted to one class: its parents and students see it. Teachers and room parents post from the Class Announcements page.', '發佈給單一班級，該班家長與學生可見。老師與班媽/班爸在「班級通告」頁面發佈。'),
+    fields: [
+      f('school_class_id', 'Class', '班級', 'ref', { ref: 'school_classes', required: true, list: true, filter: true }),
+      f('title_en', 'Title (EN)', '標題 (英文)', 'text', { list: true, search: true, trunc: 240 }), f('title_zh', 'Title (中文)', '標題 (中文)', 'text', { list: true, search: true, trunc: 180 }),
+      f('body_en', 'Message (EN)', '內容 (英文)', 'textarea'), f('body_zh', 'Message (中文)', '內容 (中文)', 'textarea'),
+      f('pinned', 'Pin to the top', '置頂', 'bool', { list: true, filter: true }),
+      f('created_at', 'Posted', '發佈時間', 'readonly', { list: true }),
+    ],
+  },
   families: {
     table: 'families', perm: 'families', group: 'people',
-    label: L('Families', '家庭'), singular: L('Family', '家庭'),
+    label: L('Family', '家庭'), singular: L('Family', '家庭'), expandChildren: true,
     labelSql: "(SELECT p.english_last_name || ' ' || p.english_first_name FROM family_members fm JOIN persons p ON p.id = fm.person_id WHERE fm.family_id = r.id AND fm.relationship = 'parent_one' LIMIT 1) || ' (#' || r.id || ')'",
     defaultSort: 'id',
     fields: [
@@ -102,7 +198,7 @@ export const ENTITIES = {
       f('notes', 'Notes', '備註', 'textarea'),
     ],
     listExtra: [
-      { key: 'parents', label: L('Parents', '家長'), sql: "(SELECT group_concat(p.english_last_name || ' ' || p.english_first_name, ' / ') FROM family_members fm JOIN persons p ON p.id = fm.person_id WHERE fm.family_id = t.id AND fm.relationship IN ('parent_one','parent_two') AND fm.deleted_at IS NULL)", search: true },
+      { key: 'parents', label: L('Parents', '家長'), linkDetail: true, sql: "(SELECT group_concat(p.english_last_name || ' ' || p.english_first_name, ' / ') FROM family_members fm JOIN persons p ON p.id = fm.person_id WHERE fm.family_id = t.id AND fm.relationship IN ('parent_one','parent_two') AND fm.deleted_at IS NULL)", search: true },
       { key: 'children', label: L('Children', '子女'), sql: "(SELECT COUNT(*) FROM family_members fm WHERE fm.family_id = t.id AND fm.relationship = 'child' AND fm.deleted_at IS NULL)" },
     ],
     listOrder: ['id', 'parents', 'children', 'street', 'city', 'home_phone', 'email', 'status'],
@@ -130,7 +226,7 @@ export const ENTITIES = {
     ],
   },
   users: {
-    table: 'users', perm: 'users', group: 'people',
+    table: 'users', perm: 'users', group: 'admin',
     label: L('Users', '用戶'), singular: L('User', '用戶'), defaultSort: 'username',
     labelSql: 'r.username',
     fields: [
@@ -175,7 +271,7 @@ export const ENTITIES = {
     adminOnly: true,
   },
   user_types: {
-    table: 'user_types', perm: 'user_types', group: 'security',
+    table: 'user_types', perm: 'user_types', group: 'admin',
     label: L('User Types', '用戶類型'), singular: L('User Type', '用戶類型'), defaultSort: 'sort', labelSql: 'r.name_en',
     fields: [
       f('code', 'Code', '代碼', 'text', { required: true, list: true }),
@@ -202,7 +298,7 @@ export const ENTITIES = {
     label: L('School Years', '學年'), singular: L('School Year', '學年'), defaultSort: 'label', defaultDir: 'desc', labelSql: 'r.label',
     fields: [
       f('school_id', 'School', '學校', 'ref', { ref: 'schools', required: true }),
-      f('label', 'Label (e.g. 2026-2027)', '學年', 'text', { required: true, list: true, search: true }),
+      f('label', 'Label (e.g. 2026-2027)', '學年', 'text', { required: true, list: true, search: true, minw: 130 }),
       f('start_date', 'Start', '開始', 'date', { list: true }), f('end_date', 'End', '結束', 'date', { list: true }),
       f('first_day', 'First day of school', '開學日', 'date', { list: true }), f('last_day', 'Last day of school', '結業日', 'date'),
       f('second_semester_start', 'Second semester starts', '第二學期開始', 'date'),
@@ -213,7 +309,7 @@ export const ENTITIES = {
     ],
   },
   class_types: {
-    table: 'class_types', perm: 'class_types', group: 'academics',
+    table: 'class_types', perm: 'class_types', group: 'admin',
     label: L('Class Types', '班別'), singular: L('Class Type', '班別'), defaultSort: 'sort', labelSql: "r.name_en || ' ' || r.name_zh",
     fields: [
       f('code', 'Code', '代碼', 'text', { required: true, list: true, search: true }),
@@ -228,7 +324,7 @@ export const ENTITIES = {
     ],
   },
   class_levels: {
-    table: 'class_levels', perm: 'class_levels', group: 'academics',
+    table: 'class_levels', perm: 'class_levels', group: 'admin',
     label: L('Class Levels', '班級程度'), singular: L('Class Level', '班級程度'), defaultSort: 'sort', labelSql: "r.name_en || ' ' || r.name_zh",
     fields: [
       f('class_type_id', 'Class Type', '班別', 'ref', { ref: 'class_types', required: true, list: true, filter: true }),
@@ -240,7 +336,7 @@ export const ENTITIES = {
     ],
   },
   rooms: {
-    table: 'rooms', perm: 'rooms', group: 'academics',
+    table: 'rooms', perm: 'rooms', group: 'setup',
     label: L('Rooms', '教室'), singular: L('Room', '教室'), defaultSort: 'code', labelSql: 'r.code',
     fields: [
       f('code', 'Room', '教室', 'text', { required: true, list: true, search: true }),
@@ -250,7 +346,7 @@ export const ENTITIES = {
     ],
   },
   textbooks: {
-    table: 'textbooks', perm: 'textbooks', group: 'academics',
+    table: 'textbooks', perm: 'textbooks', group: 'setup',
     label: L('Textbooks', '課本'), singular: L('Textbook', '課本'), defaultSort: 'title_en', labelSql: "COALESCE(NULLIF(r.title_zh,''), r.title_en)",
     fields: [
       f('title_en', 'Title (EN)', '英文書名', 'text', { list: true, search: true }),
@@ -263,7 +359,7 @@ export const ENTITIES = {
   school_classes: {
     table: 'school_classes', perm: 'classes', group: 'academics',
     defaultCols: ['school_year_id', 'code', 'name_en', 'name_zh', 'teacher', 'students', 'status'],
-    label: L('Classes', '班級'), singular: L('Class', '班級'), defaultSort: 'code', labelSql: "r.code || ' ' || r.name_zh",
+    label: L('Classes', '班級'), singular: L('Class', '班級'), movedList: '/class-roster', defaultSort: 'code', labelSql: "r.code || ' ' || r.name_zh",
     fields: [
       f('school_year_id', 'School Year', '學年', 'ref', { ref: 'school_years', required: true, list: true, filter: true, defaultCurrentYear: true }),
       f('class_type_id', 'Class Type', '班別', 'ref', { ref: 'class_types', required: true, list: true, filter: true }),
@@ -284,13 +380,13 @@ export const ENTITIES = {
     detail: '/portal/classes/:id',
   },
   assignment_roles: {
-    table: 'assignment_roles', perm: 'assignment_roles', group: 'academics',
+    table: 'assignment_roles', perm: 'assignment_roles', group: 'admin',
     label: L('Assignment Roles', '任課角色'), singular: L('Assignment Role', '任課角色'), defaultSort: 'code', labelSql: 'r.name_en',
     fields: [f('code', 'Code', '代碼', 'text', { required: true, list: true }), f('name_en', 'Name (EN)', '英文名稱', 'text', { required: true, list: true }), f('name_zh', 'Name (中文)', '中文名稱', 'text', { list: true })],
   },
   class_assignments: {
     table: 'class_assignments', perm: 'assignments', group: 'academics',
-    label: L('Instructor & Room Parent Assignments', '任課與班級家長'), singular: L('Assignment', '任課'), defaultSort: 'id', defaultDir: 'desc',
+    label: L('Instructor & Room Parent Assignments', '任課與班級家長'), moved: '/class-roster', singular: L('Assignment', '任課'), defaultSort: 'id', defaultDir: 'desc',
     fields: [
       f('school_year_id', 'School Year', '學年', 'ref', { ref: 'school_years', required: true, list: true, filter: true, defaultCurrentYear: true }),
       f('school_class_id', 'School Class', '班級', 'ref', { ref: 'school_classes', required: true, list: true, filter: true }),
@@ -301,13 +397,14 @@ export const ENTITIES = {
     ],
   },
   student_types: {
-    table: 'student_types', perm: 'student_types', group: 'academics',
+    table: 'student_types', perm: 'student_types', group: 'admin',
     label: L('Student Types', '學生類別'), singular: L('Student Type', '學生類別'), defaultSort: 'code', labelSql: 'r.name_en',
     fields: [f('code', 'Code', '代碼', 'text', { required: true, list: true }), f('name_en', 'Name (EN)', '英文名稱', 'text', { required: true, list: true }), f('name_zh', 'Name (中文)', '中文名稱', 'text', { list: true })],
   },
   enrollments: {
     table: 'enrollments', perm: 'enrollments', group: 'academics',
-    label: L('Enrollments & Class Placement', '註冊與分班'), singular: L('Enrollment', '註冊'), defaultSort: 'id', defaultDir: 'desc',
+    label: L('Enrollment', '學生註冊'), singular: L('Enrollment', '學生註冊'), expandPlacement: true,
+    virtualFilters: [{ name: 'placement', label: L('Placement', '分班'), options: [{ v: 'unplaced', en: 'Not placed yet', zh: '尚未分班', sql: "t.school_class_id IS NULL AND t.status IN ('registered','placed','pending')" }, { v: 'placed', en: 'Placed in a class', zh: '已分班', sql: 't.school_class_id IS NOT NULL' }] }], defaultSort: 'id', defaultDir: 'desc',
     fields: [
       f('student_person_id', 'Student', '學生', 'ref', { ref: 'persons', required: true, list: true }),
       f('school_year_id', 'School Year', '學年', 'ref', { ref: 'school_years', required: true, list: true, filter: true, defaultCurrentYear: true }),
@@ -322,13 +419,13 @@ export const ENTITIES = {
     ],
   },
   school_districts: {
-    table: 'school_districts', perm: 'school_districts', group: 'academics',
+    table: 'school_districts', perm: 'school_districts', group: 'admin',
     label: L('School Districts', '學區'), singular: L('School District', '學區'), defaultSort: 'name', labelSql: 'r.name',
     fields: [f('name', 'Name', '名稱', 'text', { required: true, list: true, search: true })],
   },
   student_school_info: {
     table: 'student_school_info', perm: 'student_school_info', group: 'academics',
-    label: L('Middle / High School Info', '國中/高中資料'), singular: L('School Info', '學校資料'), defaultSort: 'id', defaultDir: 'desc',
+    label: L('Middle / High School Info', '國中/高中資料'), singular: L('School Info', '學校資料'), movedList: '/manage/student_list', defaultSort: 'id', defaultDir: 'desc',
     fields: [
       f('student_person_id', 'Student', '學生', 'ref', { ref: 'persons', required: true, list: true }),
       f('school_year_id', 'School Year', '學年', 'ref', { ref: 'school_years', required: true, list: true, filter: true, defaultCurrentYear: true }),
@@ -346,7 +443,7 @@ export const ENTITIES = {
     ],
   },
   credit_grades: {
-    table: 'credit_grades', perm: 'credit_grades', group: 'academics',
+    table: 'credit_grades', perm: 'credit_grades', group: 'admin',
     label: L('Credit Class Grades', '學分班成績'), singular: L('Credit Grade', '學分成績'), defaultSort: 'id', defaultDir: 'desc',
     fields: [
       f('enrollment_id', 'Enrollment', '註冊', 'ref', { ref: 'enrollments', required: true, list: true }),
@@ -393,7 +490,7 @@ export const ENTITIES = {
     ],
   },
   transaction_types: {
-    table: 'transaction_types', perm: 'transaction_types', group: 'finance',
+    table: 'transaction_types', perm: 'transaction_types', group: 'admin',
     label: L('Transaction Types', '交易類型'), singular: L('Transaction Type', '交易類型'), defaultSort: 'code', labelSql: 'r.name_en',
     fields: [
       f('code', 'Code', '代碼', 'text', { required: true, list: true }), f('name_en', 'Name (EN)', '英文名稱', 'text', { required: true, list: true }), f('name_zh', 'Name (中文)', '中文名稱', 'text', { list: true }),
@@ -402,7 +499,7 @@ export const ENTITIES = {
     ],
   },
   payment_methods: {
-    table: 'payment_methods', perm: 'payment_methods', group: 'finance',
+    table: 'payment_methods', perm: 'payment_methods', group: 'admin',
     label: L('Payment Methods', '付款方式'), singular: L('Payment Method', '付款方式'), defaultSort: 'code', labelSql: 'r.name_en',
     fields: [
       f('code', 'Code', '代碼', 'text', { required: true, list: true }), f('name_en', 'Name (EN)', '英文名稱', 'text', { required: true, list: true }), f('name_zh', 'Name (中文)', '中文名稱', 'text', { list: true }),
@@ -462,7 +559,7 @@ export const ENTITIES = {
   student_list: {
     table: 'v_student_list', perm: 'student_list', group: 'academics', readOnly: true,
     defaultCols: ['english_last_name', 'english_first_name', 'chinese_name', 'school_class_id', 'grade_label', 'status', 'family_cell_phone'],
-    label: L('Student List', '學生名單'), singular: L('Student', '學生'), defaultSort: 'english_last_name',
+    label: L('Student List', '學生名單'), singular: L('Student', '學生'), expandSchoolInfo: true, defaultSort: 'english_last_name',
     detail: '/portal/people/:id', detailKey: 'person_id',
     fields: [
       f('english_last_name', 'Last Name', '姓', 'text', { list: true, search: true }),
@@ -509,7 +606,7 @@ export const ENTITIES = {
   },
   volunteer_signups: {
     table: 'volunteer_signups', perm: 'volunteer_signups', group: 'volunteers',
-    label: L('Volunteer Sign-ups', '義工報名'), singular: L('Volunteer Sign-up', '義工報名'), defaultSort: 'signed_up_at', defaultDir: 'desc',
+    label: L('Volunteer Sign-ups', '義工報名'), singular: L('Volunteer Sign-up', '義工報名'), defaultSort: 'signed_up_at', defaultDir: 'desc', wrapCols: ['signed_up_at', 'status', 'priority'],
     fields: [
       f('school_year_id', 'School Year', '學年', 'ref', { ref: 'school_years', required: true, list: true, filter: true, defaultCurrentYear: true }),
       f('job_id', 'Volunteer Job', '義工工作', 'ref', { ref: 'volunteer_jobs', list: true, filter: true }),
@@ -585,11 +682,12 @@ export const ENTITIES = {
 };
 
 export const GROUPS = [
-  { key: 'people', label: L('People & Families', '人員與家庭') },
+  { key: 'people', label: L('Directory', '通訊錄') },
   { key: 'academics', label: L('Classes & Students', '班級與學生') },
-  { key: 'finance', label: L('Fees & Payments', '費用與付款') },
+  { key: 'finance', label: L('Finance', '財務') },
   { key: 'volunteers', label: L('Volunteers', '義工') },
-  { key: 'setup', label: L('School Setup', '學校設定') },
+  { key: 'setup', label: L('School', '學校') },
+  { key: 'admin', label: L('Admin', '管理'), adminOnly: true },
   { key: 'security', label: L('Security & System', '安全與系統') },
 ];
 
@@ -612,6 +710,10 @@ export const SPECIAL_PERMISSIONS = [
   ['fees.configure', 'fees', 'configure', 'Configure all fees for a school year'],
   ['placement.assign', 'placement', 'assign', 'Place students into classes'],
   ['withdrawal.process', 'withdrawal', 'process', 'Process withdrawals'],
+  ['finance.reports', 'finance', 'reports', 'Finance reports: daily deposit, unpaid registrations, year summary, scrip'],
+  ['finance.record_scrip', 'finance', 'record_scrip', 'Record scrip purchases / redemptions only'],
+  ['class_announcements.post_own', 'class_announcements', 'post_own', 'Post announcements to the classes I teach or help'],
+  ['class_announcements.view_own', 'class_announcements', 'view_own', 'Read announcements of my child / my own class'],
   ['reports.class_roster', 'reports', 'class_roster', 'Class roster (printable / PDF)'],
   ['class.view_own', 'class', 'view_own', 'See the student list of classes I teach or am room parent for'],
   ['grades.enter_own_classes', 'grades', 'enter_own', 'Enter credit grades for my classes'],

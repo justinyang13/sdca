@@ -1,6 +1,8 @@
 // src/portal/fees.js — registration fee calculation from the configurable fee_schedules of a school year.
 // Every number comes from the fee table (staff edit it in one place: /portal/fees). Nothing is hard-coded.
 
+import { todayLocal } from '../datetime.js';
+
 const cents = (n) => Math.round(Number(n) || 0);
 
 export function currentYear(db) {
@@ -22,7 +24,7 @@ function pick(rows, code, classTypeId) {
  * Sibling discount: children are ordered oldest → youngest across ALL children of the family registered for the year
  * (other registrations that are not cancelled + this one); the Nth child and later get the discount.
  */
-export function computeRegistration(db, { yearId, familyId, registrationId = null, items, scripPurchaseCents = 0, today = new Date().toISOString().slice(0, 10) }) {
+export function computeRegistration(db, { yearId, familyId, registrationId = null, items, scripPurchaseCents = 0, today = todayLocal() }) {
   const rows = feeRows(db, yearId);
   const year = db.prepare('SELECT * FROM school_years WHERE id = ?').get(yearId);
   const regFee = (ct) => pick(rows, 'registration_fee', ct);
@@ -78,4 +80,9 @@ export function withdrawalFee(db, yearId, appliedOn) {
   return hit ? { rule: hit, feeCents: hit.no_refund ? null : cents(hit.fee_cents), noRefund: !!hit.no_refund } : { rule: null, feeCents: 0, noRefund: false };
 }
 
-export const money = (c) => `$${(Number(c || 0) / 100).toFixed(2)}`;
+/** cents → "$1,130.50" (negative: "-$25.00"). Integer maths only, so no floating-point drift. */
+export const money = (c) => {
+  const n = Math.round(Number(c) || 0); const abs = Math.abs(n);
+  const dollars = String(Math.trunc(abs / 100)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return `${n < 0 ? '-' : ''}$${dollars}.${String(abs % 100).padStart(2, '0')}`;
+};

@@ -17,3 +17,6 @@ dist/
 
 # real portal screenshots (personal data) - never commit
 research/SDCA Portal/
+
+# images uploaded through Staff Tools → Hero Slides (user content, not source)
+public/img/slides/

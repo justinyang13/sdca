@@ -16,6 +16,8 @@ import { registerPhase5Routes } from './routes-phase5.js';
 import { registerAdminRoutes } from './admin/routes.js';
 import { registerPortalRoutes } from './portal/index.js';
 import { markPortalButtons } from './portal/public-links.js';
+import { asset } from './asset-version.js';
+import { fmtLong, fmtTime, fmtEventWhen, fmtMonthYear, fmtDate, todayLocal } from './datetime.js';
 import { lookupRedirect } from './redirects.js';
 import { portedCtx } from './ported.js';
 import { buildSitemap } from './sitemap.js';
@@ -38,6 +40,8 @@ const requestFlags = new AsyncLocalStorage();
 export function createApp({ db = openDb() } = {}) {
   const app = express();
   app.locals.idleMinutes = config.sessionIdleMinutes;
+  app.locals.asset = asset;
+  app.locals.dt = { fmtLong, fmtTime, fmtEventWhen, fmtMonthYear, fmtDate, todayLocal };
   app.set('trust proxy', 'loopback');   // Tailscale Funnel (and any local proxy) forwards the real client address / https flag
   app.set('view engine', 'ejs');
   app.set('views', config.viewsDir);
@@ -55,7 +59,7 @@ export function createApp({ db = openDb() } = {}) {
       // Block renderer partials (views/blocks/*.ejs) get the DP text helpers as L.h.
       const L = locals || {};
       if (file.startsWith('blocks/')) L.h = blockHelpers;
-      return ejs.render(src, { lang, langPath: L.langPath, portalIn: L.portalIn, t: tFn, renderPart, L, imageManifest, assetUrl });
+      return ejs.render(src, { lang, langPath: L.langPath, portalIn: L.portalIn, asset, dt: { fmtLong, fmtTime, fmtEventWhen, fmtMonthYear, fmtDate, todayLocal }, t: tFn, renderPart, L, imageManifest, assetUrl });
     }
     return renderPart;
   }
@@ -86,7 +90,7 @@ export function createApp({ db = openDb() } = {}) {
   // available in scope (so page templates can render markdown bodies).
   function pageView(viewFile, ctx) {
     const full = path.join(config.viewsDir, 'pages', viewFile);
-    const fullCtx = { renderMarkdown, assetUrl, ...ctx };
+    const fullCtx = { renderMarkdown, assetUrl, dt: { fmtLong, fmtTime, fmtEventWhen, fmtMonthYear, fmtDate, todayLocal }, ...ctx };
     return ejs.render(fs.readFileSync(full, 'utf8'), fullCtx);
   }
 
@@ -114,7 +118,8 @@ export function createApp({ db = openDb() } = {}) {
     requestFlags.run({ portalIn }, next);
   });
 
-  app.use(express.static(config.publicDir, { maxAge: '1h', etag: true }));
+  // files requested with ?v=<hash> (see asset()) never change under that URL → cache them for a year; everything else for an hour
+  app.use(express.static(config.publicDir, { maxAge: '1h', etag: true, setHeaders: (res) => { if (res.req?.query?.v) res.setHeader('Cache-Control', 'public, max-age=31536000, immutable'); } }));
 
   // ---------- Admin (mounted before /:lang routing) ----------
   registerAdminRoutes(app, { db });

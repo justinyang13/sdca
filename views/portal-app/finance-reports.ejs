@@ -1,0 +1,75 @@
+<%
+  const tab = function(r, en, zh){ return '<a class="' + (report === r ? 'is-active' : '') + '" href="' + url('/finance/reports') + '?report=' + r + '&year=' + year.id + (r === 'daily' ? '&from=' + from + '&to=' + to : '') + '">' + (lang === 'zh' ? zh : en) + '</a>'; };
+  const csvHref = url('/finance/reports') + '?report=' + report + '&year=' + year.id + '&from=' + from + '&to=' + to + '&format=csv';
+  const amt = function(c){ return c < 0 ? '−' + money(-c) : money(c); };
+%>
+<div class="portal-head no-print-actions">
+  <h1><%= b('Finance Reports', '財務報表') %></h1>
+  <div class="portal-actions"><a class="btn btn-ghost" href="<%= csvHref %>"><%= b('Download CSV', '下載 CSV') %></a> <button type="button" class="btn btn-ghost" data-print><%= b('Print', '列印') %></button></div>
+</div>
+<div class="view-tabs finance-tabs" role="tablist">
+  <%- tab('daily', 'Daily deposit', '每日存款') %><%- tab('aging', 'Unpaid registrations', '未付註冊') %><%- tab('summary', 'Year summary', '學年總結') %><%- tab('scrip', 'Scrip', '禮券') %>
+</div>
+<form method="get" class="portal-toolbar" data-instant-filters>
+  <input type="hidden" name="report" value="<%= report %>">
+  <% if (report === 'daily') { %>
+    <label class="tb-filter"><span><%= b('From', '從') %></span><input type="date" name="from" value="<%= from %>"></label>
+    <label class="tb-filter"><span><%= b('To', '到') %></span><input type="date" name="to" value="<%= to %>"></label>
+    <a class="tb-reset" href="<%= url('/finance/reports') %>?report=daily&from=<%= today %>&to=<%= today %>"><%= b('Today', '今天') %></a>
+  <% } else { %>
+    <label class="tb-filter"><span><%= b('School year', '學年') %></span><select name="year"><% years.forEach(function(y){ %><option value="<%= y.id %>" <%= y.id === year.id ? 'selected' : '' %>><%= y.label %></option><% }) %></select></label>
+  <% } %>
+  <button type="submit" hidden>Go</button>
+</form>
+<p class="muted"><%= b('Generated', '產生時間') %> <%= generated %> · <%= report === 'daily' ? from + (to !== from ? ' → ' + to : '') : year.label %></p>
+
+<% if (report === 'daily') { %>
+  <div class="stat-grid">
+    <div class="stat"><strong><%= money(data.received) %></strong><span><%= b('Received', '收款') %></span></div>
+    <div class="stat"><strong><%= money(data.returned) %></strong><span><%= b('Returned', '退款') %></span></div>
+    <div class="stat"><strong><%= amt(data.net) %></strong><span><%= b('Net deposit', '淨存款') %> (<%= data.count %>)</span></div>
+  </div>
+  <% if (!data.groups.length) { %><div class="portal-card"><p class="muted"><%= b('No transactions in this period.', '此期間沒有交易。') %></p></div><% } %>
+  <% data.groups.forEach(function(g){ %>
+  <div class="portal-card"><h2><%= one(g.method_en, g.method_zh) %> — <%= amt(g.net) %></h2>
+    <div class="table-wrap"><table class="portal-table compact"><thead><tr><th><%= b('Date', '日期') %></th><th><%= b('Type', '類型') %></th><th><%= b('Family', '家庭') %></th><th><%= b('Check #', '支票號碼') %></th><th class="num"><%= b('Amount', '金額') %></th><th><%= b('Recorded by', '登錄人') %></th></tr></thead><tbody>
+      <% g.rows.forEach(function(r){ %><tr><td class="nw"><%= r.transaction_date %></td><td><a href="<%= url('/transactions/' + r.id) %>"><%= one(r.type_en, r.type_zh) %></a></td><td><%= r.family || '' %></td><td class="nw"><%= r.check_number %></td><td class="num"><%= amt(r.signed_cents) %></td><td><%= r.recorded_by || '' %></td></tr><% }) %>
+      <tr class="subtotal"><td colspan="4"><strong><%= b('Subtotal', '小計') %></strong></td><td class="num"><strong><%= amt(g.net) %></strong></td><td></td></tr></tbody></table></div></div>
+  <% }) %>
+  <% if (data.voided.length) { %><div class="portal-card"><h2><%= b('Voided in this period (not counted)', '本期作廢 (不計入)') %></h2><ul class="plain"><% data.voided.forEach(function(v){ %><li>#<%= v.id %> · <%= v.transaction_date %> · <%= one(v.type_en, v.type_zh) %> · <%= money(v.amount_cents) %><%= v.void_reason ? ' — ' + v.void_reason : '' %></li><% }) %></ul></div><% } %>
+
+<% } else if (report === 'aging') { %>
+  <div class="stat-grid"><% data.buckets.forEach(function(k){ %><div class="stat"><strong><%= money(k.cents) %></strong><span><%= k.label %> (<%= k.n %>)</span></div><% }) %>
+    <div class="stat"><strong><%= money(data.total) %></strong><span><%= b('Total outstanding', '未收總額') %></span></div></div>
+  <div class="table-wrap"><table class="portal-table compact"><thead><tr><th>#</th><th><%= b('Family', '家庭') %></th><th><%= b('Submitted', '送出') %></th><th class="num"><%= b('Days', '天數') %></th><th class="num"><%= b('Total', '總額') %></th><th class="num"><%= b('Paid', '已付') %></th><th class="num"><%= b('Balance', '餘額') %></th><th></th></tr></thead><tbody>
+    <% if (!data.rows.length) { %><tr><td colspan="8" class="empty"><%= b('Nothing outstanding. 🎉', '沒有未收款項。') %></td></tr><% } %>
+    <% data.rows.forEach(function(r){ %><tr><td><a href="<%= url('/registrations/' + r.id) %>"><%= r.id %></a></td><td><%= r.family || '' %></td><td class="nw"><%= r.submitted_on %></td><td class="num"><%= r.days %></td><td class="num"><%= money(r.grand_total_cents) %></td><td class="num"><%= money(r.paid_cents) %></td><td class="num"><strong><%= money(r.balance_cents) %></strong></td>
+      <td><% if (can('finance.record_payment')) { %><a href="<%= url('/finance/payment?registration=' + r.id) %>"><%= b('Enter Payment', '輸入付款') %></a><% } %></td></tr><% }) %></tbody></table></div>
+
+<% } else if (report === 'summary') { %>
+  <div class="stat-grid">
+    <div class="stat"><strong><%= money(data.received) %></strong><span><%= b('Money received', '收款') %></span></div>
+    <div class="stat"><strong><%= money(data.returned) %></strong><span><%= b('Money returned', '退款') %></span></div>
+    <div class="stat"><strong><%= amt(data.net) %></strong><span><%= b('Net', '淨額') %></span></div>
+    <div class="stat"><strong><%= money(data.regs.outstanding) %></strong><span><%= b('Registrations outstanding', '註冊未收') %></span></div>
+  </div>
+  <div class="portal-card"><h2><%= b('Money by type', '依交易類型') %></h2><table class="portal-table compact"><tbody>
+    <% data.byType.forEach(function(r){ %><tr><td><%= one(r.type_en, r.type_zh) %></td><td><span class="pill"><%= r.direction === 'out' ? b('out', '支出') : b('in', '收入') %></span></td><td class="num"><%= r.n %></td><td class="num"><%= money(r.cents) %></td></tr><% }) %></tbody></table></div>
+  <div class="portal-card"><h2><%= b('Money by payment method (net)', '依付款方式 (淨額)') %></h2><table class="portal-table compact"><tbody>
+    <% data.byMethod.forEach(function(r){ %><tr><td><%= one(r.method_en, r.method_zh) %></td><td class="num"><%= r.n %></td><td class="num"><%= amt(r.cents) %></td></tr><% }) %></tbody></table></div>
+  <div class="portal-card"><h2><%= b('Registrations billed, by class type', '註冊帳單 (依班別)') %></h2><div class="table-wrap"><table class="portal-table compact"><thead><tr><th><%= b('Class type', '班別') %></th><th class="num"><%= b('Students', '學生') %></th><th class="num"><%= b('Registration', '報名費') %></th><th class="num"><%= b('Early discount', '預註冊優惠') %></th><th class="num"><%= b('Tuition', '學費') %></th><th class="num"><%= b('Misc', '雜費') %></th><th class="num"><%= b('Sibling discount', '手足折扣') %></th><th class="num"><%= b('Net', '淨額') %></th></tr></thead><tbody>
+    <% data.billing.forEach(function(r){ %><tr><td><%= one(r.class_en, r.class_zh) %></td><td class="num"><%= r.students %></td><td class="num"><%= money(r.registration) %></td><td class="num"><%= amt(-r.early) %></td><td class="num"><%= money(r.tuition) %></td><td class="num"><%= money(r.misc) %></td><td class="num"><%= amt(-r.sibling) %></td><td class="num"><strong><%= money(r.net) %></strong></td></tr><% }) %></tbody></table></div>
+    <dl class="kv"><dt><%= b('Registrations', '註冊') %></dt><dd><%= data.regs.n %></dd><dt><%= b('Service fees', '代勞費') %></dt><dd><%= money(data.regs.service) %></dd><dt><%= b('Scrip deposit', '禮券訂金') %></dt><dd><%= money(data.regs.deposit) %></dd><dt><%= b('Scrip purchase committed', '承諾購買禮券') %></dt><dd><%= money(data.regs.scrip) %></dd>
+      <dt><%= b('Billed in total', '帳單總額') %></dt><dd><strong><%= money(data.regs.billed) %></strong></dd><dt><%= b('Collected (net of refunds)', '已收 (扣退款)') %></dt><dd><strong><%= money(data.regs.collected) %></strong></dd><dt><%= b('Outstanding', '未收') %></dt><dd><strong><%= money(data.regs.outstanding) %></strong></dd></dl></div>
+
+<% } else { %>
+  <div class="stat-grid">
+    <div class="stat"><strong><%= money(data.committed) %></strong><span><%= b('Committed at registration', '註冊時承諾購買') %></span></div>
+    <div class="stat"><strong><%= money(data.purchased) %></strong><span><%= b('Purchases recorded', '已登錄購買') %></span></div>
+    <div class="stat"><strong><%= money(data.shortfall) %></strong><span><%= b('Still to buy', '尚未購買') %></span></div>
+    <div class="stat"><strong><%= money(data.refunded) %></strong><span><%= b('Redeemed / refunded', '兌換 / 退款') %></span></div>
+  </div>
+  <div class="table-wrap"><table class="portal-table compact"><thead><tr><th><%= b('Vendor', '商家') %></th><th><%= b('Product', '商品') %></th><th class="num"><%= b('Card value', '面額') %></th><th class="num"><%= b('Sold', '售出') %></th><th class="num"><%= b('Sold amount', '售出金額') %></th><th class="num"><%= b('Out', '兌換/退') %></th><th class="num"><%= b('Out amount', '兌換/退金額') %></th></tr></thead><tbody>
+    <% if (!data.products.length) { %><tr><td colspan="7" class="empty"><%= b('No scrip card lines recorded this year.', '本學年沒有禮券卡明細。') %></td></tr><% } %>
+    <% data.products.forEach(function(p){ %><tr><td><%= p.vendor %></td><td><%= p.product %></td><td class="num"><%= p.denomination ? money(p.denomination) : '' %></td><td class="num"><%= p.sold_qty %></td><td class="num"><%= money(p.sold_cents) %></td><td class="num"><%= p.out_qty %></td><td class="num"><%= money(p.out_cents) %></td></tr><% }) %></tbody></table></div>
+<% } %>

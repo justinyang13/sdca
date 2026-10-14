@@ -12,6 +12,7 @@ import { icsForEvents } from './ics.js';
 import { buildSitemap } from './sitemap.js';
 import { lookupRedirect } from './redirects.js';
 import { bodyFor, setting } from './helpers.js';
+import { todayLocal } from './datetime.js';
 import { portedCtx, usePorted } from './ported.js';
 
 const PER_PAGE = 12;
@@ -63,7 +64,7 @@ export function registerPhase5Routes(app, bridge) {
     const kind = ANN_KINDS.includes(req.query.kind) ? req.query.kind : 'all';
     const pgNum = Math.max(1, parseInt(req.query.page || '1', 10) || 1);
 
-    const where = kind === 'all' ? 'a.published = 1' : 'a.published = 1 AND a.kind = ?';
+    const where = kind === 'all' ? 'a.published = 1 AND a.deleted_at IS NULL' : 'a.published = 1 AND a.deleted_at IS NULL AND a.kind = ?';
     const params = kind === 'all' ? [] : [kind];
     const total = db.prepare(`SELECT COUNT(*) c FROM announcements a WHERE ${where}`).get(...params).c;
     const anns = db.prepare(
@@ -88,7 +89,7 @@ export function registerPhase5Routes(app, bridge) {
       `SELECT a.*, d.slug AS doc_slug, d.file_path AS doc_path, d.bytes AS doc_bytes,
               d.title_en AS doc_title_en, d.title_zh AS doc_title_zh
        FROM announcements a LEFT JOIN documents d ON d.id = a.document_id
-       WHERE a.slug = ? AND a.published = 1`
+       WHERE a.slug = ? AND a.published = 1 AND a.deleted_at IS NULL`
     ).get(req.params.slug);
     if (!ann) return notFound(req, res);
     const doc = ann.doc_slug ? {
@@ -99,7 +100,7 @@ export function registerPhase5Routes(app, bridge) {
       lang === 'zh' ? (ann.body_zh || ann.body_en) : (ann.body_en || ann.body_zh));
     const related = db.prepare(
       `SELECT slug, title_en, title_zh, published_at FROM announcements
-       WHERE published = 1 AND slug != ? ORDER BY pinned DESC, published_at DESC LIMIT 5`
+       WHERE published = 1 AND deleted_at IS NULL AND slug != ? ORDER BY pinned DESC, published_at DESC LIMIT 5`
     ).all(ann.slug);
 
     page(lang, req, res, `/news/${ann.slug}`, 'news-detail.ejs',

@@ -45,24 +45,26 @@ export function icsForEvents(events, { calendarName = 'SDCA events' } = {}) {
     `CALSCALE:GREGORIAN`,
     `X-WR-CALNAME:${icsEscape(calendarName)}`,
   ];
+  const DATE = /^(\d{4})-(\d{2})-(\d{2})/; const DT = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/;
+  const ymd = (y, m, d) => `${y}${String(m).padStart(2, '0')}${String(d).padStart(2, '0')}`;
   for (const ev of events) {
-    const start = new Date(ev.starts_at);
-    let end = ev.ends_at ? new Date(ev.ends_at) : null;
-    const allDay = !ev.ends_at; // all-day or date-only
-    if (allDay) {
-      // For all-day events, DTEND is EXCLUSIVE: next day
-      end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
-    }
+    // all-day when flagged or when there is no clock time; times are school wall-clock time (the process runs in it)
+    const sm = DT.exec(String(ev.starts_at || ''));
+    const allDay = !!ev.all_day || !sm;
     const dtstamp = toIcsDateUTC(new Date());
     lines.push('BEGIN:VEVENT');
     lines.push(`UID:${ev.uid || ev.slug || Date.now()}@sdca`);
     lines.push(`DTSTAMP:${dtstamp}`);
     if (allDay) {
-      const ds = start.toISOString().slice(0, 10).replace(/-/g, '');
-      const de = end.toISOString().slice(0, 10).replace(/-/g, '');
-      lines.push(`DTSTART;VALUE=DATE:${ds}`);
-      lines.push(`DTEND;VALUE=DATE:${de}`);
+      const a = DATE.exec(String(ev.starts_at || '')); const b = DATE.exec(String(ev.ends_at || '')) || a;
+      const last = new Date(Date.UTC(+b[1], +b[2] - 1, +b[3] + 1));          // DTEND is exclusive: the day after the last day
+      lines.push(`DTSTART;VALUE=DATE:${ymd(a[1], a[2], a[3])}`);
+      lines.push(`DTEND;VALUE=DATE:${ymd(last.getUTCFullYear(), last.getUTCMonth() + 1, last.getUTCDate())}`);
     } else {
+      const at = (m, str) => (/Z$/.test(str) ? new Date(Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5])) : new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]));   // explicit "Z" = a UTC instant
+      const start = at(sm, String(ev.starts_at));
+      const em = DT.exec(String(ev.ends_at || ''));
+      const end = em ? at(em, String(ev.ends_at)) : new Date(start.getTime() + 60 * 60 * 1000);
       lines.push(`DTSTART:${toIcsDateUTC(start)}`);
       lines.push(`DTEND:${toIcsDateUTC(end)}`);
     }

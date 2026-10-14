@@ -4,11 +4,11 @@ import { can } from './perm.js';
 import { currentYear } from './fees.js';
 import { ownsFamily, parentFamilyIds } from './auth.js';
 import { audit } from './crud.js';
+import { portalHelpers } from './util.js';
 
 export function registerVolunteerRoutes(app, { db, page, requireLogin }) {
+  const { go, forbidden } = portalHelpers(page);
   const R = '/:lang/portal';
-  const go = (req, res, p, flash) => { if (flash) req.session.portalFlash = flash; res.redirect(`/${req.params.lang}/portal${p}`); };
-  const forbidden = (req, res) => page(req, res, 'forbidden.ejs', {}, { title: 'Not allowed', status: 403 });
   const familyFor = (req) => {
     const q = Number(req.query.family || req.body?.family || 0);
     if (q && (ownsFamily(db, req.portal.person.id, q) || can(req.portal.access, 'volunteer_signups.create'))) return q;

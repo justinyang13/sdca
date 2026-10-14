@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <title><%= title %> — SDCA Admin</title>
-  <link rel="stylesheet" href="/css/tokens.css">
-  <link rel="stylesheet" href="/css/base.css">
-  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="<%= asset('/css/tokens.css') %>">
+  <link rel="stylesheet" href="<%= asset('/css/base.css') %>">
+  <link rel="stylesheet" href="<%= asset('/css/admin.css') %>">
 </head>
 <body class="admin">
   <header class="admin-top">
@@ -45,6 +45,6 @@
   </main>
   <footer class="admin-foot">SDCA Admin — internal use only</footer>
   <div data-session-timeout="<%= idleMinutes %>" data-ping="/admin/ping" data-lang="en" hidden></div>
-  <script src="/js/session-timeout.js?v=1"></script>
+  <script src="<%= asset('/js/session-timeout.js') %>"></script>
 </body>
 </html>

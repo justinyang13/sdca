@@ -9,7 +9,8 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { openDb } from '../src/db/open.js';
 import { applyMigrations } from '../src/db/migrate.js';
-import { seedRolesAndPermissions } from '../src/portal/perm.js';
+import { seedRolesAndPermissions, BOARD_POSITIONS } from '../src/portal/perm.js';
+import { seedBoardPositions, syncBoardRoles } from '../src/portal/board.js';
 import { createUser, createPerson, createFamily, addFamilyMember } from '../src/portal/creators.js';
 import { computeRegistration } from '../src/portal/fees.js';
 import { gradeLabel } from '../src/portal/grades.js';
@@ -26,6 +27,7 @@ const all = (sql, ...a) => db.prepare(sql).all(...a);
 // ---------------------------------------------------------------- lookups
 function seedLookups() {
   seedRolesAndPermissions(db);
+  seedBoardPositions(db, BOARD_POSITIONS);
   if (!one('SELECT id FROM schools LIMIT 1')) {
     q(`INSERT INTO schools (name_en, name_zh, tax_id, mailing_street, mailing_city, mailing_state, mailing_zip, phone, email, website) VALUES (?,?,?,?,?,?,?,?,?,?)`,
       'San Diego Chinese Academy', '聖地牙哥中華學苑', '33-0290580', 'P.O. Box 910093', 'San Diego', 'CA', '92191-0093', '(858) 205-7322', 'Office.SDCA@gmail.com', 'https://sandiegochineseschool.com');
@@ -141,7 +143,7 @@ const zhName = (sur, n = 2) => sur[1] + Array.from({ length: n }, () => pick(GIV
 const phone = () => `(858) 555-01${String(between(0, 99)).padStart(2, '0')}`;
 const dt = (y, m, d, hh = 10, mm = 0) => `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')} ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}:00`;
 
-const WIPE = ['portal_audit', 'email_outbox', 'waiver_acceptances', 'volunteer_signups', 'withdrawals', 'transaction_lines', 'transactions', 'credit_grades', 'student_school_info', 'registration_items', 'enrollments',
+const WIPE = ['class_announcements', 'board_members', 'portal_audit', 'email_outbox', 'waiver_acceptances', 'volunteer_signups', 'withdrawals', 'transaction_lines', 'transactions', 'credit_grades', 'student_school_info', 'registration_items', 'enrollments',
   'registrations', 'class_assignments', 'school_classes', 'parent_students', 'family_members', 'invitations', 'password_resets', 'user_roles', 'users', 'families', 'persons', 'addresses'];
 
 function wipe() {   // outside a transaction so PRAGMA foreign_keys takes effect
@@ -168,6 +170,17 @@ function demo() {
     const pid = mkPerson({ english_last_name: last, english_first_name: first, chinese_name: zh, gender: 'F', email: `${u}@example.com`, mobile: phone(), birth_date: '1975-03-15' });
     staff[u] = pid; addUser(pid, `demo.${u}`, roles, type);
   }
+  // ---- board members: one demo account per board position (titles as on the public Board of Directors page)
+  const BOARD_DEMO = [['president', 'President', 'Demo', '理事長', 'board_president'], ['vicepresident', 'VicePresident', 'Demo', '副理事長', 'board_vice_president'], ['boardsecretary', 'BoardSecretary', 'Demo', '執行祕書', 'board_secretary'],
+    ['treasurer', 'Treasurer', 'Demo', '財務理事', 'board_treasurer'], ['editorial', 'Editorial', 'Demo', '編輯組理事', 'board_editorial'], ['ptadirector', 'PTADirector', 'Demo', '家長會理事', 'board_pta'],
+    ['scrip', 'Scrip', 'Demo', '禮券組理事', 'board_scrip'], ['activity', 'Activity', 'Demo', '活動組理事', 'board_activity'], ['operation', 'Operation', 'Demo', '業務組理事', 'board_operation']];
+  for (const [u, last, first, zh, roleCode] of BOARD_DEMO) {
+    const pid = mkPerson({ english_last_name: last, english_first_name: first, chinese_name: zh, gender: 'F', email: `${u}@example.com`, mobile: phone(), birth_date: '1972-06-20' });
+    addUser(pid, `demo.${u}`, [roleCode], 'board');
+    const pos = one('SELECT id FROM board_positions WHERE role_code = ?', roleCode);
+    q('INSERT INTO board_members (person_id, board_position_id, school_year_id, start_date) VALUES (?,?,?,?)', pid, pos.id, year.id, year.start_date || null);
+  }
+  syncBoardRoles(db);
   // keep the website admin's login working in the portal too (same password hash)
   const site = one("SELECT * FROM admin_users WHERE username = 'admin'");
   if (site) { const pid = mkPerson({ english_last_name: 'Admin', english_first_name: 'Site', chinese_name: '網站管理員', email: 'admin@example.com', birth_date: '1980-01-01' });

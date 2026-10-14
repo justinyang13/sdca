@@ -1,6 +1,7 @@
 <%
   const ownLabel = (fd) => b(fd.label.en, fd.label.zh);
   const val = (n) => (values && values[n] !== undefined && values[n] !== null ? values[n] : '');
+  const dtParts = (v) => utcToLocalParts(v);   // stored UTC moment → { date, time } in school time
   const cents = (n) => (val(n) === '' ? '' : (Number(val(n)) / 100).toFixed(2));
 %>
 <div class="portal-head">
@@ -10,13 +11,20 @@
     <% if (key === 'roles' && id) { %><a class="btn btn-primary" href="<%= url('/manage/roles/' + id + '/permissions') %>"><%= b('Permissions', '權限') %></a><% } %></div>
 </div>
 <% if (errors && errors._form) { %><p class="portal-error" role="alert"><%= errors._form %></p><% } %>
-<form method="post" action="<%= id ? url('/manage/' + key + '/' + id) : url('/manage/' + key) %>" class="pform pform-wide portal-card">
+<form method="post" action="<%= id ? url('/manage/' + key + '/' + id) : url('/manage/' + key) %>" class="pform pform-wide portal-card"<%- ent.fields.some(function(f){ return f.type === 'image' || f.uploadPdf; }) ? ' enctype="multipart/form-data"' : '' %>>
   <%- csrfField() %>
   <% ent.fields.forEach(function(fd){
        const err = errors && errors[fd.name] ? errors[fd.name] : '';
        const dis = readOnly ? ' disabled' : '';
        if (fd.type === 'readonly') { %>
     <div class="frow"><label><%= ownLabel(fd) %></label><div class="fctl"><span class="ro"><%= fd.name.endsWith('_at') ? fmtDateTime(val(fd.name)) : val(fd.name) %></span></div></div>
+  <%   } else if (fd.type === 'image') { const cur = String(val(fd.name)); %>
+    <div class="frow"><label for="f_<%= fd.name %>"><%= ownLabel(fd) %></label><div class="fctl img-field">
+      <% if (imgSrc(cur)) { %><img class="img-preview" src="<%= imgSrc(cur) %>" alt=""><% } %>
+      <input type="text" id="f_<%= fd.name %>" name="<%= fd.name %>" value="<%= cur %>" placeholder="/img/… or a library name"<%= dis %>>
+      <select data-fill="f_<%= fd.name %>" aria-label="<%= b('Pick from the image library', '從圖庫選擇') %>"<%= dis %>><option value=""><%= b('— pick from the image library —', '— 從圖庫選擇 —') %></option><% imageLibrary().forEach(function(n){ %><option value="<%= n %>"><%= n %></option><% }) %></select>
+      <input type="file" name="file_<%= fd.name %>" accept="image/jpeg,image/png,image/webp,image/gif"<%= dis %>>
+      <small class="muted"><%= b('Type a library name or an /img/… path, pick one from the library, or upload a JPG / PNG / WebP / GIF (up to 8 MB).', '輸入圖庫名稱或 /img/… 路徑、從圖庫挑選，或上傳 JPG / PNG / WebP / GIF（最大 8 MB）。') %></small></div></div>
   <%   } else if (fd.type === 'bool') { %>
     <div class="frow"><label for="f_<%= fd.name %>"><%= ownLabel(fd) %></label><div class="fctl"><input type="checkbox" id="f_<%= fd.name %>" name="<%= fd.name %>" value="1" <%= Number(val(fd.name)) ? 'checked' : '' %><%= dis %>></div></div>
   <%   } else if (fd.type === 'ref') { const rf = refs[fd.name]; %>
@@ -28,10 +36,11 @@
       <input type="hidden" id="h_<%= fd.name %>" name="<%= fd.name %>" value="<%= val(fd.name) %>">
       <% } %>
       <% if (err) { %><span class="ferr"><%= err %></span><% } %></div></div>
-  <%   } else if (fd.type === 'datetime') { const dv = String(val(fd.name)).replace('T', ' '); %>
+  <%   } else if (fd.type === 'datetime' || fd.type === 'localdt') { const lp = fd.type === 'datetime' ? dtParts(val(fd.name)) : { date: String(val(fd.name)).replace('T', ' ').slice(0, 10), time: String(val(fd.name)).replace('T', ' ').slice(11, 16) }; %>
     <div class="frow<%= err ? ' has-error' : '' %>"><label for="f_<%= fd.name %>_date"><%- fd.required ? '<span class="req">*</span> ' : '' %><%= ownLabel(fd) %></label><div class="fctl dt-pair">
-      <input type="date" id="f_<%= fd.name %>_date" name="<%= fd.name %>_date" value="<%= dv.slice(0, 10) %>"<%= dis %>>
-      <input type="time" id="f_<%= fd.name %>_time" name="<%= fd.name %>_time" value="<%= dv.length > 10 ? dv.slice(11, 16) : '' %>" data-time-for="<%= fd.name %>" aria-label="<%= b('Time', '時間') %>"<%= dis %>>
+      <input type="date" id="f_<%= fd.name %>_date" name="<%= fd.name %>_date" value="<%= lp.date %>"<%= dis %>>
+      <input type="time" id="f_<%= fd.name %>_time" name="<%= fd.name %>_time" value="<%= lp.time %>" data-time-for="<%= fd.name %>" aria-label="<%= b('Time', '時間') %>"<%= dis %>>
+      <% if (fd.uploadPdf) { %><div class="pdf-upload"><label class="muted"><%= b('…or upload a PDF to attach:', '…或上傳 PDF 附件：') %> <input type="file" name="file_pdf" accept="application/pdf"<%= dis %>></label></div><% } %>
       <% if (err) { %><span class="ferr"><%= err %></span><% } %></div></div>
   <%   } else {
          const opts = fd.type === 'select' ? fd.options.map(function(o){ return { v: o.v, label: one(o.en, o.zh) }; })

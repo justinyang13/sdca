@@ -1,28 +1,36 @@
 // src/portal/r-register.js — the 3-step registration wizard for a family, plus the printable form.
 import { csrfMiddleware } from '../middleware/csrf.js';
-import { can, canAll } from './perm.js';
+import { can } from './perm.js';
 import { currentYear, computeRegistration, money } from './fees.js';
 import { ownsFamily } from './auth.js';
 import { audit } from './crud.js';
 import { gradeLabel, gradeFromBirth, ageOn, startYear } from './grades.js';
 import { queueEmail } from './auth.js';
+import { portalHelpers } from './util.js';
+import { suggestFor, previousVolunteerJobs, copySchoolInfo, gradeNumber } from './rereg.js';
 
 const n2 = (s) => String(s || '').trim();
 
 export function registerRegistrationRoutes(app, { db, page, requireLogin }) {
+  const { lang, go, forbidden, staffCan } = portalHelpers(page);
   const R = '/:lang/portal';
-  const lang = (req) => req.params.lang;
-  const go = (req, res, p, flash) => { if (flash) req.session.portalFlash = flash; res.redirect(`/${lang(req)}/portal${p}`); };
-  const forbidden = (req, res) => page(req, res, 'forbidden.ejs', {}, { title: 'Not allowed', status: 403 });
-  const staffCan = (req, c) => canAll(req.portal.access, c);
   const mayRegister = (req, fid) => (can(req.portal.access, 'registration.own') && ownsFamily(db, req.portal.person.id, fid)) || staffCan(req, 'registrations.update');
   const mayView = (req, fid) => mayRegister(req, fid) || staffCan(req, 'registrations.view') || (can(req.portal.access, 'transactions.own') && ownsFamily(db, req.portal.person.id, fid));
   const regOf = (id) => db.prepare('SELECT * FROM registrations WHERE id = ? AND deleted_at IS NULL').get(Number(id));
   const famName = (fid) => db.prepare(`SELECT p.english_last_name || ' ' || p.english_first_name || ' ' || p.chinese_name AS n FROM family_members fm JOIN persons p ON p.id = fm.person_id WHERE fm.family_id = ? AND fm.relationship = 'parent_one' AND fm.deleted_at IS NULL`).get(fid)?.n || `Family #${fid}`;
 
+  // The year being registered for: ?year= / posted year when it is open (or staff), otherwise the current year.
+  const yearOf = (req) => {
+    const id = Number(req.query?.year || req.body?.year || 0);
+    if (!id) return currentYear(db);
+    const y = db.prepare('SELECT * FROM school_years WHERE id = ? AND deleted_at IS NULL').get(id);
+    return y && (y.registration_open || staffCan(req, 'registrations.update')) ? y : null;    // null → that year is not open for this person
+  };
+  const notOpen = (req, res) => go(req, res, '', { type: 'warn', msg: 'Registration is not open yet. 註冊尚未開放。' });
+
   // ---------- step 1 ----------
   function step1(req, res, fid, values = {}, errors = {}, status = 200) {
-    const year = currentYear(db);
+    const year = yearOf(req);
     const kids = db.prepare(`SELECT p.* FROM family_members fm JOIN persons p ON p.id = fm.person_id WHERE fm.family_id = ? AND fm.relationship = 'child' AND fm.deleted_at IS NULL ORDER BY p.birth_date`).all(fid);
     const enr = new Map(db.prepare(`SELECT e.*, sc.code, sc.name_zh, sc.name_en FROM enrollments e LEFT JOIN school_classes sc ON sc.id = e.school_class_id WHERE e.school_year_id = ? AND e.deleted_at IS NULL AND e.status <> 'withdrawn'
       AND e.student_person_id IN (SELECT person_id FROM family_members WHERE family_id = ?)`).all(year.id, fid).map((e) => [e.student_person_id, e]));
@@ -35,7 +43,13 @@ export function registerRegistrationRoutes(app, { db, page, requireLogin }) {
     const jobs = db.prepare('SELECT * FROM volunteer_jobs WHERE active = 1 AND deleted_at IS NULL ORDER BY sort, id').all();
     const mine = db.prepare('SELECT * FROM volunteer_signups WHERE family_id = ? AND school_year_id = ? AND deleted_at IS NULL ORDER BY priority').all(fid, year.id);
     const types = db.prepare('SELECT * FROM class_types WHERE deleted_at IS NULL ORDER BY sort').all().filter((c) => c.code !== 'adult');
+    // re-registration: what we know from last year, per child (class type, next grade, graduated?) and the volunteer choices
+    const plan = new Map(selectable.map((k) => [k.id, suggestFor(db, k, year)]));
+    const rereg = !draft && [...plan.values()].some((p) => p.hadPrevious);
+    const prevJobs = rereg && !mine.length ? previousVolunteerJobs(db, fid, year) : [];
+    const fam = db.prepare('SELECT f.*, a.street, a.city, a.state, a.zipcode FROM families f LEFT JOIN addresses a ON a.id = f.address_id WHERE f.id = ?').get(fid);
     page(req, res, 'register-1.ejs', {
+      plan, rereg, prevJobs, fam, gl2: gradeNumber,
       fid, year, kids, already: already.map((k) => ({ ...k, enrollment: enr.get(k.id) })), selectable, draftItems, types, jobs, preschoolEligible, mine,
       values, errors, draft, faq: '/pdf/registration-notice-english', famName: famName(fid), classTypeOf: (id) => db.prepare('SELECT * FROM class_types WHERE id=?').get(id),
     }, { title: 'Registration', status });
@@ -43,14 +57,15 @@ export function registerRegistrationRoutes(app, { db, page, requireLogin }) {
   app.get(`${R}/families/:id/register`, requireLogin, (req, res) => {
     const fid = Number(req.params.id);
     if (!mayRegister(req, fid)) return forbidden(req, res);
-    const year = currentYear(db);
-    if (!year?.registration_open && !staffCan(req, 'registrations.update')) return go(req, res, '', { type: 'warn', msg: 'Registration is not open yet. 註冊尚未開放。' });
+    const year = yearOf(req);
+    if (!year || (!year.registration_open && !staffCan(req, 'registrations.update'))) return notOpen(req, res);
     step1(req, res, fid);
   });
   app.post(`${R}/families/:id/register`, requireLogin, csrfMiddleware, (req, res) => {
     const fid = Number(req.params.id);
     if (!mayRegister(req, fid)) return forbidden(req, res);
-    const year = currentYear(db);
+    const year = yearOf(req);
+    if (!year) return notOpen(req, res);
     const selected = [].concat(req.body.student || []).map(Number).filter(Boolean);
     const errors = {};
     const items = [];
@@ -85,7 +100,8 @@ export function registerRegistrationRoutes(app, { db, page, requireLogin }) {
       const parent = req.portal.person.id;
       db.prepare("UPDATE volunteer_signups SET deleted_at = datetime('now') WHERE family_id = ? AND school_year_id = ? AND deleted_at IS NULL AND status = 'requested'").run(fid, year.id);
       prio.forEach((jid, i) => { if (jid) db.prepare('INSERT INTO volunteer_signups (family_id, person_id, school_year_id, job_id, priority, created_by, updated_by) VALUES (?,?,?,?,?,?,?)').run(fid, parent, year.id, jid, i + 1, uid, uid); });
-      audit(db, 'registrations', rid, 'draft_created', null, { students: items.length }, uid, req.ip);
+      const copied = copySchoolInfo(db, items.map((i) => i.studentId), year, uid);   // last year's regular-school info → this year (parent reviews it)
+      audit(db, 'registrations', rid, 'draft_created', null, { students: items.length, schoolInfoCopied: copied }, uid, req.ip);
       db.exec('COMMIT');
       go(req, res, `/registrations/${rid}/waiver`);
     } catch (e) { db.exec('ROLLBACK'); throw e; }

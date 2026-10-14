@@ -8,13 +8,11 @@ import {
 } from './auth.js';
 import { verifyPassword } from '../admin/auth.js';
 
-const s = (v) => String(v ?? '').trim();
 export const DEMO_EMAIL = process.env.PORTAL_EMAIL_MODE !== 'smtp';
 
 export function registerAuthRoutes(app, { db, page, requireLogin, isStaticBuild }) {
+  const { lang, go } = portalHelpers(page);
   const R = '/:lang/portal';
-  const lang = (req) => req.params.lang;
-  const go = (req, res, p, flash) => { if (flash) req.session.portalFlash = flash; res.redirect(`/${lang(req)}/portal${p}`); };
   const skipStatic = (req, res, next) => (isStaticBuild(req) ? next('route') : next());
 
   // ----- sign in -----
@@ -162,6 +160,7 @@ export function registerAuthRoutes(app, { db, page, requireLogin, isStaticBuild 
 }
 
 import { createUser, createPerson, createFamily, addFamilyMember } from './creators.js';
+import { s, portalHelpers } from './util.js';
 export { createUser, createPerson, createFamily, addFamilyMember };
 
 function createNewFamily(db, v, pw, lang) {

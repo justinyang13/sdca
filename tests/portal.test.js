@@ -89,10 +89,10 @@ test('Admin CRUD on an entity with audit + soft delete', async () => {
   assert.doesNotMatch((await c.get('/en/portal/manage/rooms?q=T-100')).text, /T-100<\/a>/);
 });
 
-test('List search + filter + paging on People', async () => {
+test('List search + filter + paging on the Directory (persons)', async () => {
   const c = new Client(); await c.login('demo.admin');
   const all = await c.get('/en/portal/manage/persons?ps=10');
-  assert.match(all.text, /Showing[^<]*1–10 \/ \d+/);
+  assert.match(all.text, /Showing[^<]*1–10 \/ \d+/); assert.match(all.text, /<h1>Directory/);
   const f = await c.get('/en/portal/manage/persons?f_gender=F&q=Demo');
   assert.equal(f.status, 200);
   const csv = await c.get('/en/portal/manage/persons/export.csv');

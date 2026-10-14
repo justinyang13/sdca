@@ -56,3 +56,13 @@ Git: `research/raw/`, `research/assets/` bulk, `work/`, `logs/`, `data/`, `node_
 
 ## CONTENT PRESERVATION RULE (owner rule, 2026-10-05) — applies to EVERY phase and every future change
 Presentation may be redesigned freely (layout, cards, galleries, typography), BUT for every old page its CONTENT AND ORDER MUST BE PRESERVED: all text (EN and ZH), all images/photos with their captions, all PDFs/links/embeds/forms, and the ORDER of sections/items as on the old page (e.g. the order of board members, staff, programs, announcements, sponsors, FAQs, list items, photo sequence). Nothing may be dropped, merged away, shortened or reordered. If something cannot be placed, add it to research/CONTENT-LEDGER.md under NEEDS OWNER REVIEW instead of silently omitting it. Every phase report must state how this rule was verified (content-audit + image-parity + order check). Add an ORDER CHECK to scripts/content-audit.js: for each old page, the sequence of its headings and of its content images/links must appear in the same relative order on the new page (report any inversions).
+
+## Dates and times (one rule per kind of value — `src/datetime.js`)
+| Kind | Stored as | Shown as |
+|---|---|---|
+| A moment something happened (`created_at`, `paid_at`, `last_login_at`, session / reset expiry …) | UTC `YYYY-MM-DD HH:MM:SS` (SQLite `datetime('now')`, or `nowUtc()` in JS) | portal / admin: `2026-10-13 14:30` in school time |
+| A calendar day (birthday, `transaction_date`, deadlines, school-year dates, all-day events) | `YYYY-MM-DD`, no time zone | `2026-10-13`; public pages `Oct 13, 2026` / `2026年10月13日` |
+| An event's clock time (`events.starts_at/ends_at`, field type `localdt`) | `YYYY-MM-DD HH:MM` school wall-clock time | `2:30 PM` / `下午 2:30` |
+- The school time zone is `SCHOOL_TZ` (default `America/Los_Angeles`); `config.js` sets `process.env.TZ`, so local `Date` getters, SQLite `'localtime'` and `todayLocal()` always mean school time, even on a UTC server. Never use `toISOString().slice(0, 10)` for "today" (it is the UTC date) — a test enforces it.
+- Form fields of type `datetime` are typed in school time and converted to UTC on save; `localdt` is stored as typed.
+- Legacy ISO `…T…Z` values were normalised by migration 011.

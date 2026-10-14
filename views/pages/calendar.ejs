@@ -21,8 +21,7 @@
   const key = function(d){ return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); };
   const dayOf = function(v){ return String(v).slice(0, 10); };
   const todayKey = key(new Date());
-  const monthName = L === 'zh' ? (month.getFullYear() + ' 年 ' + (month.getMonth() + 1) + ' 月')
-    : ['January','February','March','April','May','June','July','August','September','October','November','December'][month.getMonth()] + ' ' + month.getFullYear();
+  const monthName = dt.fmtMonthYear(month, L);
   const heads = L === 'zh' ? ['日','一','二','三','四','五','六'] : ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const CAT = { class: ['Class', '上課'], exam: ['Exam', '考試'], contest: ['Contest', '比賽'], meeting: ['Meeting', '會議'], deadline: ['Deadline', '截止日'], holiday: ['No school', '放假'], performance: ['Performance', '表演'], other: ['Other', '其他'] };
   const cats = Object.keys(CAT);
@@ -54,7 +53,7 @@
     <% if (!eventsArr.length) { %><p class="ann-empty"><%= t('events.no_events') %></p><% } %>
     <% let lastM = ''; eventsArr.forEach(function(e) { const m = String(e.starts_at).slice(0, 7);
          if (m !== lastM) { lastM = m; const dm = ld(e.starts_at); %>
-      <h3 class="all-ev-month"><%= L === 'zh' ? (dm.getFullYear() + ' 年 ' + (dm.getMonth() + 1) + ' 月') : ['January','February','March','April','May','June','July','August','September','October','November','December'][dm.getMonth()] + ' ' + dm.getFullYear() %></h3>
+      <h3 class="all-ev-month"><%= dt.fmtMonthYear(dm, L) %></h3>
     <% } %>
       <div class="events-list">
       <%- renderPart('partials/event-row.ejs', {

@@ -1,8 +1,10 @@
 // src/portal/crud.js — generic list / get / create / update / soft-delete for the entities in entities.js.
 import { ENTITIES } from './entities.js';
 import { hashPassword } from '../admin/auth.js';
+import { nowUtc, localToUtc, utcToLocalParts } from '../datetime.js';
+import { syncBoardRoles } from './board.js';
 
-const now = () => new Date().toISOString().replace('T', ' ').slice(0, 19);
+const now = () => nowUtc();
 const q = (s) => `"${String(s).replace(/"/g, '')}"`;       // identifier quoting (names come from our own definitions)
 export const getEntity = (key) => ENTITIES[key] || null;
 const isAddr = (fd) => !!fd.addr;
@@ -68,6 +70,11 @@ export function listRows(db, ent, params = {}) {
     if (['text', 'email', 'tel', 'textarea'].includes(fd.type)) { where.push(`${colSql(ent, fd)} LIKE ?`); args.push(`%${v}%`); }
     else { where.push(`${colSql(ent, fd)} = ?`); args.push(v); }
   }
+  // named filters defined by the entity (e.g. enrollments: placement = not placed yet)
+  for (const vf of ent.virtualFilters || []) {
+    const opt = vf.options.find((o) => o.v === params.filters?.[vf.name]);
+    if (opt) where.push(opt.sql);
+  }
   // extra filter on computed columns (exact)
   for (const ex of ent.listExtra || []) {
     const v = params.filters?.[ex.key];
@@ -111,7 +118,8 @@ export function coerce(fd, raw) {
     case 'money': { if (v === '') return null; const n = Math.round(parseFloat(v.replace(/[$,]/g, '')) * 100); return Number.isFinite(n) ? n : null; }
     case 'ref': return v === '' ? null : Number(v);
     case 'date': return v === '' ? null : v.slice(0, 10);
-    case 'datetime': return v === '' ? null : v.replace('T', ' ').slice(0, 19);
+    case 'datetime': { if (v === '') return null; const [d, t = ''] = v.replace('T', ' ').split(' '); return localToUtc(d, t); }   // typed in school time → stored UTC
+    case 'localdt': return v === '' ? null : v.replace('T', ' ').slice(0, 16);
     default: return v;
   }
 }
@@ -138,9 +146,9 @@ export function fromBody(ent, body, only = null) {
     if (fd.type === 'readonly') continue;
     if (only && !only.includes(fd.name)) continue;
     if (fd.type === 'bool') { out[fd.name] = coerce(fd, body[fd.name]); continue; }
-    if (fd.type === 'datetime' && body[`${fd.name}_date`] !== undefined) {   // date + time inputs → one value
+    if ((fd.type === 'datetime' || fd.type === 'localdt') && body[`${fd.name}_date`] !== undefined) {   // date + time inputs → one value
       const d = String(body[`${fd.name}_date`] || '').trim(); const t = String(body[`${fd.name}_time`] || '').trim();
-      out[fd.name] = d ? `${d}${t ? ' ' + t : ''}` : null; continue;
+      out[fd.name] = d ? (fd.type === 'localdt' ? `${d}${t ? ' ' + t : ''}` : localToUtc(d, t)) : null; continue;
     }
     if (body[fd.name] === undefined) continue;
     out[fd.name] = isVirtual(fd) ? String(body[fd.name] || '') : coerce(fd, body[fd.name]);
@@ -194,6 +202,27 @@ function prepEvent(db, data, existing) {
   }
   return d;
 }
+/** Public announcements: generate the web-address name from kind + date + title when empty. */
+function prepAnnouncement(db, data, existing) {
+  const d = { ...data };
+  if (!existing || ('slug' in d && !d.slug)) {
+    const kind = d.kind || existing?.kind || 'news'; const day = String(d.published_at || existing?.published_at || nowUtc()).slice(0, 10);
+    const title = String(d.title_en || existing?.title_en || d.title_zh || existing?.title_zh || 'announcement');
+    const base = `${kind}-${day}-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40)}`.replace(/-+$/g, '');
+    let slug = base; let n = 2;
+    while (db.prepare('SELECT 1 FROM announcements WHERE slug = ? AND id <> ?').get(slug, existing?.id || 0)) slug = `${base}-${n++}`;
+    d.slug = slug;
+  }
+  return d;
+}
+function indexAnnouncement(db, id) {
+  try {
+    const a = db.prepare('SELECT * FROM announcements WHERE id = ?').get(Number(id)); if (!a) return;
+    db.prepare("DELETE FROM search_index WHERE kind = 'announcement' AND slug = ?").run(a.slug);
+    if (a.published && !a.deleted_at) db.prepare('INSERT INTO search_index (kind, slug, title_en, title_zh, body_en, body_zh) VALUES (?,?,?,?,?,?)').run('announcement', a.slug, a.title_en, a.title_zh, a.body_en, a.body_zh);
+  } catch { /* optional */ }
+}
+
 /** Keep the website search index in step with an event (published, not deleted). */
 function indexEvent(db, id) {
   try {
@@ -206,6 +235,7 @@ function indexEvent(db, id) {
 
 export function createRow(db, ent, data, userId, ip = '') {
   if (ent.table === 'events') data = prepEvent(db, data, null);
+  if (ent.table === 'announcements') data = prepAnnouncement(db, data, null);
   const { own, addr, password } = splitData(ent, data, null);
   for (const [fk, parts] of Object.entries(addr)) { const id = upsertAddress(db, null, parts, userId); if (id) own[fk] = id; }
   if (ent.table === 'users' && password) own.password_hash = hashPassword(password);
@@ -215,6 +245,8 @@ export function createRow(db, ent, data, userId, ip = '') {
   const id = Number(r.lastInsertRowid);
   audit(db, ent.table, id, 'create', null, { ...own, password_hash: undefined }, userId, ip);
   if (ent.table === 'events') indexEvent(db, id);
+  if (ent.table === 'announcements') indexAnnouncement(db, id);
+  if (ent.table === 'board_members') syncBoardRoles(db);
   return id;
 }
 
@@ -222,6 +254,7 @@ export function updateRow(db, ent, id, data, userId, ip = '') {
   const before = db.prepare(`SELECT * FROM ${q(ent.table)} WHERE id = ?`).get(Number(id));
   if (!before) return false;
   if (ent.table === 'events') data = prepEvent(db, data, before);
+  if (ent.table === 'announcements') data = prepAnnouncement(db, data, before);
   const { own, addr, password } = splitData(ent, data, before);
   for (const [fk, parts] of Object.entries(addr)) { const aid = upsertAddress(db, before[fk], parts, userId); if (aid) own[fk] = aid; }
   if (ent.table === 'users' && password) own.password_hash = hashPassword(password);
@@ -230,6 +263,8 @@ export function updateRow(db, ent, id, data, userId, ip = '') {
   db.prepare(`UPDATE ${q(ent.table)} SET ${cols.map((c) => `${q(c)} = ?`).join(', ')} WHERE id = ?`).run(...Object.values(own), Number(id));
   audit(db, ent.table, Number(id), 'update', { ...before, password_hash: undefined }, { ...own, password_hash: undefined }, userId, ip);
   if (ent.table === 'events') indexEvent(db, id);
+  if (ent.table === 'announcements') indexAnnouncement(db, id);
+  if (ent.table === 'board_members') syncBoardRoles(db);
   return true;
 }
 
@@ -240,6 +275,8 @@ export function softDelete(db, ent, id, userId, ip = '') {
   db.prepare(`UPDATE ${q(ent.table)} SET deleted_at = ?, updated_at = ?, updated_by = ? WHERE id = ?`).run(now(), now(), userId || null, Number(id));
   audit(db, ent.table, Number(id), 'delete', { ...before, password_hash: undefined }, null, userId, ip);
   if (ent.table === 'events') indexEvent(db, id);
+  if (ent.table === 'announcements') indexAnnouncement(db, id);
+  if (ent.table === 'board_members') syncBoardRoles(db);
   return true;
 }
 

@@ -1,13 +1,15 @@
 // src/portal/r-people.js — person + family pages (staff and parents), add child / parent, edit, school info, instructor assignment.
 import { csrfMiddleware } from '../middleware/csrf.js';
 import { ENTITIES } from './entities.js';
-import { can, canAll } from './perm.js';
+import { can } from './perm.js';
 import { currentYear } from './fees.js';
 import { fromBody, validate, updateRow, createRow, audit } from './crud.js';
 import { ownsFamily, ownsPerson, createInvitation, queueEmail } from './auth.js';
 import { DEMO_EMAIL } from './r-auth.js';
 import { familyView } from './r-home.js';
 import { createPerson, createFamily, addFamilyMember } from './r-auth.js';
+import { todayLocal } from '../datetime.js';
+import { portalHelpers } from './util.js';
 
 const PERSON_MAIN = ['english_last_name', 'english_first_name', 'chinese_name', 'title', 'gender', 'birth_date', 'native_language', 'regular_school', 'regular_grade'];
 const PERSON_MEDICAL = ['allergy', 'special_medical_needs'];
@@ -16,11 +18,8 @@ const PERSON_STAFF = ['email', 'mobile', 'is_faculty'];
 const FAMILY_FIELDS = ['street', 'city', 'state', 'zipcode', 'home_phone', 'cell_phone', 'email', 'list_in_directory', 'emergency_contact', 'emergency_home_phone', 'emergency_cell_phone'];
 
 export function registerPeopleRoutes(app, { db, page, requireLogin }) {
+  const { lang, go, forbidden, staffCan } = portalHelpers(page);
   const R = '/:lang/portal';
-  const lang = (req) => req.params.lang;
-  const go = (req, res, p, flash) => { if (flash) req.session.portalFlash = flash; res.redirect(`/${lang(req)}/portal${p}`); };
-  const forbidden = (req, res) => page(req, res, 'forbidden.ejs', {}, { title: 'Not allowed', status: 403 });
-  const staffCan = (req, c) => canAll(req.portal.access, c);
   const mayViewFamily = (req, fid) => staffCan(req, 'families.view') || (can(req.portal.access, 'family.own') && ownsFamily(db, req.portal.person.id, fid));
   const mayEditFamily = (req, fid) => staffCan(req, 'families.update') || (can(req.portal.access, 'family.own') && ownsFamily(db, req.portal.person.id, fid));
   const mayEditPerson = (req, pid) => staffCan(req, 'persons.update') || (can(req.portal.access, 'family.own') && ownsPerson(db, req.portal.person.id, pid));
@@ -219,7 +218,7 @@ export function registerPeopleRoutes(app, { db, page, requireLogin }) {
   };
   app.get(`${R}/people/:id/assign`, requireLogin, (req, res) => {
     if (!staffCan(req, 'assignments.create')) return forbidden(req, res);
-    const year = currentYear(db); const today = new Date().toISOString().slice(0, 10);
+    const year = currentYear(db); const today = todayLocal();
     assignForm(req, res, Number(req.params.id), { school_year_id: year?.id, start_date: year?.first_day || today, end_date: year?.last_day || today });
   });
   app.post(`${R}/people/:id/assign`, requireLogin, csrfMiddleware, (req, res) => {

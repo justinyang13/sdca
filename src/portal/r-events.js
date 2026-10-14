@@ -2,13 +2,14 @@
 // so everything created here shows on the public events page, calendar and home page.
 import { can } from './perm.js';
 import { EVENT_CATEGORIES } from './entities.js';
+import { portalHelpers } from './util.js';
 
 const pad = (n) => String(n).padStart(2, '0');
 const ymd = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
 export function registerEventRoutes(app, { db, page, requireLogin }) {
+  const { forbidden } = portalHelpers(page);
   const R = '/:lang/portal';
-  const forbidden = (req, res) => page(req, res, 'forbidden.ejs', {}, { title: 'Not allowed', status: 403 });
 
   app.get(`${R}/events-calendar`, requireLogin, (req, res) => {
     if (!can(req.portal.access, 'events.list')) return forbidden(req, res);

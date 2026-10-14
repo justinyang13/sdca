@@ -11,25 +11,25 @@
   <link rel="alternate" hreflang="en" href="<%= typeof enUrl !== 'undefined' ? enUrl : '/en/' %>">
   <link rel="alternate" hreflang="zh-Hant" href="<%= typeof zhUrl !== 'undefined' ? zhUrl : '/zh/' %>">
   <link rel="alternate" hreflang="x-default" href="<%= typeof enUrl !== 'undefined' ? enUrl : '/en/' %>">
-  <link rel="icon" href="/favicon/favicon-32.png?v=210489" type="image/png" sizes="32x32">
-  <link rel="icon" href="/favicon/favicon.ico?v=210489" type="image/x-icon">
-  <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon-180.png?v=210489">
-  <link rel="icon" type="image/png" sizes="192x192" href="/favicon/icon-192.png?v=210489">
-  <link rel="icon" type="image/png" sizes="512x512" href="/favicon/icon-512.png?v=210489">
+  <link rel="icon" href="<%= asset('/favicon/favicon-32.png') %>" type="image/png" sizes="32x32">
+  <link rel="icon" href="<%= asset('/favicon/favicon.ico') %>" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="180x180" href="<%= asset('/favicon/apple-touch-icon-180.png') %>">
+  <link rel="icon" type="image/png" sizes="192x192" href="<%= asset('/favicon/icon-192.png') %>">
+  <link rel="icon" type="image/png" sizes="512x512" href="<%= asset('/favicon/icon-512.png') %>">
   <meta property="og:site_name" content="San Diego Chinese Academy">
   <meta property="og:title" content="<%= typeof title !== 'undefined' ? title : 'SDCA' %>">
   <meta property="og:description" content="<%= typeof description !== 'undefined' ? description : 'Non-profit Chinese language school in San Diego since 1988.' %>">
   <meta property="og:type" content="website">
   <meta property="og:image" content="<%= typeof ogImage !== 'undefined' && ogImage ? ogImage : '/brand/og-image.png' %>">
-  <link rel="stylesheet" href="/css/tokens.css?v=5">
-  <link rel="stylesheet" href="/css/base.css?v=4">
-  <link rel="stylesheet" href="/css/layout.css?v=12">
-  <link rel="stylesheet" href="/css/brand.css?v=3">
-  <link rel="stylesheet" href="/css/components.css?v=4">
-  <link rel="stylesheet" href="/css/blocks.css?v=26">
-  <link rel="stylesheet" href="/css/phase5.css?v=4">
-  <link rel="stylesheet" href="/css/portal.css?v=3">
-  <link rel="stylesheet" href="/css/portal-app.css?v=18">
+  <link rel="stylesheet" href="<%= asset('/css/tokens.css') %>">
+  <link rel="stylesheet" href="<%= asset('/css/base.css') %>">
+  <link rel="stylesheet" href="<%= asset('/css/layout.css') %>">
+  <link rel="stylesheet" href="<%= asset('/css/brand.css') %>">
+  <link rel="stylesheet" href="<%= asset('/css/components.css') %>">
+  <link rel="stylesheet" href="<%= asset('/css/blocks.css') %>">
+  <link rel="stylesheet" href="<%= asset('/css/phase5.css') %>">
+  <link rel="stylesheet" href="<%= asset('/css/portal.css') %>">
+  <link rel="stylesheet" href="<%= asset('/css/portal-app.css') %>">
 <% if (typeof jsonLd !== 'undefined' && jsonLd) { %>
   <script type="application/ld+json"><%- JSON.stringify(jsonLd) %></script>
 <% } %>
@@ -43,14 +43,14 @@
     </main>
     <%- typeof footer !== 'undefined' ? footer : '' %>
   </div>
-  <script type="module" src="/js/nav.js?v=3" defer></script>
-  <script type="module" src="/js/tabs.js?v=3" defer></script>
-  <script type="module" src="/js/lightbox.js?v=3" defer></script>
-  <script type="module" src="/js/slider.js?v=1" defer></script>
-  <script type="module" src="/js/mini-calendar.js?v=2" defer></script>
-  <script type="module" src="/js/forms.js?v=3" defer></script>
-  <script type="module" src="/js/portal.js?v=1" defer></script>
-  <script type="module" src="/js/portal-app.js?v=5" defer></script>
-  <script type="module" src="/js/hero-carousel.js?v=3" defer></script>
+  <script type="module" src="<%= asset('/js/nav.js') %>" defer></script>
+  <script type="module" src="<%= asset('/js/tabs.js') %>" defer></script>
+  <script type="module" src="<%= asset('/js/lightbox.js') %>" defer></script>
+  <script type="module" src="<%= asset('/js/slider.js') %>" defer></script>
+  <script type="module" src="<%= asset('/js/mini-calendar.js') %>" defer></script>
+  <script type="module" src="<%= asset('/js/forms.js') %>" defer></script>
+  <script type="module" src="<%= asset('/js/portal.js') %>" defer></script>
+  <script type="module" src="<%= asset('/js/portal-app.js') %>" defer></script>
+  <script type="module" src="<%= asset('/js/hero-carousel.js') %>" defer></script>
 </body>
 </html>

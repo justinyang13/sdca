@@ -7,18 +7,23 @@ import { currentYear } from './fees.js';
 import {
   listRows, getRow, createRow, updateRow, softDelete, fromBody, validate, refOptions, refCount, refLabel, csvEscape, listColumns, audit,
 } from './crud.js';
+import { portalHelpers } from './util.js';
+import { makeUploads } from './uploads.js';
+import { todayLocal } from '../datetime.js';
 
 const SMALL_REF = 150;
 
 export function registerManageRoutes(app, { db, page, requireLogin }) {
+  const { lang } = portalHelpers(page);
+  const imageUploads = makeUploads(db);
   const R = '/:lang/portal';
-  const lang = (req) => req.params.lang;
   const back = (req, res, p, flash) => { if (flash) req.session.portalFlash = flash; res.redirect(`/${lang(req)}/portal${p}`); };
 
   function guard(action) {
     return (req, res, next) => {
       const ent = ENTITIES[req.params.entity];
       if (!ent) return next('route');
+      if (ent.moved) return res.redirect(`/${req.params.lang}/portal${ent.moved}`);     // page merged into another one (e.g. assignments → Class Roster)
       const a = req.portal?.access;
       const ok = canAll(a, `${ent.perm}.${action}`) && !(ent.adminOnly && !can(a, 'roles.manage')) && entityActions(ent).includes(action);
       if (!ok) return page(req, res, 'forbidden.ejs', {}, { title: 'Not allowed', status: 403 });
@@ -48,6 +53,7 @@ export function registerManageRoutes(app, { db, page, requireLogin }) {
       } else w = { ...w, kind: 'text' };
       out.push(w);
     }
+    for (const vf of ent.virtualFilters || []) out.push({ name: vf.name, label: vf.label, value: filters[vf.name] ?? '', kind: 'select', options: vf.options.map((o) => ({ v: o.v, en: o.en, zh: o.zh })) });
     return out;
   }
 
@@ -123,13 +129,42 @@ export function registerManageRoutes(app, { db, page, requireLogin }) {
   // ---------- list ----------
   app.get(`${R}/manage/:entity`, requireLogin, guard('list'), (req, res) => {
     const ent = req.ent;
+    if (ent.movedList) return res.redirect(`/${req.params.lang}/portal${ent.movedList}`);   // the list lives elsewhere (Classes = the class page); forms still work
     const filters = filtersOf(req, ent);
     const year = currentYear(db);
     // default to the current school year for year-scoped lists the first time (no filter chosen yet)
     if (!('yr' in req.query) && year) { const fd = ent.fields.find((x) => x.defaultCurrentYear && x.filter); if (fd && !filters[fd.name]) filters[fd.name] = String(year.id); }
     const params = { q: req.query.q, filters, sort: req.query.sort, dir: req.query.dir, page: req.query.page, pageSize: req.query.ps };
     const result = listRows(db, ent, params);
+    // Family list: the children of each family (with a "Student" indicator when enrolled this year) for the expanded row
+    let kids = {};
+    if (ent.expandChildren && result.rows.length) {
+      const cy = currentYear(db); const ids = result.rows.map((r) => r.id);
+      for (const k of db.prepare(`SELECT fm.family_id, p.id, p.english_first_name, p.english_last_name, p.chinese_name, p.gender, p.birth_date, p.allergy, p.special_medical_needs,
+          e.status AS enr_status, e.grade_label, sc.code AS class_code, sc.name_en AS class_en, sc.name_zh AS class_zh, ct.name_en AS ct_en, ct.name_zh AS ct_zh
+        FROM family_members fm JOIN persons p ON p.id = fm.person_id
+        LEFT JOIN enrollments e ON e.student_person_id = p.id AND e.school_year_id = ? AND e.status <> 'withdrawn' AND e.deleted_at IS NULL
+        LEFT JOIN school_classes sc ON sc.id = e.school_class_id LEFT JOIN class_types ct ON ct.id = e.class_type_id
+        WHERE fm.family_id IN (${ids.map(() => '?').join(',')}) AND fm.relationship = 'child' AND fm.deleted_at IS NULL ORDER BY p.birth_date`).all(cy?.id || 0, ...ids)) (kids[k.family_id] ||= []).push(k);
+    }
+    // Student List: the regular (middle / high) school information of credit-class students, shown in the expanded row
+    let schoolInfo = {}; let creditTypes = new Set(); let currentYearId = null;
+    if (ent.expandSchoolInfo && result.rows.length) {
+      currentYearId = currentYear(db)?.id || null;
+      creditTypes = new Set(db.prepare('SELECT id FROM class_types WHERE is_credit = 1').all().map((r) => r.id));
+      const pids = [...new Set(result.rows.map((r) => r.person_id))];
+      for (const i of db.prepare(`SELECT i.*, d.name AS district FROM student_school_info i LEFT JOIN school_districts d ON d.id = i.school_district_id
+        WHERE i.deleted_at IS NULL AND i.student_person_id IN (${pids.map(() => '?').join(',')})`).all(...pids)) schoolInfo[`${i.student_person_id}-${i.school_year_id}`] = i;
+    }
+    // enrollments: classes the row's student could be placed in (same school year, any class type is offered first when it matches)
+    let placeClasses = [];
+    if (ent.expandPlacement && canAll(req.portal.access, 'placement.assign')) {
+      const yearIds = [...new Set(result.rows.map((r) => r.school_year_id))];
+      if (yearIds.length) placeClasses = db.prepare(`SELECT sc.id, sc.code, sc.name_en, sc.name_zh, sc.class_type_id, sc.school_year_id, sc.capacity, (SELECT COUNT(*) FROM enrollments e WHERE e.school_class_id = sc.id AND e.status IN ('registered','placed') AND e.deleted_at IS NULL) AS n
+        FROM school_classes sc WHERE sc.school_year_id IN (${yearIds.map(() => '?').join(',')}) AND sc.deleted_at IS NULL ORDER BY sc.code`).all(...yearIds);
+    }
     page(req, res, 'manage-list.ejs', {
+      kids, schoolInfo, creditTypes, currentYearId, placeClasses, canPlace: canAll(req.portal.access, 'placement.assign'),
       ent, key: req.entKey, result, filters, widgets: filterWidgets(ent, filters), q: String(req.query.q || ''),
       canCreate: !ent.readOnly && !ent.noCreate && canAll(req.portal.access, `${ent.perm}.create`),
       canUpdate: !ent.readOnly && canAll(req.portal.access, `${ent.perm}.update`),
@@ -175,16 +210,18 @@ export function registerManageRoutes(app, { db, page, requireLogin }) {
     const year = currentYear(db);
     for (const fd of ent.fields) {
       if (fd.defaultCurrentYear && year) values[fd.name] = year.id;
+      if (fd.defaultToday) values[fd.name] = todayLocal();
       if (fd.type === 'select' && fd.options?.length && !values[fd.name]) values[fd.name] = fd.options[0].v;
       if (fd.type === 'bool' && ['active', 'is_current'].includes(fd.name) === false) values[fd.name] = fd.name === 'active' ? 1 : 0;
       if (req.query[fd.name] !== undefined) values[fd.name] = req.query[fd.name];
     }
     renderForm(req, res, ent, req.entKey, values, {}, null);
   });
-  app.post(`${R}/manage/:entity`, requireLogin, csrfMiddleware, guard('create'), (req, res) => {
+  app.post(`${R}/manage/:entity`, requireLogin, guard('create'), imageUploads, csrfMiddleware, (req, res) => {
     const ent = req.ent;
     const data = fromBody(ent, req.body);
     const errors = validate(ent, data, { creating: true });
+    if (req.uploadError) errors._form = req.uploadError;
     if (Object.keys(errors).length) return renderForm(req, res, ent, req.entKey, { ...data }, errors, null, 400);
     try {
       const id = createRow(db, ent, data, req.portal.user.id, req.ip);
@@ -201,12 +238,13 @@ export function registerManageRoutes(app, { db, page, requireLogin }) {
     if (!row) return back(req, res, `/manage/${req.entKey}`, { type: 'warn', msg: 'Not found' });
     renderForm(req, res, ent, req.entKey, row, {}, row.id);
   });
-  app.post(`${R}/manage/:entity/:id`, requireLogin, csrfMiddleware, guard('update'), (req, res) => {
+  app.post(`${R}/manage/:entity/:id`, requireLogin, guard('update'), imageUploads, csrfMiddleware, (req, res) => {
     const ent = req.ent;
     const row = getRow(db, ent, req.params.id);
     if (!row) return back(req, res, `/manage/${req.entKey}`, { type: 'warn', msg: 'Not found' });
     const data = fromBody(ent, req.body);
     const errors = validate(ent, data);
+    if (req.uploadError) errors._form = req.uploadError;
     if (Object.keys(errors).length) return renderForm(req, res, ent, req.entKey, { ...row, ...data }, errors, row.id, 400);
     try {
       updateRow(db, ent, row.id, data, req.portal.user.id, req.ip);

@@ -1,5 +1,6 @@
 <% const e = errors || {}; const mopt = methods.map(function(m){ return {v:m.id,label:one(m.name_en,m.name_zh)}; }); %>
-<h1><%= b('Enter Registration Payment', '輸入註冊付款') %></h1>
+<div class="portal-head"><h1><%= b('Enter Registration Payment', '輸入註冊付款') %></h1>
+  <div class="portal-actions"><a class="btn btn-ghost" href="<%= url('/finance/manual/new') %>">+ <%= b('New Manual Transaction', '新增手動交易') %></a></div></div>
 <% if (!pending.length) { %><p class="muted"><%= b('There are no submitted registrations waiting for payment.', '目前沒有等待付款的註冊。') %></p><% } %>
 <form method="post" action="<%= url('/finance/payment') %>" class="pform pform-wide portal-card"><%- csrfField() %>
   <%- field({ label: b('Registration', '註冊'), name: 'registration', value: chosen, error: e.registration, required: true,

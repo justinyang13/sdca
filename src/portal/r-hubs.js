@@ -1,15 +1,24 @@
 // src/portal/r-hubs.js — landing pages for the Profile, Account, Billing and Resources menus.
 import { can } from './perm.js';
 import { RESOURCES } from './render.js';
+import { paidSql } from './money.js';
+import { fmtDateTime } from '../datetime.js';
+import { familyView } from './r-home.js';
+import { portalHelpers } from './util.js';
 
 export function registerHubRoutes(app, { db, page, requireLogin }) {
+  const { lang: L, P, forbidden } = portalHelpers(page);
   const R = '/:lang/portal';
-  const L = (req) => req.params.lang;
-  const P = (req, p = '') => `/${L(req)}/portal${p}`;
-  const forbidden = (req, res) => page(req, res, 'forbidden.ejs', {}, { title: 'Not allowed', status: 403 });
 
   // keep-alive for the "stay signed in" button / activity pings (the session cookie is renewed on every response)
   app.get(`${R}/ping`, requireLogin, (req, res) => res.status(204).set('Cache-Control', 'no-store').end());
+
+  // "Manage Enrollment": registration buttons, registrations and where each child is placed — per family
+  app.get(`${R}/enrollment`, requireLogin, (req, res) => {
+    const fams = req.portal.familyIds.map((id) => familyView(db, id)).filter(Boolean);
+    if (!fams.length) return forbidden(req, res);
+    page(req, res, 'enrollment.ejs', { fams, canRegister: can(req.portal.access, 'registration.own') }, { title: 'Manage Enrollment' });
+  });
 
   app.get(`${R}/profile`, requireLogin, (req, res) => {
     const { person, familyIds } = req.portal;
@@ -36,7 +45,7 @@ export function registerHubRoutes(app, { db, page, requireLogin }) {
       [{ en: 'Account Status', zh: '帳號狀態' }, user.status],
       [{ en: 'Roles', zh: '角色' }, access.roles.map((r) => (L(req) === 'zh' ? r.name_zh || r.name_en : r.name_en)).join(', ')],
       [{ en: 'Account Email', zh: '帳號電子郵件' }, email],
-      [{ en: 'Last Sign-in', zh: '上次登入' }, (user.last_login_at || '—').slice(0, 16)],
+      [{ en: 'Last Sign-in', zh: '上次登入' }, fmtDateTime(user.last_login_at) || '—'],
       [{ en: 'Password', zh: '密碼' }, '••••••••'],
     ], cards: [{ en: 'Change User Name', zh: '更改用戶名稱', desc_en: 'Pick a different sign-in name.', desc_zh: '選擇新的登入名稱。', href: P(req, '/change-username') }, { en: 'Change Password', zh: '更改密碼', desc_en: 'Choose a new password (8 or more characters).', desc_zh: '設定新密碼（至少八個字元）。', href: P(req, '/change-password') }] }, { title: 'Account' });
   });
@@ -46,7 +55,7 @@ export function registerHubRoutes(app, { db, page, requireLogin }) {
     if (!can(req.portal.access, 'transactions.own') || !fams.length) return forbidden(req, res);
     const ph = fams.map(() => '?').join(',');
     const regs = db.prepare(`SELECT r.id, r.status, r.grand_total_cents, y.label AS year,
-        COALESCE((SELECT SUM(t.amount_cents) FROM transactions t WHERE t.registration_id = r.id AND t.voided_at IS NULL AND t.deleted_at IS NULL), 0) AS paid_cents
+        ${paidSql('r')} AS paid_cents
       FROM registrations r JOIN school_years y ON y.id = r.school_year_id
       WHERE r.family_id IN (${ph}) AND r.deleted_at IS NULL AND r.status <> 'draft' ORDER BY y.label DESC, r.id DESC`).all(...fams);
     const recent = db.prepare(`SELECT t.id, t.transaction_date, t.amount_cents, t.voided_at, tt.name_en AS type_en, tt.name_zh AS type_zh FROM transactions t JOIN transaction_types tt ON tt.id = t.transaction_type_id

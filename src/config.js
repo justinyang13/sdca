@@ -4,8 +4,14 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
+// The school's time zone. The whole process runs in it, so "today", local Date getters and SQLite's 'localtime' always
+// mean school time whatever the host's own zone is (see src/datetime.js and ARCHITECTURE.md → Dates and times).
+export const SCHOOL_TZ = process.env.SCHOOL_TZ || 'America/Los_Angeles';
+process.env.TZ = SCHOOL_TZ;
+
 export const config = {
   env: process.env.NODE_ENV || 'development',
+  timezone: SCHOOL_TZ,
   isProduction: process.env.NODE_ENV === 'production',
   port: Number(process.env.PORT || 3000),
   host: process.env.HOST || '0.0.0.0',

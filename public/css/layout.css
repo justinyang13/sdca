@@ -452,3 +452,7 @@ html[lang="en"] .brand-en { color: var(--gray-500); }
 .hero-carousel:has(.is-intro.is-current) { background: #fffaf2; }
 .footer-portal + .footer-portal { display: flex; width: max-content; margin-top: 10px; background: transparent; border: 1px solid rgba(255, 255, 255, .6); }
 .footer-portal + .footer-portal:hover { background: rgba(255, 255, 255, .14); }
+.hero-caption-desc { color: #fff; font-size: .95rem; max-width: 60ch; }
+.hero-caption-desc p { margin: 0; }
+.hero-feature-title { margin: 0 0 4px; color: #fff; font-size: clamp(1.8rem, 4vw, 3rem); text-wrap: balance; }
+.hero-enroll .hero-carousel-tagline p { margin: 0; }

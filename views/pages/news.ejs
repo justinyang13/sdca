@@ -10,13 +10,7 @@
   const pageCount = Math.max(1, Math.ceil(total / per));
   const items = n.anns || [];
   const L = lang;
-  const dateFmt = (iso) => {
-    if (!iso) return '';
-    const d = new Date(iso);
-    const months = L === 'zh' ? ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
-                              : ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
-  };
+  const dateFmt = (iso) => dt.fmtLong(iso, L);   // public style: Oct 13, 2026 / 2026年10月13日
   const title = (r) => L === 'zh' ? (r.title_zh || r.title_en || '') : (r.title_en || r.title_zh || '');
   const note  = (r) => {
     const en = r.title_en || ''; const zh = r.title_zh || '';

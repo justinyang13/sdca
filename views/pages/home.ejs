@@ -14,19 +14,12 @@
     if (L === 'zh') return zh ? null : (en ? 'meta.lang_note_zh' : null);
     return en ? null : (zh ? 'meta.lang_note_en' : null);
   };
-  const dateFmt = (iso) => {
-    if (!iso) return '';
-    const d = new Date(iso);
-    const months = L === 'zh' ? ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
-                              : ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
-  };
+  const dateFmt = (iso) => dt.fmtLong(iso, L);   // public style: Oct 13, 2026 / 2026年10月13日
 %>
 
 <% const __all = (typeof blocks !== 'undefined' && blocks) ? blocks : []; %>
-<% const __introFirst = __all.length && __all[0].columns; %>
+<% const __introFirst = __all.length && __all[0].columns; /* the welcome columns now live in the first hero slide (database) */ %>
 <%- renderPart('partials/hero-carousel.ejs', {
-  introHtml: __introFirst ? renderPart('partials/blocks.ejs', { blocks: [__all[0]] }).replace(/href="\/en\//g, 'href="/' + L + '/') : '',
   slides: slides,
   schoolName: schoolName,
   tagline: tagline,

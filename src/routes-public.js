@@ -141,11 +141,12 @@ export function registerPublicRoutes(app, bridge) {
           descEn: 'A California non-profit funded by families, sponsors and Scrip sales.',
           descZh: '由家長、贊助商與禮券收入支持的加州非營利機構。' },
       ],
-      slides: db.prepare('SELECT * FROM slides WHERE published = 1 ORDER BY sort, id').all(),
+      slides: db.prepare('SELECT * FROM slides WHERE published = 1 AND deleted_at IS NULL ORDER BY sort, id').all()
+        .map((r) => ({ ...r, html_en: renderMarkdown(r.description_en), html_zh: renderMarkdown(r.description_zh) })),
       announcements: db.prepare(
         'SELECT a.*, d.title_en AS doc_title_en, d.title_zh AS doc_title_zh, d.file_path AS doc_path '
         + 'FROM announcements a LEFT JOIN documents d ON d.id = a.document_id '
-        + 'WHERE a.published = 1 ORDER BY a.published_at DESC LIMIT 5'
+        + 'WHERE a.published = 1 AND a.deleted_at IS NULL ORDER BY a.published_at DESC LIMIT 5'
       ).all(),
       events: db.prepare(
         'SELECT * FROM events WHERE deleted_at IS NULL AND published = 1 ORDER BY starts_at DESC LIMIT 5'

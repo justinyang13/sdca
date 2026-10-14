@@ -1,20 +1,16 @@
 // src/portal/r-finance.js — transaction history & receipts (parents), payment entry / manual transactions / void / withdrawal (staff).
 import { csrfMiddleware } from '../middleware/csrf.js';
-import { can, canAll } from './perm.js';
+import { can } from './perm.js';
 import { currentYear, money, withdrawalFee } from './fees.js';
 import { ownsFamily, queueEmail } from './auth.js';
 import { audit, refOptions } from './crud.js';
+import { paidSql, registrationPaid } from './money.js';
+import { s, dollars, today, portalHelpers } from './util.js';
 
-const s = (v) => String(v ?? '').trim();
-const dollars = (v) => { const n = Math.round(parseFloat(String(v || '').replace(/[$,]/g, '')) * 100); return Number.isFinite(n) ? n : null; };
 
 export function registerFinanceRoutes(app, { db, page, requireLogin }) {
+  const { lang, go, forbidden, staffCan } = portalHelpers(page);
   const R = '/:lang/portal';
-  const lang = (req) => req.params.lang;
-  const go = (req, res, p, flash) => { if (flash) req.session.portalFlash = flash; res.redirect(`/${lang(req)}/portal${p}`); };
-  const forbidden = (req, res) => page(req, res, 'forbidden.ejs', {}, { title: 'Not allowed', status: 403 });
-  const staffCan = (req, c) => canAll(req.portal.access, c);
-  const today = () => new Date().toISOString().slice(0, 10);
   const famName = (fid) => db.prepare(`SELECT p.english_last_name || ' ' || p.english_first_name || ' ' || p.chinese_name AS n FROM family_members fm JOIN persons p ON p.id = fm.person_id WHERE fm.family_id = ? AND fm.relationship = 'parent_one' AND fm.deleted_at IS NULL`).get(fid)?.n || `Family #${fid}`;
   const txOf = (id) => db.prepare(`SELECT t.*, tt.name_en AS type_en, tt.name_zh AS type_zh, tt.is_registration, pm.name_en AS method_en, pm.name_zh AS method_zh,
     (SELECT p.english_first_name || ' ' || p.english_last_name || ' ' || p.chinese_name FROM persons p WHERE p.id = t.executed_by_person_id) AS executed_by,
@@ -55,7 +51,7 @@ export function registerFinanceRoutes(app, { db, page, requireLogin }) {
     db.exec('BEGIN');
     db.prepare("UPDATE transactions SET voided_at = datetime('now'), voided_by = ?, void_reason = ?, updated_at = datetime('now'), updated_by = ? WHERE id = ?").run(uid, s(req.body.reason), uid, tx.id);
     if (tx.registration_id) {
-      const paid = db.prepare('SELECT COALESCE(SUM(amount_cents),0) AS n FROM transactions WHERE registration_id = ? AND voided_at IS NULL AND deleted_at IS NULL').get(tx.registration_id).n;
+      const paid = registrationPaid(db, tx.registration_id);
       const reg = db.prepare('SELECT * FROM registrations WHERE id = ?').get(tx.registration_id);
       if (reg && paid < reg.grand_total_cents && reg.status === 'paid') {
         db.prepare("UPDATE registrations SET status = 'submitted', paid_at = NULL WHERE id = ?").run(reg.id);
@@ -72,7 +68,7 @@ export function registerFinanceRoutes(app, { db, page, requireLogin }) {
   app.get(`${R}/finance/payment`, requireLogin, (req, res) => {
     if (!staffCan(req, 'finance.record_payment')) return forbidden(req, res);
     const year = currentYear(db);
-    const pending = db.prepare(`SELECT r.id, r.family_id, r.status, r.grand_total_cents, (SELECT COALESCE(SUM(t.amount_cents),0) FROM transactions t WHERE t.registration_id = r.id AND t.voided_at IS NULL AND t.deleted_at IS NULL) AS paid,
+    const pending = db.prepare(`SELECT r.id, r.family_id, r.status, r.grand_total_cents, ${paidSql('r')} AS paid,
       (SELECT p.english_last_name || ' ' || p.english_first_name || ' ' || p.chinese_name FROM family_members fm JOIN persons p ON p.id = fm.person_id WHERE fm.family_id = r.family_id AND fm.relationship = 'parent_one' LIMIT 1) AS parent
       FROM registrations r WHERE r.school_year_id = ? AND r.status = 'submitted' AND r.deleted_at IS NULL ORDER BY r.submitted_at`).all(year.id);
     const chosen = Number(req.query.registration || 0) || (req.query.family ? pending.find((r) => r.family_id === Number(req.query.family))?.id : 0) || 0;
@@ -100,7 +96,7 @@ export function registerFinanceRoutes(app, { db, page, requireLogin }) {
       const date = s(req.body.transaction_date) || today();
       const t = db.prepare(`INSERT INTO transactions (family_id, registration_id, school_year_id, transaction_type_id, transaction_date, payment_method_id, check_number, amount_cents, note, recorded_by_user_id, created_by, updated_by)
         VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`).run(reg.family_id, reg.id, reg.school_year_id, type, date, m.id, s(req.body.check_number), cents, s(req.body.note), uid, uid, uid);
-      const paid = db.prepare('SELECT COALESCE(SUM(amount_cents),0) AS n FROM transactions WHERE registration_id = ? AND voided_at IS NULL AND deleted_at IS NULL').get(reg.id).n;
+      const paid = registrationPaid(db, reg.id);
       if (paid >= reg.grand_total_cents) {
         db.prepare("UPDATE registrations SET status = 'paid', paid_at = datetime('now'), updated_at = datetime('now'), updated_by = ? WHERE id = ?").run(uid, reg.id);
         db.prepare("UPDATE enrollments SET status = CASE WHEN school_class_id IS NULL THEN 'registered' ELSE 'placed' END, updated_at = datetime('now') WHERE registration_id = ? AND status = 'pending'").run(reg.id);
@@ -119,17 +115,19 @@ export function registerFinanceRoutes(app, { db, page, requireLogin }) {
     const members = fid ? db.prepare(`SELECT p.id, p.english_first_name, p.english_last_name, p.chinese_name, fm.relationship FROM family_members fm JOIN persons p ON p.id = fm.person_id WHERE fm.family_id = ? AND fm.deleted_at IS NULL ORDER BY fm.relationship, p.birth_date`).all(fid) : [];
     page(req, res, 'manual-form.ejs', {
       v: { transaction_date: today(), ...v, family_id: fid || '' }, errors, members, famName: fid ? famName(fid) : '',
-      types: db.prepare('SELECT * FROM transaction_types WHERE deleted_at IS NULL ORDER BY id').all(), methods: methods(),
+      types: db.prepare('SELECT * FROM transaction_types WHERE deleted_at IS NULL ORDER BY id').all().filter((t) => !scripOnly(req) || /^scrip_/.test(t.code)), methods: methods(),
       products: db.prepare('SELECT * FROM scrip_products WHERE active = 1 AND deleted_at IS NULL ORDER BY vendor, denomination_cents').all(),
       families: fid ? [] : refOptions(db, 'families', { limit: 60 }),
     }, { title: 'New Manual Transaction', status });
   };
-  app.get(`${R}/finance/manual/new`, requireLogin, (req, res) => { if (!staffCan(req, 'finance.record_payment')) return forbidden(req, res); manualForm(req, res, { person_id: req.query.person || '' }); });
+  const scripOnly = (req) => !staffCan(req, 'finance.record_payment') && staffCan(req, 'finance.record_scrip');
+  app.get(`${R}/finance/manual/new`, requireLogin, (req, res) => { if (!staffCan(req, 'finance.record_payment') && !staffCan(req, 'finance.record_scrip')) return forbidden(req, res); manualForm(req, res, { person_id: req.query.person || '' }); });
   app.post(`${R}/finance/manual/new`, requireLogin, csrfMiddleware, (req, res) => {
-    if (!staffCan(req, 'finance.record_payment')) return forbidden(req, res);
+    if (!staffCan(req, 'finance.record_payment') && !staffCan(req, 'finance.record_scrip')) return forbidden(req, res);
     const b = req.body; const errors = {};
     const fid = Number(b.family_id) || null;
     const type = db.prepare('SELECT * FROM transaction_types WHERE id = ?').get(Number(b.transaction_type_id));
+    if (type && scripOnly(req) && !/^scrip_/.test(type.code)) return forbidden(req, res);   // the Scrip Director records scrip purchases / redemptions only
     const m = db.prepare('SELECT * FROM payment_methods WHERE id = ?').get(Number(b.payment_method_id));
     if (!fid) errors.family_id = 'required'; if (!type) errors.transaction_type_id = 'required'; if (!m) errors.payment_method_id = 'required'; if (!s(b.transaction_date)) errors.transaction_date = 'required';
     // scrip lines: product_i + qty_i

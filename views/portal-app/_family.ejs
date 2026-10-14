@@ -14,7 +14,7 @@
       <dt><%= b('Native Language', '母語') %></dt><dd><%= me.native_language %></dd></dl>
     <p><a class="btn btn-ghost" href="<%= url('/people/' + me.id + '/edit') %>"><%= b('Edit Person Details', '編輯個人資料') %></a></p></div>
   <% } %>
-  <% if (canRegister && regOpen && F.children.length) { %><p><a class="btn btn-primary" href="<%= url('/families/' + fid + '/register') %>"><%= b('Register For ' + yr.label + ' School Year', '註冊 ' + yr.label + ' 學年') %></a>
+  <% if (canRegister && F.children.length) { %><p class="btn-row"><% F.regOptions.forEach(function(o){ %><a class="btn btn-primary" href="<%= url('/families/' + fid + '/register?year=' + o.year.id) %>"><%= o.reregister ? b('Re-register For ' + o.year.label + ' School Year', '續讀註冊 ' + o.year.label + ' 學年') : b('Register For ' + o.year.label + ' School Year', '註冊 ' + o.year.label + ' 學年') %></a> <% }) %>
     <a class="btn btn-ghost" href="<%= url('/volunteer?family=' + fid) %>"><%= b('Volunteer Sign Up', '義工報名') %></a></p><% } %>
   <div class="portal-card">
     <h2><%= b('Family for', '家庭') %> <%= nmP(F.parent1) %></h2>
@@ -61,6 +61,6 @@
   <% if (F.registrations.length) { %><div class="portal-card"><h2><%= b('Registrations', '註冊') %> <%= yr ? yr.label : '' %></h2>
     <table class="portal-table compact"><tbody><% F.registrations.forEach(function(r){ %><tr><td>#<%= r.id %></td><td><span class="pill"><%= r.status %></span></td><td class="num"><%= money(r.grand_total_cents) %></td>
       <td><% if (r.status === 'draft') { %><a href="<%= url('/registrations/' + r.id + '/waiver') %>"><%= b('Continue registration', '繼續註冊') %></a><% } else { %><a href="<%= url('/registrations/' + r.id + '/form') %>"><%= b('View form', '檢視註冊表') %></a><% } %></td></tr><% }) %></tbody></table></div><% } %>
-  <% if (canRegister && regOpen && F.children.length) { %><p><a class="btn btn-primary" href="<%= url('/families/' + fid + '/register') %>"><%= b('Register For ' + yr.label + ' School Year', '註冊 ' + yr.label + ' 學年') %></a>
+  <% if (canRegister && F.children.length) { %><p class="btn-row"><% F.regOptions.forEach(function(o){ %><a class="btn btn-primary" href="<%= url('/families/' + fid + '/register?year=' + o.year.id) %>"><%= o.reregister ? b('Re-register For ' + o.year.label + ' School Year', '續讀註冊 ' + o.year.label + ' 學年') : b('Register For ' + o.year.label + ' School Year', '註冊 ' + o.year.label + ' 學年') %></a> <% }) %>
     <a class="btn btn-ghost" href="<%= url('/volunteer?family=' + fid) %>"><%= b('Volunteer Sign Up', '義工報名') %></a></p><% } %>
 </section>

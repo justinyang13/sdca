@@ -2,7 +2,8 @@
   const e = errors || {}; const v = values || {};
   const nm = function(p){ return p.english_first_name + ' ' + p.english_last_name + (p.chinese_name ? ' ' + p.chinese_name : ''); };
   const sel = [].concat(v.student || []).map(Number);
-  const hasSel = function(id){ return sel.length ? sel.includes(id) : draftItems.has(id); };
+  const hasSel = function(id){ if (sel.length) return sel.includes(id); if (draftItems.has(id)) return true; const p = plan.get(id); return !!(rereg && p && p.hadPrevious && !p.graduated); };
+  const defType = function(k, di){ const p = plan.get(k.id); return String(v['ctype_' + k.id] || (di && di.class_type_id) || (rereg && p && p.hadPrevious && !p.graduated ? p.classTypeId : '') || ''); };
 %>
 <%- include('_stepper', { step: 1 }) %>
 <h1><%= b('Registration For ' + year.label + ' School Year', '註冊 ' + year.label + ' 學年') %></h1>
@@ -12,6 +13,18 @@
   <li><%= b('Class type', '班別') %>:<ul>
     <% types.forEach(function(c){ %><li><strong><%= one(c.name_en, c.name_zh) %></strong> — <%= c.is_credit ? b('High School credit classes', '高中課程') : (c.code === 'bilingual' ? b('Both Mandarin and English are used in lecture', '中英文教學') : b('Mandarin is heavily used in lecture', '中文教學')) %></li><% }) %></ul></li>
 </ul>
+<% if (rereg) { %>
+<div class="portal-card rereg-banner">
+  <h2>🔄 <%= b('Re-registration — filled in from last year', '續讀註冊 — 已帶入去年的資料') %></h2>
+  <p><%= b('We copied your students, class types, volunteer choices and regular-school information from last year. Please check everything below and change whatever is different. Nothing is final until you submit the registration form.', '我們已帶入去年的學生、班別、義工選擇與正規學校資料。請逐項檢查並修改有變動的地方；在送出註冊表之前都不會生效。') %></p>
+  <h3><%= b('Please review your family information', '請檢查您的家庭資料') %></h3>
+  <dl class="kv"><dt><%= b('Address', '住址') %></dt><dd><%= [fam.street, fam.city, fam.state, fam.zipcode].filter(Boolean).join(', ') %></dd>
+    <dt><%= b('Phones', '電話') %></dt><dd><%= [fam.home_phone, fam.cell_phone].filter(Boolean).join(' · ') %></dd>
+    <dt><%= b('Email', '電子郵件') %></dt><dd><%= fam.email %></dd>
+    <dt><%= b('Emergency Contact', '緊急聯絡人') %></dt><dd><%= fam.emergency_contact %> <%= fam.emergency_home_phone ? '· ' + fam.emergency_home_phone : '' %></dd></dl>
+  <p><a class="btn btn-ghost" href="<%= url('/families/' + fid + '/edit') %>" target="_blank" rel="noopener"><%= b('Update family information', '更新家庭資料') %></a></p>
+</div>
+<% } %>
 <% if (already.length) { %>
 <h2><%= b('Students Already Registered For ' + year.label + ' School Year', '已註冊學生') %></h2>
 <table class="portal-table compact"><thead><tr><th><%= b('Student', '學生') %></th><th><%= year.label %> <%= b('Grade', '年級') %></th><th><%= b('School Class', '班級') %></th></tr></thead><tbody>
@@ -23,21 +36,23 @@
 <% } else { %>
 <form method="post" action="<%= url('/families/' + fid + '/register') %>" class="portal-card">
   <%- csrfField() %>
+  <input type="hidden" name="year" value="<%= year.id %>">
   <h2><%= b('Select Students To Register', '未註冊學生') %></h2>
   <p><%= b('Please check the boxes for students who are going to register, update birthdate and select preferred school class type.', '請勾選需要註冊的學生，生日與班別。') %></p>
-  <div class="table-wrap"><table class="portal-table compact"><thead><tr><th></th><th><%= b('Student', '學生') %></th><th><span class="req">*</span> <%= b('Birthday', '生日') %></th><th><span class="req">*</span> <%= b('Class Type', '班別') %></th></tr></thead><tbody>
+  <div class="table-wrap"><table class="portal-table compact"><thead><tr><th></th><th><%= b('Student', '學生') %></th><% if (rereg) { %><th><%= b('Last year → this year', '去年 → 今年') %></th><% } %><th><span class="req">*</span> <%= b('Birthday', '生日') %></th><th><span class="req">*</span> <%= b('Class Type', '班別') %></th></tr></thead><tbody>
     <% selectable.forEach(function(k){ const di = draftItems.get(k.id); %>
     <tr class="<%= e['birth_' + k.id] || e['ctype_' + k.id] ? 'has-error' : '' %>"><td><input type="checkbox" name="student" value="<%= k.id %>" id="st_<%= k.id %>" <%= hasSel(k.id) ? 'checked' : '' %>></td>
       <td><label for="st_<%= k.id %>"><%= nm(k) %></label></td>
+      <% if (rereg) { const p = plan.get(k.id); %><td class="muted"><% if (p && p.hadPrevious) { %><%= gl(p.prev.grade_label) %><%= p.prev.class_code ? ' (' + p.prev.class_code + ')' : '' %> → <% if (p.graduated) { %><strong><%= b('Graduated 🎓', '已畢業 🎓') %></strong><% } else { %><strong><%= p.label ? gl(p.label) : '—' %></strong><% } %><% } else { %><%= b('New student', '新生') %><% } %></td><% } %>
       <td><input type="date" name="birth_<%= k.id %>" value="<%= (v['birth_' + k.id] || (di && di.birth_date_snapshot) || k.birth_date || '').slice(0,10) %>"></td>
-      <td><select name="ctype_<%= k.id %>"><option value=""></option><% types.forEach(function(c){ %><option value="<%= c.id %>" <%= String(v['ctype_' + k.id] || (di && di.class_type_id) || '') === String(c.id) ? 'selected' : '' %>><%= one(c.name_en, c.name_zh) %></option><% }) %></select></td></tr>
+      <td><select name="ctype_<%= k.id %>"><option value=""></option><% types.forEach(function(c){ %><option value="<%= c.id %>" <%= defType(k, di) === String(c.id) ? 'selected' : '' %>><%= one(c.name_en, c.name_zh) %></option><% }) %></select></td></tr>
     <% }) %></tbody></table></div>
   <h2><%= b('Scrip Purchase Fundraising', '禮券購買') %></h2>
   <%- field({ label: b('Total scrip purchase amount ($)', '禮券購買總金額 ($)'), name: 'scrip', type: 'number', value: v.scrip || '', error: e.scrip, attrs: 'min="0" step="1" inputmode="numeric"' }) %>
   <h2><%= b('PTA Volunteer Sign Up', '家長會義工報名') %></h2>
   <p><%= b('SDCA needs you to sign up for volunteers. We rely heavily on parent volunteers to assist academic and maintain all non-academic functions of the school. The service fee is refundable when a parent participates as a volunteer and completes the service. Refund is given in Scrip gift cards.', '聖地牙哥中華學苑需要您報名義工。代勞費在家長完成服務後可退還，以禮券方式退還。') %> <a href="<%= url('/volunteer?family=' + fid) %>" target="_blank" rel="noopener"><%= b('Volunteer Job Descriptions', '義工工作說明') %></a></p>
   <p><strong><%= b('Please select up to three jobs. Select “TBD” if you are not sure — PTA will contact you.', '請選擇最多三項。不確定請選「TBD」，家長會將與您聯繫。') %></strong></p>
-  <% [1,2,3].forEach(function(i){ const cur = v['job_' + i] || (mine[i-1] && mine[i-1].job_id) || ''; %>
+  <% [1,2,3].forEach(function(i){ const cur = v['job_' + i] || (mine[i-1] && mine[i-1].job_id) || (prevJobs[i-1] || ''); %>
   <div class="frow"><label for="job_<%= i %>"><%= [b('First Priority','第一選擇'), b('Second Priority','第二選擇'), b('Third Priority','第三選擇')][i-1] %></label><div class="fctl"><select id="job_<%= i %>" name="job_<%= i %>"><option value=""></option>
     <% jobs.filter(function(j){ return !j.reserved_for_preschool || preschoolEligible; }).forEach(function(j){ %><option value="<%= j.id %>" <%= String(cur) === String(j.id) ? 'selected' : '' %>><%= one(j.name_en, j.name_zh) %></option><% }) %></select></div></div>
   <% }) %>

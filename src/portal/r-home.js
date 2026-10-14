@@ -6,8 +6,13 @@ import { can, hasRole } from './perm.js';
 import { currentYear, money } from './fees.js';
 import { myClassIds } from './auth.js';
 import { csrfMiddleware } from '../middleware/csrf.js';
+import { registrationOptions } from './rereg.js';
+import { resourcesFor } from './resources.js';
+import { visibleAnnouncements } from './announcements.js';
+import { todayLocal, nowUtc } from '../datetime.js';
+import { portalHelpers } from './util.js';
 
-export function placementVisible(year, today = new Date().toISOString().slice(0, 10)) {
+export function placementVisible(year, today = todayLocal()) {
   if (!year?.first_day) return true;
   const d = new Date(year.first_day + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() - (year.placement_visible_days_before ?? 7));
   return today >= d.toISOString().slice(0, 10);
@@ -32,21 +37,21 @@ export function familyView(db, familyId, { staff = false } = {}) {
     return { ...c, enrollment: en, showPlacement: visible && en?.school_class_id, hasSchoolInfo: !!info };
   });
   const registrations = year ? db.prepare(`SELECT * FROM registrations WHERE family_id = ? AND school_year_id = ? AND status <> 'cancelled' AND deleted_at IS NULL ORDER BY id DESC`).all(familyId, year.id) : [];
-  return { fam, year, parent1, parent2, children, registrations, members };
+  return { fam, year, parent1, parent2, children, registrations, members, regOptions: registrationOptions(db, familyId) };
 }
 
 export function registerHomeRoutes(app, { db, page, requireLogin, requirePerm, isStaticBuild }) {
+  const { lang, P } = portalHelpers(page);
   const R = '/:lang/portal';
-  const lang = (req) => req.params.lang;
-  const P = (req, p = '') => `/${lang(req)}/portal${p}`;
 
   app.get(R, (req, res) => {
     if (!req.portal) return res.redirect(P(req, '/signin'));
     const a = req.portal.access;
     const year = currentYear(db);
-    const w = { year, admin: null, secretary: null, finance: null, pta: null, instructor: null, families: null, canRegister: false, volunteer: null, student: null };
+    const w = { classNews: [], resources: resourcesFor(a, can, (p) => P(req, p)), year, admin: null, secretary: null, finance: null, pta: null, instructor: null, families: null, canRegister: false, volunteer: null, student: null };
     const count = (sql, ...args) => db.prepare(sql).get(...args).n;
     const personId = req.portal.person.id;
+    w.classNews = (can(a, 'class_announcements.view_own') || can(a, 'class_announcements.post_own')) && !can(a, 'class_announcements.list') ? visibleAnnouncements(db, req.portal, { limit: 3 }) : [];
 
     if (can(a, 'dashboard.admin')) {
       w.admin = {
@@ -131,7 +136,7 @@ export function registerHomeRoutes(app, { db, page, requireLogin, requirePerm, i
       WHERE e.school_class_id = ? AND e.status IN ('registered','placed') AND e.deleted_at IS NULL ORDER BY p.english_last_name, p.english_first_name`).all(cls.id);
     const isStaff = can(req.portal.access, 'reports.class_roster');
     const grades = cls.is_credit && (can(req.portal.access, 'grades.enter_own_classes') || can(req.portal.access, 'credit_grades.update')) && classAccess(req, cls.id);
-    page(req, res, 'class-list.ejs', { cls, staffAssign, students, isStaff, grades, now: new Date().toISOString().replace('T', ' ').slice(0, 19), print: req.query.print === '1' }, { title: `Class ${cls.code}` });
+    page(req, res, 'class-list.ejs', { cls, staffAssign, students, isStaff, grades, now: nowUtc(), print: req.query.print === '1' }, { title: `Class ${cls.code}` });
   });
   // ---------- credit grades (teacher enters / staff edits) ----------
   app.get(`${R}/classes/:id/grades`, requireLogin, (req, res) => {

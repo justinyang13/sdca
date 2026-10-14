@@ -4,6 +4,9 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import ejs from 'ejs';
 import { config } from '../config.js';
+import { asset } from '../asset-version.js';
+import { imageManifest } from '../helpers.js';
+import { fmtDate, fmtDateTime, fmtLocalDateTime, utcToLocalParts, fmtLong, fmtTime } from '../datetime.js';
 import { ENTITIES, GROUPS } from './entities.js';
 import { can } from './perm.js';
 import { money } from './fees.js';
@@ -12,6 +15,14 @@ const dir = path.join(config.viewsDir, 'portal-app');
 export const esc = (x) => String(x ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 /** One form row: <div class="frow"><label>…</label><input …><span class="ferr">…</span></div> */
+/** a stored image value (library name or /path) → URL for a preview */
+export function imgSrc(v) {
+  if (!v) return '';
+  const e = imageManifest()[v];
+  if (e?.files?.length) { const f = e.files[Math.min(1, e.files.length - 1)].file; return f.startsWith('/') ? f : '/' + f; }
+  return /^\//.test(v) ? v : '';
+}
+
 export function fieldRow(o) {
   const { label, name, type = 'text', value = '', error = '', required = false, options = null, attrs = '', help = '', size = '' } = o;
   const id = `f_${name}`;
@@ -52,49 +63,57 @@ export const RESOURCES = [
 export function buildNav(portal, lang) {
   const P = (p) => `/${lang}/portal${p}`;
   const a = portal?.access;
-  const pid = portal?.person?.id;
   const fid = portal?.familyIds?.[0];
-  const profile = [{ en: 'Profile Overview', zh: '個人資料總覽', href: P('/profile') }];
-  if (pid) profile.push({ en: 'Personal Information', zh: '個人資料', href: P(`/people/${pid}`) }, { en: 'Edit Personal Information', zh: '編輯個人資料', href: P(`/people/${pid}/edit`) });
-  if (fid) profile.push({ en: 'Family & Address', zh: '家庭與住址', href: P(`/families/${fid}/edit`) });
-  const billing = can(a, 'transactions.own') ? [
-    { en: 'Billing Overview', zh: '帳務總覽', href: P('/billing') },
-    { en: 'Transaction History', zh: '付款紀錄', href: P('/transactions') },
-  ] : [];
-  const menu = [
-    { key: 'profile', en: 'Profile', zh: '個人資料', items: profile },
-    { key: 'account', en: 'Account', zh: '帳號', items: [
-      { en: 'Account Overview', zh: '帳號總覽', href: P('/account') },
-      { en: 'Change User Name', zh: '更改用戶名稱', href: P('/change-username') },
-      { en: 'Change Password', zh: '更改密碼', href: P('/change-password') },
-    ] },
-    ...(billing.length ? [{ key: 'billing', en: 'Billing', zh: '帳務', items: billing }] : []),
-    { key: 'resources', en: 'Resources', zh: '資源', items: [
-      { en: 'Resources Overview', zh: '資源總覽', href: P('/resources') },
-      ...RESOURCES.map((r) => ({ en: r.en, zh: r.zh, href: r.href(lang), blank: r.blank })),
-    ] },
+  // ---- profile menu (avatar, top right): everything about "me" and my family's money / enrollment
+  const profileMenu = [
+    { en: 'Personal Info', zh: '個人資料', href: P('/profile') },
+    { en: 'Password & Security', zh: '密碼與安全', href: P('/account') },
+    ...(can(a, 'transactions.own') && fid ? [{ en: 'Billing & Payments', zh: '帳務與付款', href: P('/billing') }] : []),
+    ...(fid && (can(a, 'registration.own') || can(a, 'family.own')) ? [{ en: 'Manage Enrollment', zh: '管理註冊', href: P('/enrollment') }] : []),
   ];
-  const home = { en: 'Home', zh: '首頁', href: P('') };
-  const staff = [];
+  // ---- left (hamburger) menu: the work areas
+  const home = { en: 'Dashboard', zh: '首頁', href: P('') };
+  const groups = [];
   if (a) {
+    // Staff Tools = the website content tools
     const special = [];
-    if (can(a, 'placement.assign')) special.push({ en: 'Class Placement', zh: '分班', href: P('/placement') });
-    if (can(a, 'fees.configure')) special.push({ en: 'Fees for a School Year', zh: '學年費用設定', href: P('/fees') });
-    if (can(a, 'finance.record_payment')) special.push({ en: 'Enter Payment', zh: '輸入付款', href: P('/finance/payment') });
-    if (can(a, 'reports.class_roster')) special.push({ en: 'Class Roster', zh: '班級人數清單', href: P('/class-roster') });
-    if (can(a, 'student_list.list') || can(a, 'volunteer_list.list') || can(a, 'transactions.list')) special.push({ en: 'Reports & Exports', zh: '報表與匯出', href: P('/reports') });
-    if (can(a, 'events.list')) special.push({ en: 'Events', zh: '活動', href: P('/manage/events') }, { en: 'Event Calendar', zh: '活動行事曆', href: P('/events-calendar') });
-    if (can(a, 'class.view_own')) special.push({ en: 'My Classes', zh: '我的班級', href: P('/my-classes') });
-    if (can(a, 'roles.manage')) special.push({ en: 'Roles & Permissions', zh: '角色與權限', href: P('/manage/roles') });
-    if (special.length) staff.push({ title: { en: 'Staff Tools', zh: '員工工具' }, items: special });
+    if (can(a, 'events.list')) special.push({ en: 'Events', zh: '活動', href: P('/manage/events') });
+    if (can(a, 'announcements.list')) special.push({ en: 'Public Announcements', zh: '公開通告', href: P('/manage/announcements') });
+    if (can(a, 'slides.list')) special.push({ en: 'Hero Slides', zh: '首頁橫幅', href: P('/manage/slides') });
+    if (can(a, 'class_announcements.list') || can(a, 'class_announcements.post_own') || can(a, 'class_announcements.view_own')) special.push({ en: 'Class Announcements', zh: '班級通告', href: P('/class-announcements') });
+    if (can(a, 'student_list.list') || can(a, 'volunteer_list.list') || can(a, 'transactions.list')) special.push({ en: 'Reports', zh: '報表', href: P('/reports') });
+    if (special.length) groups.push({ title: { en: 'Staff Tools', zh: '員工工具' }, items: special });
     for (const g of GROUPS) {
+      if (g.adminOnly && !can(a, 'roles.manage')) continue;      // the Admin menu is for the admin role only
       const items = Object.entries(ENTITIES)
-        .filter(([key, e]) => e.group === g.key && can(a, `${e.perm}.list`) && !(e.adminOnly && !can(a, 'roles.manage')) && key !== 'roles' && key !== 'events')
+        .filter(([key, e]) => e.group === g.key && can(a, `${e.perm}.list`) && !(e.adminOnly && !can(a, 'roles.manage')) && key !== 'roles' && key !== 'events' && key !== 'slides' && key !== 'announcements' && key !== 'documents' && key !== 'class_announcements' && key !== 'fee_schedules' && key !== 'withdrawal_fee_rules' && key !== 'family_members' && key !== 'parent_students' && key !== 'class_assignments' && key !== 'school_classes' && key !== 'student_school_info')
         .map(([key, e]) => ({ en: e.label.en, zh: e.label.zh, href: P(`/manage/${key}`) }));
-      if (items.length) staff.push({ title: g.label, items });
+      if (g.key === 'academics') {
+        // Classes (the class page) · Enrollment (class placement lives in its rows) · Textbooks, then the rest
+        const take = (href) => { const i = items.findIndex((x) => x.href === P(href)); return i < 0 ? null : items.splice(i, 1)[0]; };
+        const ordered = [can(a, 'class.view_own') ? { en: 'My Classes', zh: '我的班級', href: P('/my-classes') } : null, can(a, 'reports.class_roster') ? { en: 'Classes', zh: '班級', href: P('/class-roster') } : null, take('/manage/enrollments')].filter(Boolean);
+        items.splice(0, items.length, ...ordered, ...items);
+      }
+      if (g.key === 'finance') {
+        // Transactions · Registrations · Payment · Withdrawals, then whatever else this role may open (fee tables, scrip products)
+        const by = (href) => items.findIndex((i) => i.href === P(href));
+        const take = (href) => { const i = by(href); return i < 0 ? null : items.splice(i, 1)[0]; };
+        const ordered = [take('/manage/transactions'), take('/manage/registrations'),
+          can(a, 'finance.record_payment') ? { en: 'Payment', zh: '付款', href: P('/finance/payment') } : null, take('/manage/withdrawals')].filter(Boolean);
+        const extra = [can(a, 'fees.configure') ? { en: 'Fees for a School Year', zh: '學年費用設定', href: P('/fees') } : null, can(a, 'finance.reports') ? { en: 'Finance Reports', zh: '財務報表', href: P('/finance/reports') } : null].filter(Boolean);
+        items.splice(0, items.length, ...ordered, ...extra, ...items);
+      }
+      if (g.key === 'admin' && can(a, 'roles.manage')) items.push({ en: 'Roles & Permissions', zh: '角色與權限', href: P('/manage/roles') });
+      if (items.length) groups.push({ title: g.label, items });
     }
   }
-  return { home, menu, staff };
+  groups.push({ title: { en: 'Resources', zh: '資源' }, items: [
+    { en: 'All Resources', zh: '資源總覽', href: P('/resources') },
+    ...RESOURCES.map((r) => ({ en: r.en, zh: r.zh, href: r.href(lang), blank: r.blank })),
+  ] });
+  // a group with a single entry is just a link (no chevron)
+  const drawer = [{ link: home }, ...groups.map((g) => (g.items.length === 1 ? { link: g.items[0] } : { group: g }))];
+  return { home, profileMenu, drawer };
 }
 
 export function makeRenderer({ makeRenderPart, renderShell, t, db }) {
@@ -115,10 +134,10 @@ export function makeRenderer({ makeRenderPart, renderShell, t, db }) {
     const gl = (label) => { const m = /^(.*?)\s*\((.*)\)\s*$/.exec(label || ''); return m ? (lang === 'zh' ? m[1] : m[2]) : (label || ''); };
     const url = (p = '') => `/${lang}/portal${p}`;
     const base = {
-      lang, t: tFn, b, one, gl, url, idleMinutes: config.sessionIdleMinutes, csrf, flash, money, esc, field: fieldRow, title: opts.title || '',
+      lang, t: tFn, b, one, gl, url, idleMinutes: config.sessionIdleMinutes, asset, csrf, flash, money, esc, field: fieldRow, title: opts.title || '',
       csrfField: () => `<input type="hidden" name="_csrf" value="${csrf}">`,
       U: req.portal || null, can: (c) => can(req.portal?.access, c),
-      ENTITIES, fmtDate: (d) => (d ? String(d).slice(0, 10) : ''), fmtDateTime: (d) => (d ? String(d).slice(0, 16) : ''),
+      ENTITIES, imgSrc, imageLibrary: () => Object.keys(imageManifest()).sort(), fmtDate, fmtDateTime, fmtLocalDateTime, utcToLocalParts, fmtLong: (v) => fmtLong(v, lang), fmtTime: (v) => fmtTime(v, lang),
       ...locals,
     };
     const v = tpl(view);
@@ -127,12 +146,21 @@ export function makeRenderer({ makeRenderPart, renderShell, t, db }) {
     const shellName = opts.shell || (req.portal ? 'app' : 'bare');
     const sh = tpl(`shell-${shellName}.ejs`);
     const body = ejs.render(sh.src, { ...base, inner, nav, title: opts.title || locals.title || '', current: req.path }, { filename: sh.file });
+    // signed-in portal pages get their own header (hamburger menu + profile menu) and a slim footer — never the public site menu
+    let portalChrome = {};
+    if (shellName === 'app') {
+      const alt = lang === 'zh' ? 'en' : 'zh';
+      const ctx = { ...base, nav, current: req.path, altLangUrl: `/${alt}${req.langPath || '/portal'}${req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : ''}`, altLangLabel: alt === 'zh' ? '中文' : 'EN' };
+      const hd = tpl('portal-header.ejs'); const ft = tpl('portal-footer.ejs');
+      portalChrome = { header: ejs.render(hd.src, ctx, { filename: hd.file }), footer: ejs.render(ft.src, ctx, { filename: ft.file }) };
+    }
     const title = `${opts.title || locals.title || 'Portal'} — SDCA`;
     res.status(opts.status || 200).render('layouts/main.ejs', {
       lang, t: tFn, renderPart: makeRenderPart(lang), title, description: 'SDCA school portal',
       canonical: `/${lang}${req.path.replace(/^\/[a-z]{2}/, '')}`.replace(/\/$/, '') || `/${lang}/portal`,
       enUrl: `/en${req.langPath || '/portal'}`, zhUrl: `/zh${req.langPath || '/portal'}`, jsonLd: null, body,
       ...renderShell(lang, { langPath: req.langPath || '/portal' }),
+      ...portalChrome,
     });
   };
 }

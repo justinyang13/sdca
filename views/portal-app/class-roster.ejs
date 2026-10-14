@@ -1,15 +1,82 @@
 <%
-  const sortHref = function(k){ return url('/class-roster') + '?sort=' + k + '&dir=' + ((sort === k && dir === 'ASC') ? 'desc' : 'asc'); };
-  const th = function(k, en, zh, cls){ return '<th scope="col"' + (cls ? ' class="' + cls + '"' : '') + '><a class="sortlink' + (sort === k ? ' on ' + dir.toLowerCase() : '') + '" href="' + sortHref(k) + '">' + (lang === 'zh' ? zh : en) + '</a></th>'; };
+  const base = function(over){ const p = { year: year.id, q: q, type: type || '', status: status, sort: sort, dir: dir.toLowerCase() }; Object.assign(p, over || {}); return url('/class-roster') + '?' + Object.keys(p).filter(function(k){ return p[k] !== '' && p[k] != null; }).map(function(k){ return k + '=' + encodeURIComponent(p[k]); }).join('&'); };
+  const sortHref = function(k){ return base({ sort: k, dir: (sort === k && dir === 'ASC') ? 'desc' : 'asc', open: '' }); };
+  const th = function(k, en, zh, cls){ return '<th scope="col" data-col="' + k + '"' + (cls ? ' class="' + cls + '"' : '') + '><a class="sortlink' + (sort === k ? ' on ' + dir.toLowerCase() : '') + '" href="' + sortHref(k) + '">' + (lang === 'zh' ? zh : en) + '</a></th>'; };
+  const nm = function(p){ return p.english_first_name + ' ' + p.english_last_name + (p.chinese_name ? ' ' + p.chinese_name : ''); };
 %>
-<h1><%= b('Class Roster', '班級人數清單') %><% if (year) { %> <small>· <%= year.label %></small><% } %></h1>
-<div class="table-wrap">
+<div class="portal-head">
+  <h1><%= b('Classes', '班級') %><small class="count">(<%= classes.length %>)</small></h1>
+  <div class="portal-actions"><a class="btn btn-ghost" href="<%= base({ format: 'csv' }) %>"><%= b('Download CSV', '下載 CSV') %></a>
+    <% if (canCreateClass) { %><a class="btn btn-primary" href="<%= url('/manage/school_classes/new') %>">+ <%= b('New Class', '新增班級') %></a><% } %></div>
+</div>
+<form method="get" action="<%= url('/class-roster') %>" class="portal-toolbar" role="search" data-instant-filters>
+  <label class="tb-search"><span class="sr-only"><%= b('Search', '搜尋') %></span><input type="search" name="q" value="<%= q %>" placeholder="<%= b('Search class, teacher, room parent', '搜尋班級、老師、班媽/班爸') %>…"></label>
+  <label class="tb-filter"><span><%= b('School Year', '學年') %></span><select name="year"><% years.forEach(function(y){ %><option value="<%= y.id %>" <%= y.id === year.id ? 'selected' : '' %>><%= y.label %></option><% }) %></select></label>
+  <label class="tb-filter"><span><%= b('Class Type', '班別') %></span><select name="type"><option value=""><%= b('All', '全部') %></option><% types.forEach(function(t){ %><option value="<%= t.id %>" <%= type === t.id ? 'selected' : '' %>><%= one(t.name_en, t.name_zh) %></option><% }) %></select></label>
+  <label class="tb-filter"><span><%= b('Status', '狀態') %></span><select name="status"><option value=""><%= b('All', '全部') %></option><% ['open', 'full', 'closed'].forEach(function(st){ %><option value="<%= st %>" <%= status === st ? 'selected' : '' %>><%= st %></option><% }) %></select></label>
+  <button type="submit" hidden>Search</button><a class="tb-reset" href="<%= url('/class-roster') %>"><%= b('Reset', '重設') %></a>
+</form>
+<div class="table-wrap" data-col-table="class-roster">
 <table class="portal-table">
-  <thead><tr><%- th('code', 'Class', '班級') %><%- th('room', 'Room', '教室') %><%- th('teacher', 'Teacher', '老師') %><%- th('n', 'Students', '學生', 'num') %></tr></thead>
+  <thead><tr><%- th('year', 'School Year', '學年') %><%- th('code', 'Class', '班級') %><%- th('type', 'Class Type', '班別') %><%- th('room', 'Room', '教室') %><%- th('teacher', 'Teacher', '老師') %><%- th('room_parent', 'Room Parent', '班媽/班爸') %><%- th('n', 'Students', '學生', 'num') %></tr></thead>
   <tbody>
-  <% classes.forEach(function(c){ %><tr><td class="nw"><a href="<%= url('/classes/' + c.id) %>"><%= c.code %> <%= one(c.name_en, c.name_zh) %></a></td><td class="nw"><%= c.room || '—' %></td><td><%= c.teacher || '—' %></td><td class="num"><%= c.n %></td></tr><% }) %>
-  <% if (!classes.length) { %><tr><td colspan="4" class="empty"><%= b('Nothing found.', '沒有資料。') %></td></tr><% } %>
+  <% if (!classes.length) { %><tr><td colspan="7" class="empty"><%= b('Nothing found.', '沒有資料。') %></td></tr><% } %>
+  <% classes.forEach(function(c){ const isOpen = open === c.id; const asg = byClass[c.id] || []; const sts = studentsBy[c.id] || []; %>
+  <tr class="data-row" id="class-<%= c.id %>">
+    <td class="nw"><button type="button" class="row-toggle" aria-expanded="<%= isOpen %>" aria-label="<%= b('Show details', '顯示詳細資料') %>"><%= isOpen ? '▾' : '▸' %></button> <%= c.year_label %></td>
+    <td class="nw"><a href="<%= url('/classes/' + c.id) %>"><strong><%= c.code %></strong> <%= one(c.name_en, c.name_zh) %></a></td>
+    <td class="nw"><%= one(c.ct_en || '', c.ct_zh || '') %></td><td class="nw"><%= c.room || '—' %></td>
+    <td><%= c.teacher || '—' %></td><td><%= c.room_parents || '—' %></td><td class="num"><%= c.n %><%= c.capacity ? ' / ' + c.capacity : '' %></td>
+  </tr>
+  <tr class="row-detail" <%= isOpen ? '' : 'hidden' %>><td colspan="7"><div class="detail-inner two-col roster-detail">
+    <div>
+      <h4><%= b('Class details', '班級資料') %></h4>
+      <dl class="kv">
+        <dt><%= b('School Year', '學年') %></dt><dd><%= c.year_label %></dd>
+        <dt><%= b('Class', '班級') %></dt><dd><%= c.code %> · <%= c.name_en %> <%= c.name_zh %></dd>
+        <dt><%= b('Class Type', '班別') %></dt><dd><%= one(c.ct_en || '', c.ct_zh || '') || '—' %></dd>
+        <dt><%= b('Class Level', '級別') %></dt><dd><%= one(c.level_en || '', c.level_zh || '') || '—' %></dd>
+        <dt><%= b('Room', '教室') %></dt><dd><%= c.room || '—' %></dd>
+        <dt><%= b('Textbook', '課本') %></dt><dd><%= one(c.book_en || '', c.book_zh || '') || '—' %></dd>
+        <dt><%= b('Students', '學生') %></dt><dd><%= c.n %><%= c.capacity ? ' / ' + c.capacity : '' %></dd>
+        <dt><%= b('Status', '狀態') %></dt><dd><%= c.status %></dd>
+        <dt><%= b('Teacher', '老師') %></dt><dd><%= c.teacher || '—' %></dd>
+        <dt><%= b('Room Parent', '班媽/班爸') %></dt><dd><%= c.room_parents || '—' %></dd>
+        <dt></dt><dd><a href="<%= url('/classes/' + c.id) %>"><%= b('Open the class list', '開啟班級名單') %></a> · <a href="<%= url('/classes/' + c.id) %>?print=1" target="_blank" rel="noopener"><%= b('Print / PDF', '列印 / PDF') %></a><% if (canEditClass) { %> · <a href="<%= url('/manage/school_classes/' + c.id) %>"><%= b('Edit class', '編輯班級') %></a><% } %>
+          <% if (canDeleteClass) { %> · <form method="post" action="<%= url('/manage/school_classes/' + c.id + '/delete') %>" class="inline" data-confirm="<%= b('Delete this class?', '確定刪除此班級？') %>"><%- csrfField() %><button type="submit" class="linklike danger"><%= b('Delete class', '刪除班級') %></button></form><% } %></dd>
+      </dl>
+      <h4><%= b('Students', '學生') %> (<%= sts.length %>)</h4>
+      <% if (!sts.length) { %><p class="muted"><%= b('No students placed yet.', '尚未有學生分班。') %></p><% } else { %><p class="roster-students"><% sts.slice(0, 40).forEach(function(st, i){ %><a href="<%= url('/people/' + st.id) %>"><%= nm(st) %></a><%= i < Math.min(sts.length, 40) - 1 ? ' · ' : '' %><% }) %><% if (sts.length > 40) { %> … <a href="<%= url('/classes/' + c.id) %>"><%= b('see all', '全部') %></a><% } %></p><% } %>
+    </div>
+    <div class="detail-col2">
+      <h4><%= b('Instructors & Room Parents', '任課老師與班媽/班爸') %> (<%= asg.length %>)</h4>
+      <% if (!asg.length) { %><p class="muted"><%= b('Nobody assigned yet.', '尚未指派。') %></p><% } %>
+      <% asg.forEach(function(a){ %>
+      <form method="post" action="<%= url('/class-roster/assignments/' + a.id) %>" class="assign-row"><%- csrfField() %><input type="hidden" name="_year" value="<%= year.id %>">
+        <span class="assign-who"><a href="<%= url('/people/' + a.person_id) %>"><%= nm(a) %></a></span>
+        <% if (canChange) { %><select name="assignment_role_id" aria-label="<%= b('Role', '角色') %>"><% roles.forEach(function(r){ %><option value="<%= r.id %>" <%= r.id === a.assignment_role_id ? 'selected' : '' %>><%= one(r.name_en, r.name_zh) %></option><% }) %></select>
+          <input type="date" name="start_date" value="<%= a.start_date || '' %>" aria-label="<%= b('Start', '開始') %>"><input type="date" name="end_date" value="<%= a.end_date || '' %>" aria-label="<%= b('End', '結束') %>">
+          <button class="btn btn-ghost btn-sm" type="submit"><%= b('Save', '儲存') %></button>
+        <% } else { %><span class="pill"><%= one(a.role_en, a.role_zh) %></span> <span class="muted"><%= fmtDate(a.start_date) %> → <%= fmtDate(a.end_date) %></span><% } %>
+        <% if (canRemove) { %><button class="btn btn-ghost btn-sm danger" type="submit" formaction="<%= url('/class-roster/assignments/' + a.id + '/delete') %>" formnovalidate onclick="return confirm('<%= b('Remove this assignment?', '確定移除此指派？') %>')"><%= b('Remove', '移除') %></button><% } %>
+      </form>
+      <% }) %>
+      <% if (canAssign) { %>
+      <form method="post" action="<%= url('/class-roster/assignments') %>" class="assign-add"><%- csrfField() %><input type="hidden" name="school_class_id" value="<%= c.id %>"><input type="hidden" name="_year" value="<%= year.id %>">
+        <h5>+ <%= b('Assign someone to this class', '指派人員到此班級') %></h5>
+        <div class="assign-fields">
+          <input type="text" class="ref-input" data-ref="persons" data-url="<%= url('/api/lookup/persons') %>" data-target="h_person_<%= c.id %>" placeholder="<%= b('type a name to search', '輸入姓名搜尋') %>" autocomplete="off" aria-label="<%= b('Person', '人員') %>">
+          <input type="hidden" id="h_person_<%= c.id %>" name="person_id">
+          <select name="assignment_role_id" aria-label="<%= b('Role', '角色') %>"><% roles.forEach(function(r){ %><option value="<%= r.id %>"><%= one(r.name_en, r.name_zh) %></option><% }) %></select>
+          <input type="date" name="start_date" value="<%= year.first_day || '' %>" aria-label="<%= b('Start', '開始') %>"><input type="date" name="end_date" value="<%= year.last_day || '' %>" aria-label="<%= b('End', '結束') %>">
+          <button class="btn btn-primary btn-sm" type="submit"><%= b('Assign', '指派') %></button>
+        </div>
+      </form>
+      <% } %>
+    </div>
+  </div></td></tr>
+  <% }) %>
   </tbody>
 </table>
 </div>
-<p class="muted"><%= b('Open a class, then use Print and choose “Save as PDF” in your browser to get a PDF roster.', '開啟班級後按「列印」，在瀏覽器選擇「另存為 PDF」即可取得 PDF 名單。') %></p>
+<p class="muted"><%= b('Click ▸ to see everything about a class and to add, change or remove its teachers and room parents. Open a class and use Print to get a PDF roster.', '點選 ▸ 可查看班級完整資料，並新增、修改或移除老師與班媽/班爸。開啟班級後按「列印」可取得 PDF 名單。') %></p>

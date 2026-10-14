@@ -21,7 +21,7 @@
 <section class="section" aria-labelledby="ev-h">
   <div class="container container-narrow">
     <div class="detail-meta">
-      <time datetime="<%= e.starts_at %>"><%= months[start.getMonth()] %> <%= start.getDate() %>, <%= start.getFullYear() %></time>
+      <time datetime="<%= e.starts_at %>"><%= dt.fmtEventWhen(e.starts_at, e.all_day, L) %></time>
       <% if (e.all_day) { %><span class="chip chip-notice"><%= t('events.all_day') %></span><% } %>
       <% if (e.location) { %><span><%= t('events.location') %>: <%= e.location %></span><% } %>
     </div>

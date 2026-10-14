@@ -1,5 +1,6 @@
 // src/helpers.js — shared render/query helpers for public pages
 import fs from 'node:fs';
+import { todayLocal } from './datetime.js';
 import path from 'node:path';
 import { marked } from 'marked';
 import sanitizeHtml from 'sanitize-html';
@@ -158,8 +159,7 @@ export function bodyFor(page, lang) {
  * Upcoming events starting from today, newest first, capped at `limit`.
  */
 export function upcomingEvents(db, { limit = 5 } = {}) {
-  const d = new Date();
-  const today = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const today = todayLocal();
   return db.prepare(
     'SELECT * FROM events WHERE deleted_at IS NULL AND published = 1 AND (all_day = 1 OR date(starts_at) >= ?) ORDER BY starts_at DESC LIMIT ?'
   ).all(today, limit);
@@ -170,7 +170,7 @@ export function latestAnnouncements(db, { limit = 5 } = {}) {
   return db.prepare(
     'SELECT a.*, d.title_en AS doc_title_en, d.title_zh AS doc_title_zh, d.file_path AS doc_path '
     + 'FROM announcements a LEFT JOIN documents d ON d.id = a.document_id '
-    + 'WHERE a.published = 1 ORDER BY a.published_at DESC LIMIT ?'
+    + 'WHERE a.published = 1 AND a.deleted_at IS NULL ORDER BY a.published_at DESC LIMIT ?'
   ).all(limit);
 }
 

@@ -1,0 +1,46 @@
+<%
+  const e = errors || {}; const f = v || {};
+  const sel = Number(f.school_class_id || (edit && edit.school_class_id) || classId || 0);
+  const val = function(n){ return f[n] !== undefined ? f[n] : (edit && edit[n] !== undefined ? edit[n] : ''); };
+%>
+<div class="portal-head">
+  <h1><%= b('Class Announcements', '班級通告') %><% if (year) { %> <small>· <%= year.label %></small><% } %></h1>
+  <% if (classes.length > 1) { %>
+  <form method="get" class="inline-filter"><label><span class="sr-only"><%= b('Class', '班級') %></span>
+    <select name="class" data-autosubmit><option value=""><%= b('All classes', '所有班級') %></option>
+      <% classes.forEach(function(c){ %><option value="<%= c.id %>" <%= Number(classId) === c.id ? 'selected' : '' %>><%= c.code %> <%= one(c.name_en, c.name_zh) %></option><% }) %></select></label></form>
+  <% } %>
+</div>
+
+<% if (postClasses.length) { %>
+<details class="portal-card" <%= edit || Object.keys(e).length ? 'open' : '' %> id="new">
+  <summary><strong><%= edit && edit.id ? b('Edit announcement', '編輯通告') : b('Post a new announcement', '發佈新通告') %></strong></summary>
+  <form method="post" action="<%= edit && edit.id ? url('/class-announcements/' + edit.id) : url('/class-announcements') %>" class="pform pform-wide">
+    <%- csrfField() %>
+    <% if (edit && edit.id) { %><input type="hidden" name="school_class_id" value="<%= sel %>"><% } else { %>
+    <div class="frow<%= e.school_class_id ? ' has-error' : '' %>"><label for="f_class"><span class="req">*</span> <%= b('Class', '班級') %></label><div class="fctl">
+      <select id="f_class" name="school_class_id"><option value=""></option><% postClasses.forEach(function(c){ %><option value="<%= c.id %>" <%= sel === c.id ? 'selected' : '' %>><%= c.code %> <%= one(c.name_en, c.name_zh) %></option><% }) %></select></div></div>
+    <% } %>
+    <%- field({ label: b('Title (English)', '標題 (英文)'), name: 'title_en', value: val('title_en'), error: e.title_en }) %>
+    <%- field({ label: b('Title (中文)', '標題 (中文)'), name: 'title_zh', value: val('title_zh') }) %>
+    <%- field({ label: b('Message (English)', '內容 (英文)'), name: 'body_en', type: 'textarea', value: val('body_en'), error: e.body_en }) %>
+    <%- field({ label: b('Message (中文)', '內容 (中文)'), name: 'body_zh', type: 'textarea', value: val('body_zh') }) %>
+    <div class="frow"><label for="f_pinned"><%= b('Pin to the top', '置頂') %></label><div class="fctl"><input type="checkbox" id="f_pinned" name="pinned" value="1" <%= Number(val('pinned')) ? 'checked' : '' %>></div></div>
+    <% if (!(edit && edit.id)) { %><div class="frow"><label for="f_notify"><%= b('E-mail the parents', '電郵通知家長') %></label><div class="fctl"><input type="checkbox" id="f_notify" name="notify" value="1"> <small class="muted"><%= b('Queues one e-mail per family of the class (shown in the outbox in demo mode).', '為該班每個家庭排入一封電郵 (示範模式只記錄在寄件匣)。') %></small></div></div><% } %>
+    <div class="fact"><button class="btn btn-primary" type="submit"><%= edit && edit.id ? b('Save', '儲存') : b('Post', '發佈') %></button>
+      <% if (edit && edit.id) { %><a class="btn btn-ghost" href="<%= url('/class-announcements') %>"><%= b('Cancel', '取消') %></a><% } %></div>
+  </form>
+</details>
+<% } %>
+
+<% if (!posts.length) { %><div class="portal-card"><p class="muted"><%= b('No announcements yet.', '目前沒有通告。') %></p></div><% } %>
+<% posts.forEach(function(p){ const title = one(p.title_en, p.title_zh), body = one(p.body_en, p.body_zh); %>
+<article class="portal-card class-post<%= p.pinned ? ' is-pinned' : '' %>">
+  <header><span class="pill"><%= p.class_code %> <%= one(p.class_en, p.class_zh) %></span> <% if (p.pinned) { %><span class="pill">📌 <%= b('Pinned', '置頂') %></span><% } %></header>
+  <h2><%= title %></h2>
+  <div class="class-post-body"><%- esc(body).replace(/\n/g, '<br>') %></div>
+  <footer class="muted"><%= fmtDateTime(p.created_at) %><% if (p.author) { %> · <%= p.author %><% } %>
+    <% if (p.canEdit) { %> · <a href="<%= url('/class-announcements?edit=' + p.id) %>#new"><%= b('Edit', '編輯') %></a><% } %>
+    <% if (p.canDelete) { %> · <form method="post" action="<%= url('/class-announcements/' + p.id + '/delete') %>" class="inline" data-confirm="<%= b('Delete this announcement?', '確定刪除此通告？') %>"><%- csrfField() %><button type="submit" class="linklike danger"><%= b('Delete', '刪除') %></button></form><% } %></footer>
+</article>
+<% }) %>

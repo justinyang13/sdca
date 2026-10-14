@@ -79,3 +79,34 @@ document.querySelectorAll('input[name=all_day][type=checkbox]').forEach((cb) => 
   const sync = () => document.querySelectorAll('input[data-time-for]').forEach((t) => { t.disabled = cb.checked; if (cb.checked) t.value = ''; });
   cb.addEventListener('change', sync); sync();
 });
+
+// image fields: the library drop-down fills the text box next to it
+document.addEventListener('change', (e) => {
+  const sel = e.target.closest('select[data-fill]'); if (!sel || !sel.value) return;
+  const box = document.getElementById(sel.dataset.fill); if (box) box.value = sel.value;
+});
+
+// portal header: hamburger drawer + profile menu (open / close, click outside, Escape, return focus)
+(function () {
+  const root = document.querySelector('[data-portal-header]'); if (!root) return;
+  const panels = { drawer: root.querySelector('[data-ph-panel="drawer"]'), profile: root.querySelector('[data-ph-panel="profile"]') };
+  const overlay = root.querySelector('.ph-overlay');
+  const openers = [...root.querySelectorAll('[data-ph-open]')];
+  let last = null;
+  const set = (name, on) => {
+    const panel = panels[name]; if (!panel) return;
+    panel.dataset.open = String(on);
+    openers.filter((o) => o.dataset.phOpen === name).forEach((o) => o.setAttribute('aria-expanded', String(on)));
+    if (name === 'drawer') { overlay.dataset.open = String(on); document.body.style.overflow = on ? 'hidden' : ''; }
+    if (on) { const first = panel.querySelector('a, button'); if (first && name === 'drawer') first.focus(); } else if (last) { last.focus(); }
+  };
+  const closeAll = () => { set('drawer', false); set('profile', false); };
+  openers.forEach((o) => o.addEventListener('click', () => {
+    const name = o.dataset.phOpen; const isOpen = panels[name].dataset.open === 'true';
+    last = o; Object.keys(panels).forEach((n) => { if (n !== name) panels[n].dataset.open = 'false'; });
+    overlay.dataset.open = 'false'; set(name, !isOpen);
+  }));
+  root.querySelectorAll('[data-ph-close]').forEach((c) => c.addEventListener('click', () => closeAll()));
+  document.addEventListener('click', (e) => { if (panels.profile.dataset.open === 'true' && !e.target.closest('.ph-profile')) set('profile', false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAll(); });
+})();

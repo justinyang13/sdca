@@ -1,19 +1,15 @@
 // src/portal/r-staff.js — reports & exports, class placement, and the one-place fee configuration page.
 import { csrfMiddleware } from '../middleware/csrf.js';
-import { can, canAll } from './perm.js';
+import { can } from './perm.js';
 import { currentYear } from './fees.js';
-import { csvEscape, audit } from './crud.js';
+import { csvEscape, audit, createRow, updateRow, softDelete } from './crud.js';
 import { ENTITIES } from './entities.js';
+import { s, dollars, num, portalHelpers } from './util.js';
 
-const s = (v) => String(v ?? '').trim();
-const dollars = (v) => { const t = s(v).replace(/[$,]/g, ''); if (t === '') return null; const n = Math.round(parseFloat(t) * 100); return Number.isFinite(n) ? n : null; };
-const num = (v) => { const t = s(v); return t === '' ? null : Number(t); };
 
 export function registerStaffRoutes(app, { db, page, requireLogin }) {
+  const { go, forbidden, staffCan } = portalHelpers(page);
   const R = '/:lang/portal';
-  const go = (req, res, p, flash) => { if (flash) req.session.portalFlash = flash; res.redirect(`/${req.params.lang}/portal${p}`); };
-  const forbidden = (req, res) => page(req, res, 'forbidden.ejs', {}, { title: 'Not allowed', status: 403 });
-  const staffCan = (req, c) => canAll(req.portal.access, c);
   const csv = (res, name, header, rows) => {
     const lines = [header.map(csvEscape).join(',')].concat(rows.map((r) => r.map(csvEscape).join(',')));
     res.type('text/csv; charset=utf-8').set('Content-Disposition', `attachment; filename="${name}"`).send('﻿' + lines.join('\r\n'));
@@ -23,34 +19,87 @@ export function registerStaffRoutes(app, { db, page, requireLogin }) {
   app.get(`${R}/reports`, requireLogin, (req, res) => {
     const a = req.portal.access;
     if (!can(a, 'student_list.list') && !can(a, 'volunteer_list.list') && !can(a, 'transactions.list')) return forbidden(req, res);
-    page(req, res, 'reports.ejs', { year: currentYear(db) }, { title: 'Reports & Exports' });
+    page(req, res, 'reports.ejs', { year: currentYear(db) }, { title: 'Reports' });
   });
 
-  // ---------- class roster (sortable) ----------
-  app.get(`${R}/class-roster`, requireLogin, (req, res) => {
-    if (!can(req.portal.access, 'reports.class_roster')) return forbidden(req, res);
-    const year = currentYear(db);
-    const SORTS = { code: 'sc.code', name: 'sc.name_en', room: 'rm.code', teacher: 'teacher', n: 'n' };
+  // ---------- class roster: classes with teachers, room parents, and the assignments (add / change / remove) ----------
+  const ROLE_TEACH = ['primary_instructor', 'assistant_instructor', 'teaching_assistant', 'substitute'];
+  const rosterData = (req) => {
+    const years = db.prepare('SELECT * FROM school_years WHERE deleted_at IS NULL ORDER BY label DESC').all();
+    const year = years.find((y) => y.id === Number(req.query.year)) || currentYear(db);
+    const q = String(req.query.q || '').trim();
+    const type = Number(req.query.type) || null; const status = String(req.query.status || '');
+    const SORTS = { code: 'sc.code', year: 'y.label', name: 'sc.name_en', room: 'rm.code', teacher: 'teacher', room_parent: 'room_parents', n: 'n', type: 'ct.sort' };
     const sort = SORTS[req.query.sort] ? req.query.sort : 'code';
     const dir = req.query.dir === 'desc' ? 'DESC' : 'ASC';
-    const classes = year ? db.prepare(`SELECT sc.id, sc.code, sc.name_zh, sc.name_en, rm.code AS room, (SELECT COUNT(*) FROM enrollments e WHERE e.school_class_id = sc.id AND e.status IN ('registered','placed') AND e.deleted_at IS NULL) AS n,
-      (SELECT p.english_last_name || ' ' || p.chinese_name FROM class_assignments ca JOIN assignment_roles ar ON ar.id = ca.assignment_role_id JOIN persons p ON p.id = ca.person_id WHERE ca.school_class_id = sc.id AND ar.code = 'primary_instructor' AND ca.deleted_at IS NULL LIMIT 1) AS teacher
-      FROM school_classes sc LEFT JOIN rooms rm ON rm.id = sc.room_id WHERE sc.school_year_id = ? AND sc.deleted_at IS NULL ORDER BY ${SORTS[sort]} COLLATE NOCASE ${dir}, sc.code`).all(year.id) : [];
-    page(req, res, 'class-roster.ejs', { year, classes, sort, dir }, { title: 'Class Roster' });
+    const nameOf = (role) => `(SELECT group_concat(p.english_first_name || ' ' || p.english_last_name, ', ') FROM class_assignments ca JOIN assignment_roles ar ON ar.id = ca.assignment_role_id JOIN persons p ON p.id = ca.person_id
+      WHERE ca.school_class_id = sc.id AND ca.deleted_at IS NULL AND ${role})`;
+    const where = ['sc.school_year_id = ?', 'sc.deleted_at IS NULL']; const args = [year.id];
+    if (type) { where.push('sc.class_type_id = ?'); args.push(type); }
+    if (status) { where.push('sc.status = ?'); args.push(status); }
+    if (q) { where.push(`(sc.code LIKE ? OR sc.name_en LIKE ? OR sc.name_zh LIKE ? OR EXISTS (SELECT 1 FROM class_assignments ca JOIN persons p ON p.id = ca.person_id WHERE ca.school_class_id = sc.id AND ca.deleted_at IS NULL AND (p.english_first_name || ' ' || p.english_last_name || p.chinese_name) LIKE ?))`); args.push(...Array(4).fill(`%${q}%`)); }
+    const classes = db.prepare(`SELECT sc.*, y.label AS year_label, ct.name_en AS ct_en, ct.name_zh AS ct_zh, cl.name_en AS level_en, cl.name_zh AS level_zh, rm.code AS room, tb.title_en AS book_en, tb.title_zh AS book_zh,
+        (SELECT COUNT(*) FROM enrollments e WHERE e.school_class_id = sc.id AND e.status IN ('registered','placed') AND e.deleted_at IS NULL) AS n,
+        ${nameOf(`ar.code = 'primary_instructor'`)} AS teacher, ${nameOf(`ar.code = 'room_parent'`)} AS room_parents
+      FROM school_classes sc JOIN school_years y ON y.id = sc.school_year_id LEFT JOIN class_types ct ON ct.id = sc.class_type_id LEFT JOIN class_levels cl ON cl.id = sc.class_level_id
+      LEFT JOIN rooms rm ON rm.id = sc.room_id LEFT JOIN textbooks tb ON tb.id = sc.textbook_id WHERE ${where.join(' AND ')} ORDER BY ${SORTS[sort]} COLLATE NOCASE ${dir}, sc.code`).all(...args);
+    const ids = classes.map((c) => c.id);
+    const byClass = {}; const studentsBy = {};
+    if (ids.length) {
+      const ph = ids.map(() => '?').join(',');
+      for (const a of db.prepare(`SELECT ca.id, ca.school_class_id, ca.person_id, ca.assignment_role_id, ca.start_date, ca.end_date, ar.code AS role_code, ar.name_en AS role_en, ar.name_zh AS role_zh,
+          p.english_first_name, p.english_last_name, p.chinese_name FROM class_assignments ca JOIN assignment_roles ar ON ar.id = ca.assignment_role_id JOIN persons p ON p.id = ca.person_id
+        WHERE ca.school_class_id IN (${ph}) AND ca.deleted_at IS NULL ORDER BY ar.id, p.english_last_name`).all(...ids)) (byClass[a.school_class_id] ||= []).push(a);
+      for (const st of db.prepare(`SELECT e.school_class_id, p.id, p.english_first_name, p.english_last_name, p.chinese_name, e.grade_label FROM enrollments e JOIN persons p ON p.id = e.student_person_id
+        WHERE e.school_class_id IN (${ph}) AND e.status IN ('registered','placed') AND e.deleted_at IS NULL ORDER BY p.english_last_name, p.english_first_name`).all(...ids)) (studentsBy[st.school_class_id] ||= []).push(st);
+    }
+    return { years, year, classes, byClass, studentsBy, q, type, status, sort, dir, open: Number(req.query.open) || null,
+      types: db.prepare('SELECT id, name_en, name_zh FROM class_types WHERE deleted_at IS NULL ORDER BY sort').all(),
+      roles: db.prepare('SELECT id, code, name_en, name_zh FROM assignment_roles WHERE deleted_at IS NULL ORDER BY id').all() };
+  };
+  app.get(`${R}/class-roster`, requireLogin, (req, res) => {
+    if (!can(req.portal.access, 'reports.class_roster')) return forbidden(req, res);
+    const d = rosterData(req);
+    if (req.query.format === 'csv') {
+      const lines = [['School year', 'Class', 'Name (EN)', 'Name (中文)', 'Class type', 'Level', 'Room', 'Status', 'Capacity', 'Students', 'Teacher', 'Room parent', 'Textbook']];
+      d.classes.forEach((c) => lines.push([c.year_label, c.code, c.name_en, c.name_zh, c.ct_en, c.level_en || '', c.room || '', c.status, c.capacity || '', c.n, c.teacher || '', c.room_parents || '', c.book_en || '']));
+      lines.push([], ['Assignments'], ['School year', 'Class', 'Role', 'Person', 'Start', 'End']);
+      d.classes.forEach((c) => (d.byClass[c.id] || []).forEach((a) => lines.push([c.year_label, c.code, a.role_en, `${a.english_first_name} ${a.english_last_name} ${a.chinese_name}`.trim(), a.start_date || '', a.end_date || ''])));
+      audit(db, 'school_classes', null, 'export_class_roster_csv', null, { rows: d.classes.length }, req.portal.user.id, req.ip);
+      return res.type('text/csv; charset=utf-8').set('Content-Disposition', `attachment; filename="classes-${d.year.label}.csv"`).send('﻿' + lines.map((l) => l.map(csvEscape).join(',')).join('\r\n'));
+    }
+    page(req, res, 'class-roster.ejs', { ...d, canAssign: staffCan(req, 'assignments.create'), canChange: staffCan(req, 'assignments.update'), canRemove: staffCan(req, 'assignments.delete'), canEditClass: staffCan(req, 'classes.update'), canCreateClass: staffCan(req, 'classes.create'), canDeleteClass: staffCan(req, 'classes.delete') }, { title: 'Classes' });
+  });
+  const backToRoster = (req, res, classId, msg, type = 'ok') => { req.session.portalFlash = { type, msg }; res.redirect(`/${req.params.lang}/portal/class-roster?open=${classId}${req.body._year ? '&year=' + encodeURIComponent(req.body._year) : ''}#class-${classId}`); };
+  app.post(`${R}/class-roster/assignments`, requireLogin, csrfMiddleware, (req, res) => {
+    if (!staffCan(req, 'assignments.create')) return forbidden(req, res);
+    const cls = db.prepare('SELECT * FROM school_classes WHERE id = ? AND deleted_at IS NULL').get(Number(req.body.school_class_id));
+    const person = Number(req.body.person_id); const role = Number(req.body.assignment_role_id);
+    if (!cls) return go(req, res, '/class-roster');
+    if (!person || !db.prepare('SELECT 1 FROM persons WHERE id = ? AND deleted_at IS NULL').get(person) || !db.prepare('SELECT 1 FROM assignment_roles WHERE id = ?').get(role))
+      return backToRoster(req, res, cls.id, 'Choose a person and a role. 請選擇人員與角色。', 'warn');
+    const yr = db.prepare('SELECT * FROM school_years WHERE id = ?').get(cls.school_year_id);
+    createRow(db, ENTITIES.class_assignments, { school_year_id: cls.school_year_id, school_class_id: cls.id, person_id: person, assignment_role_id: role, start_date: s(req.body.start_date) || yr?.first_day || null, end_date: s(req.body.end_date) || yr?.last_day || null }, req.portal.user.id, req.ip);
+    backToRoster(req, res, cls.id, 'Assignment added. 已指派。');
+  });
+  app.post(`${R}/class-roster/assignments/:id`, requireLogin, csrfMiddleware, (req, res) => {
+    if (!staffCan(req, 'assignments.update')) return forbidden(req, res);
+    const a = db.prepare('SELECT * FROM class_assignments WHERE id = ? AND deleted_at IS NULL').get(Number(req.params.id));
+    if (!a) return go(req, res, '/class-roster');
+    const role = Number(req.body.assignment_role_id) || a.assignment_role_id;
+    updateRow(db, ENTITIES.class_assignments, a.id, { assignment_role_id: role, start_date: s(req.body.start_date) || null, end_date: s(req.body.end_date) || null }, req.portal.user.id, req.ip);
+    backToRoster(req, res, a.school_class_id, 'Assignment saved. 已儲存。');
+  });
+  app.post(`${R}/class-roster/assignments/:id/delete`, requireLogin, csrfMiddleware, (req, res) => {
+    if (!staffCan(req, 'assignments.delete')) return forbidden(req, res);
+    const a = db.prepare('SELECT * FROM class_assignments WHERE id = ? AND deleted_at IS NULL').get(Number(req.params.id));
+    if (!a) return go(req, res, '/class-roster');
+    softDelete(db, ENTITIES.class_assignments, a.id, req.portal.user.id, req.ip);
+    backToRoster(req, res, a.school_class_id, 'Assignment removed. 已移除。');
   });
 
-  // ---------- class placement ----------
-  app.get(`${R}/placement`, requireLogin, (req, res) => {
-    if (!staffCan(req, 'placement.assign')) return forbidden(req, res);
-    const year = currentYear(db);
-    const filter = ['unplaced', 'all'].includes(req.query.show) ? req.query.show : 'unplaced';
-    const rows = db.prepare(`SELECT e.id, e.status, e.grade_label, e.school_class_id, e.class_type_id, p.english_first_name, p.english_last_name, p.chinese_name, p.birth_date, ct.name_en AS ct_en, ct.name_zh AS ct_zh
-      FROM enrollments e JOIN persons p ON p.id = e.student_person_id LEFT JOIN class_types ct ON ct.id = e.class_type_id
-      WHERE e.school_year_id = ? AND e.status IN ('registered','placed','pending') AND e.deleted_at IS NULL ${filter === 'unplaced' ? 'AND e.school_class_id IS NULL' : ''} ORDER BY ct.sort, p.birth_date LIMIT 300`).all(year.id);
-    const classes = db.prepare(`SELECT sc.id, sc.code, sc.name_zh, sc.name_en, sc.class_type_id, sc.capacity, (SELECT COUNT(*) FROM enrollments e WHERE e.school_class_id = sc.id AND e.status IN ('registered','placed') AND e.deleted_at IS NULL) AS n
-      FROM school_classes sc WHERE sc.school_year_id = ? AND sc.deleted_at IS NULL ORDER BY sc.code`).all(year.id);
-    page(req, res, 'placement.ejs', { year, rows, classes, filter }, { title: 'Class Placement' });
-  });
+  // ---------- class placement: saved from the expanded row of the Enrollment table (and kept for old links) ----------
+  app.get(`${R}/placement`, requireLogin, (req, res) => res.redirect(`/${req.params.lang}/portal/manage/enrollments?f_placement=unplaced`));
   app.post(`${R}/placement`, requireLogin, csrfMiddleware, (req, res) => {
     if (!staffCan(req, 'placement.assign')) return forbidden(req, res);
     const uid = req.portal.user.id; let n = 0;
@@ -63,7 +112,9 @@ export function registerStaffRoutes(app, { db, page, requireLogin }) {
       db.prepare("UPDATE enrollments SET school_class_id = ?, status = CASE WHEN status='pending' THEN 'pending' ELSE 'placed' END, placed_at = datetime('now'), updated_at = datetime('now'), updated_by = ? WHERE id = ?").run(cls, uid, en.id);
       audit(db, 'enrollments', en.id, 'placed', { class: en.school_class_id }, { class: cls, paid }, uid, req.ip); n += 1;
     }
-    go(req, res, '/placement', { type: 'ok', msg: `${n} student(s) placed. 已分班。` });
+    const back = /^\/(en|zh)\/portal\/manage\/enrollments(\?[A-Za-z0-9_=&%.+-]*)?$/.test(String(req.body._back || '')) ? String(req.body._back) : `/${req.params.lang}/portal/manage/enrollments`;
+    req.session.portalFlash = { type: 'ok', msg: n ? `${n} student(s) placed. 已分班。` : 'Nothing changed. 沒有變更。' };
+    res.redirect(back);
   });
 
   // ---------- fees: everything for one school year in one place ----------

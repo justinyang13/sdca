@@ -7,7 +7,8 @@
     if (c.field && c.field.type === 'bool') return r[c.key] ? '✓' : '';
     if (c.field && c.field.type === 'money') return r[c.key] == null ? '' : money(r[c.key]);
     if (c.field && c.field.type === 'select') { const o = (c.field.options || []).find(function(o){ return String(o.v) === String(r[c.key]); }); return o ? one(o.en, o.zh) : (r[c.key] ?? ''); }
-    if (c.field && (c.field.type === 'datetime')) return fmtDateTime(r[c.key]);
+    if (c.field && c.field.type === 'datetime') return fmtDateTime(r[c.key]);
+    if (c.field && c.field.type === 'localdt') return fmtLocalDateTime(r[c.key]);
     return r[c.key] ?? '';
   };
   // columns shown by default (the rest live behind the Columns picker and the row's expand panel)
@@ -16,7 +17,7 @@
   if (defKeys.indexOf(allKeys[0]) < 0) defKeys.unshift(allKeys[0]);
   const isDef = function(k){ return defKeys.indexOf(k) >= 0; };
   const WRAPOK = ['allergy', 'special_medical_needs', 'notes', 'street', 'course_name', 'description', 'note', 'withdrawal_reason', 'subject', 'body'];
-  const oneLine = function(c){ return !(c.type === 'ref' || c.type === 'textarea' || c.extra || WRAPOK.indexOf(c.key) >= 0); };
+  const oneLine = function(c){ return !(c.type === 'ref' || c.type === 'textarea' || c.extra || WRAPOK.indexOf(c.key) >= 0 || (ent.wrapCols || []).indexOf(c.key) >= 0); };
   const colCls = function(c, extra){ return ((extra || '') + (oneLine(c) ? ' nw' : '') + (isDef(c.key) ? '' : ' col-off')).trim(); };
   const hasMore = defKeys.length < allKeys.length;
   const detailCols = ent.fields.filter(function(fd){ return fd.type !== 'password'; }).map(function(fd){ return { key: fd.name, label: fd.label, field: fd, type: fd.type }; })
@@ -71,14 +72,47 @@
     <% result.rows.forEach(function(r){ const d = detailUrl(r); %>
     <tr class="data-row">
       <% result.cols.forEach(function(c, ci){ %>
-      <td data-col="<%= c.key %>" class="<%= colCls(c, c.type === 'money' ? 'num' : '') %><%= c.field && c.field.trunc ? ' trunc' : '' %>"<%- c.field && c.field.trunc ? ' style="max-width:' + c.field.trunc + 'px" title="' + esc(String(cellVal(r, c) || '')) + '"' : '' %>><% if (ci === 0) { %><button type="button" class="row-toggle" aria-expanded="false" aria-label="<%= b('Show details', '顯示詳細資料') %>">▸</button><a href="<%= (d && ent.readOnly) ? '/' + lang + d : url('/manage/' + key + '/' + r.id) %>"><%= cellVal(r, c) || '—' %></a><% } else { %><%= cellVal(r, c) %><% } %></td>
+      <td data-col="<%= c.key %>" class="<%= colCls(c, c.type === 'money' ? 'num' : '') %><%= c.field && c.field.trunc ? ' trunc' : '' %>"<%- c.field && c.field.minw && !(c.field.trunc) ? ' style="min-width:' + c.field.minw + 'px"' : '' %><%- c.field && c.field.trunc ? ' style="max-width:' + c.field.trunc + 'px" title="' + esc(String(cellVal(r, c) || '')) + '"' : '' %>><% if (c.field && c.field.type === 'image') { %><% if (imgSrc(r[c.key])) { %><img class="thumb" src="<%= imgSrc(r[c.key]) %>" alt="" loading="lazy"><% } %><% } else if (ci === 0) { %><button type="button" class="row-toggle" aria-expanded="false" aria-label="<%= b('Show details', '顯示詳細資料') %>">▸</button><a href="<%= (d && ent.readOnly) ? '/' + lang + d : url('/manage/' + key + '/' + r.id) %>"><%= String(cellVal(r, c)) === '' ? '—' : cellVal(r, c) %></a><% } else if (c.extra && c.extra.linkDetail && d && cellVal(r, c) !== '') { %><a href="/<%= lang %><%= d %>"><%= cellVal(r, c) %></a><% } else { %><%= cellVal(r, c) %><% } %></td>
       <% }) %>
     </tr>
-    <tr class="row-detail" hidden><td colspan="<%= totalCols %>"><div class="detail-inner"><dl class="kv">
+    <tr class="row-detail" hidden><td colspan="<%= totalCols %>"><div class="detail-inner<%= (ent.expandChildren || ent.expandSchoolInfo) ? ' two-col' : '' %>"><dl class="kv">
       <% detailCols.forEach(function(c){ const v = cellVal(r, c); if (v === '' || v === null || v === undefined) return; %><dt><%= b(c.label.en, c.label.zh) %></dt><dd><%= v %></dd><% }) %>
       <dt>ID</dt><dd><%= r.id %></dd>
       <% if (d) { %><dt></dt><dd><a href="/<%= lang %><%= d %>"><%= b('More Details', '詳細') %></a></dd><% } %>
-    </dl></div></td></tr>
+    </dl>
+    <% if (ent.expandPlacement && canPlace) { const opts = placeClasses.filter(function(c){ return c.school_year_id === r.school_year_id; }); %>
+    <div class="placement-box"><h4><%= b('Class placement', '分班') %></h4>
+      <form method="post" action="<%= url('/placement') %>" class="assign-fields"><%- csrfField() %><input type="hidden" name="_back" value="<%= url('/manage/enrollments') + (qs() ? '?' + qs() : '') %>">
+        <select name="class_<%= r.id %>" aria-label="<%= b('Class', '班級') %>"><option value=""><%= r.school_class_id ? b('— keep —', '— 不變 —') : b('— not placed yet —', '— 尚未分班 —') %></option>
+          <% opts.filter(function(c){ return !r.class_type_id || c.class_type_id === r.class_type_id; }).forEach(function(c){ %><option value="<%= c.id %>" <%= r.school_class_id === c.id ? 'selected' : '' %>><%= c.code %> <%= one(c.name_en, c.name_zh) %> (<%= c.n %><%= c.capacity ? '/' + c.capacity : '' %>)</option><% }) %></select>
+        <button class="btn btn-primary btn-sm" type="submit"><%= b('Save placement', '儲存分班') %></button>
+      </form>
+      <p class="muted"><%= b('Parents see the class, room and teacher one week before the first day of school.', '家長在開學前一週可看到班級、教室與老師。') %></p></div>
+    <% } %>
+    <% if (ent.expandSchoolInfo) { const si = schoolInfo[r.person_id + '-' + r.school_year_id]; const isCredit = creditTypes.has(r.class_type_id); %>
+    <div class="detail-col2"><h4><%= b('Regular school (middle / high school)', '就讀的一般學校 (國中/高中)') %></h4>
+      <% if (si) { %><dl class="kv">
+        <dt><%= b('School', '學校') %></dt><dd><%= si.school_name %></dd><dt><%= b('Grade', '年級') %></dt><dd><%= si.grade %></dd>
+        <dt><%= b('Address', '地址') %></dt><dd><%= [si.mailing_address, si.city, si.state, si.zipcode].filter(Boolean).join(', ') %></dd>
+        <dt><%= b('School District', '學區') %></dt><dd><%= si.district || si.other_school_district || '—' %></dd>
+        <dt><%= b('Counselor', '輔導老師') %></dt><dd><%= si.counselor_name %></dd>
+        <dt><%= b('Counselor phone', '輔導老師電話') %></dt><dd><%= si.counselor_phone || '—' %><%= si.counselor_extension ? ' ext. ' + si.counselor_extension : '' %></dd>
+        <% if (si.notes) { %><dt><%= b('Notes', '備註') %></dt><dd><%= si.notes %></dd><% } %></dl>
+      <% } else if (isCredit) { %><p class="muted"><%= b('Not entered yet — needed for credit classes.', '尚未填寫 — 學分班需要。') %></p>
+      <% } else { %><p class="muted"><%= b('Only credit-class students need this.', '只有學分班學生需要填寫。') %></p><% } %>
+      <% if ((si || isCredit) && r.school_year_id === currentYearId) { %><p><a class="btn btn-ghost btn-sm" href="<%= url('/people/' + r.person_id + '/school-info') %>"><%= si ? b('Edit school info', '編輯學校資料') : b('Enter school info', '輸入學校資料') %></a></p><% } %></div>
+    <% } %>
+    <% if (ent.expandChildren) { const ks = kids[r.id] || []; %>
+    <div class="detail-col2"><h4><%= b('Children', '子女') %> (<%= ks.length %>)</h4>
+      <% if (!ks.length) { %><p class="muted"><%= b('No children recorded.', '沒有子女資料。') %></p><% } %>
+      <ul class="kid-list"><% ks.forEach(function(k){ %><li>
+        <a href="<%= url('/people/' + k.id) %>"><strong><%= k.english_first_name %> <%= k.english_last_name %> <%= k.chinese_name %></strong></a>
+        <% if (k.enr_status) { %><span class="pill pill-student" title="<%= b('Enrolled this school year', '本學年已註冊') %>">🎓 <%= b('Student', '學生') %></span><% } else { %><span class="pill pill-muted"><%= b('Not enrolled this year', '本學年未註冊') %></span><% } %>
+        <div class="muted"><%= k.gender === 'F' ? b('Girl', '女') : b('Boy', '男') %><%= k.birth_date ? ' · ' + k.birth_date : '' %><% if (k.enr_status) { %> · <%= gl(k.grade_label) %><%= k.ct_en ? ' · ' + one(k.ct_en, k.ct_zh) : '' %><%= k.class_code ? ' · ' + k.class_code + ' ' + one(k.class_en, k.class_zh) : ' · ' + b('not placed yet', '尚未分班') %> · <%= k.enr_status %><% } %></div>
+        <% if (k.allergy || k.special_medical_needs) { %><div class="muted">⚠ <%= [k.allergy, k.special_medical_needs].filter(Boolean).join(' · ') %></div><% } %>
+      </li><% }) %></ul>
+    </div>
+    <% } %></div></td></tr>
     <% }) %>
   </tbody>
 </table>

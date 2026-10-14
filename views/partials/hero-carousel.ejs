@@ -1,85 +1,81 @@
 <%
-  // hero-carousel.ejs — home hero sliding bulletin board (Phase 8).
-  // Server renders all slides; JS (public/js/hero-carousel.js) enables
-  // auto-advance, prev/next, dots, keyboard, swipe, pause on hover/focus,
+  // hero-carousel.ejs — home hero sliding bulletin board. Every slide is a database record (Staff Tools → Hero Slides):
+  // title, description, image and a link ("find out more", optional second button). Three layouts:
+  //   photo   — picture with a caption bar: title, description, one button
+  //   feature — centred headline, description and up to two buttons (e.g. Enroll)
+  //   intro   — welcome text in two columns (中文 | English) with decorative side banners
+  // Server renders all slides; JS (public/js/hero-carousel.js) adds auto-advance, prev/next, dots, keyboard, swipe, pause
   // and respects prefers-reduced-motion. Without JS: first slide visible.
-  //
-  // Read from L: slides (array of { image, caption_en, caption_zh, link_url, id })
-  // ctx: lang, t (i18n fn), imageManifest
-  // Slide 1 is the home intro (red banners + bilingual welcome text, L.introHtml); photo slides follow.
-  const introHtml = (typeof L !== 'undefined' && L.introHtml) || '';
-  const photoSlides = (typeof L !== 'undefined' && L.slides) ? L.slides : [];
-  const slides = (introHtml ? [{ intro: true, caption_en: 'Welcome', caption_zh: '歡迎' }] : [])
-    .concat(photoSlides.length || introHtml ? photoSlides : [{ image: 'anniversary-30th', caption_en: 'San Diego Chinese Academy', caption_zh: '聖地牙哥中華學苑', link_url: '' }]);
+  // L.slides: rows of `slides` with html_en / html_zh (the markdown descriptions rendered and sanitised by the route).
+  const slides = (typeof L !== 'undefined' && L.slides) ? L.slides : [];
   const manifest = (typeof imageManifest === 'function') ? imageManifest() : {};
   const schoolName = (L && (L.schoolName)) || (lang === 'zh' ? '聖地牙哥中華學苑' : 'San Diego Chinese Academy');
-  const tagline = (L && L.tagline) || (lang === 'zh'
-    ? '非營利語言學校，自 1988 年起教授華語和中華文化'
-    : 'Non-profit language school teaching Mandarin and Chinese culture since 1988');
-  const portalUrl = (L && L.portalUrl) || ('/' + lang + '/portal/signin');
   const escapeAttr = (v) => String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  // an image is a name from the image library (responsive sizes) or a plain path such as /img/slides/x.jpg
   const imgFor = (name) => {
+    if (!name) return null;
     const entry = manifest[name];
-    if (!entry || !entry.files || !entry.files.length) return null;
-    const best = entry.files[entry.files.length - 1];
-    const srcset = entry.files.map((f) => (f.file.startsWith('/') ? f.file : '/' + f.file) + ' ' + f.w + 'w').join(', ');
-    return { src: (best.file.startsWith('/') ? best.file : '/' + best.file), srcset, w: best.w, h: best.h, alt_en: entry.alt_en, alt_zh: entry.alt_zh };
+    if (entry && entry.files && entry.files.length) {
+      const best = entry.files[entry.files.length - 1];
+      const srcset = entry.files.map((f) => (f.file.startsWith('/') ? f.file : '/' + f.file) + ' ' + f.w + 'w').join(', ');
+      return { src: (best.file.startsWith('/') ? best.file : '/' + best.file), srcset, w: best.w, h: best.h, alt_en: entry.alt_en, alt_zh: entry.alt_zh };
+    }
+    return /^\//.test(name) ? { src: name, srcset: '', w: null, h: null } : null;
   };
+  const href = (u) => (!u ? '' : (/^\/(en|zh)(\/|$)/.test(u) || !/^\//.test(u)) ? u : '/' + lang + u);
+  const pickT = (s) => (lang === 'zh' ? (s.caption_zh || s.caption_en || '') : (s.caption_en || s.caption_zh || ''));
+  const pickD = (s) => (lang === 'zh' ? (s.html_zh || s.html_en || '') : (s.html_en || s.html_zh || ''));
+  const label = (s, n, fallbackEn, fallbackZh) => (n === 2
+    ? (lang === 'zh' ? (s.link2_label_zh || s.link2_label_en) : (s.link2_label_en || s.link2_label_zh))
+    : (lang === 'zh' ? (s.link_label_zh || s.link_label_en) : (s.link_label_en || s.link_label_zh))) || (lang === 'zh' ? fallbackZh : fallbackEn);
 %>
 <section class="hero-carousel" role="region" aria-roledescription="carousel" aria-label="<%= lang === 'zh' ? '歡迎橫幅' : 'Welcome banner' %>" data-carousel>
   <div class="hero-carousel-slides" data-carousel-slides>
     <% slides.forEach(function(slide, i) {
       const img = imgFor(slide.image);
-      const alt = (lang === 'zh') ? (slide.caption_zh || (img && img.alt_zh) || slide.caption_en || '') : (slide.caption_en || (img && img.alt_en) || slide.caption_zh || '');
-      const isHome = false;
+      const title = pickT(slide);
+      const alt = title || (img && (lang === 'zh' ? img.alt_zh : img.alt_en)) || '';
+      const desc = pickD(slide);
     %>
-    <% if (slide.intro) { %>
-    <article class="hero-carousel-slide is-intro" role="group" aria-roledescription="slide" aria-label="<%= escapeAttr(schoolName) %>">
-      <% const introImg = imgFor('intro-bg'); if (introImg) { %>
-      <div class="hero-carousel-media" aria-hidden="true">
-        <img class="hero-carousel-img" src="<%= introImg.src %>" srcset="<%= introImg.srcset %>" sizes="100vw" width="<%= introImg.w %>" height="<%= introImg.h %>" alt="" fetchpriority="high">
+    <% if (slide.layout === 'intro') { const left = imgFor(slide.image_left); const right = imgFor(slide.image_right); %>
+    <article class="hero-carousel-slide is-intro" role="group" aria-roledescription="slide" aria-label="<%= escapeAttr(alt) %>">
+      <% if (img) { %><div class="hero-carousel-media" aria-hidden="true"><img class="hero-carousel-img" src="<%= img.src %>"<% if (img.srcset) { %> srcset="<%= img.srcset %>" sizes="100vw"<% } %><% if (img.w) { %> width="<%= img.w %>" height="<%= img.h %>"<% } %> alt="" <%= i === 0 ? 'fetchpriority="high"' : 'loading="lazy"' %>></div><% } %>
+      <h1 class="sr-only"><%= i === 0 ? schoolName : alt %></h1>
+      <div class="hero-intro blocks-in-hero" data-page="home">
+        <div class="blk-columns blk-cols-4">
+          <div class="blk-col"><% if (left) { %><div class="blk-vis hide-phone"><figure class="blk-image"><img src="<%= left.src %>" alt="" loading="lazy" decoding="async"></figure></div><% } %></div>
+          <div class="blk-col"><div class="blk-richtext"><%- slide.html_zh %></div></div>
+          <div class="blk-col"><div class="blk-richtext"><%- slide.html_en %>
+            <% if (slide.link_url) { %><p><a class="btn btn-ghost btn-sm" href="<%= href(slide.link_url) %>"><%= label(slide, 1, 'Learn more', '了解更多') %> →</a></p><% } %></div></div>
+          <div class="blk-col"><% if (right) { %><div class="blk-vis hide-phone"><figure class="blk-image"><img src="<%= right.src %>" alt="" loading="lazy" decoding="async"></figure></div><% } %></div>
+        </div>
       </div>
-      <% } %>
-      <h1 class="sr-only"><%= schoolName %></h1>
-      <div class="hero-intro blocks-in-hero" data-page="home"><%- introHtml %></div>
     </article>
     <% return; } %>
-    <article class="hero-carousel-slide <%= isHome ? 'is-home' : '' %>" role="group" aria-roledescription="slide" aria-label="<%= escapeAttr(alt) %>">
-      <div class="hero-carousel-media" aria-hidden="<%= isHome ? 'false' : 'true' %>">
+    <article class="hero-carousel-slide" role="group" aria-roledescription="slide" aria-label="<%= escapeAttr(alt) %>">
+      <div class="hero-carousel-media" aria-hidden="true">
         <% if (img) { %>
-          <img class="hero-carousel-img"
-               src="<%= img.src %>"
-               srcset="<%= img.srcset %>"
-               sizes="(max-width: 768px) 100vw, 1600px"
-               width="<%= img.w %>" height="<%= img.h %>"
-               alt="<%= escapeAttr(alt) %>"
-               <%= isHome ? 'fetchpriority="high"' : 'loading="lazy"' %>>
+          <img class="hero-carousel-img" src="<%= img.src %>"<% if (img.srcset) { %> srcset="<%= img.srcset %>" sizes="(max-width: 768px) 100vw, 1600px"<% } %><% if (img.w) { %> width="<%= img.w %>" height="<%= img.h %>"<% } %>
+               alt="<%= escapeAttr(alt) %>" <%= i === 0 ? 'fetchpriority="high"' : 'loading="lazy"' %>>
         <% } else { %>
           <div class="hero-carousel-img hero-carousel-fallback"></div>
         <% } %>
       </div>
       <div class="hero-carousel-inner">
-        <% if (slide.image === 'enroll-bg') { %>
+        <% if (slide.layout === 'feature') { %>
         <div class="hero-enroll">
-          <p class="hero-carousel-tagline"><%= tagline %></p>
-          <div class="hero-carousel-cta">
-            <a class="btn btn-primary btn-lg" href="/<%= lang %>/programs/classes"><%= lang === 'zh' ? '探索課程' : 'Explore Programs' %> →</a>
-            <a class="btn btn-light btn-lg" href="<%= portalUrl %>"><%= lang === 'zh' ? '立即報名' : 'Enroll Now' %></a>
-          </div>
+          <% if (title) { %><h2 class="hero-feature-title"><%= title %></h2><% } %>
+          <% if (desc) { %><div class="hero-carousel-tagline"><%- desc %></div><% } %>
+          <% if (slide.link_url || slide.link2_url) { %><div class="hero-carousel-cta">
+            <% if (slide.link_url) { %><a class="btn btn-primary btn-lg" href="<%= href(slide.link_url) %>"><%= label(slide, 1, 'Learn more', '了解更多') %></a><% } %>
+            <% if (slide.link2_url) { %><a class="btn btn-light btn-lg" href="<%= href(slide.link2_url) %>"><%= label(slide, 2, 'Learn more', '了解更多') %></a><% } %>
+          </div><% } %>
         </div>
-        <% } else if (isHome) { %>
-        <h1 class="hero-carousel-h1"><%= schoolName %></h1>
-        <p class="hero-carousel-tagline"><%= tagline %></p>
-        <div class="hero-carousel-cta">
-          <a class="btn btn-primary btn-lg" href="/<%= lang %>/programs"><%= lang === 'zh' ? '探索課程' : 'Explore Programs' %> →</a>
-          <a class="btn btn-light btn-lg" href="<%= portalUrl %>"><%= lang === 'zh' ? '立即報名' : 'Enroll Now' %></a>
-        </div>
-        <% } else if (slide.caption_en || slide.caption_zh) { %>
+        <% } else if (title || desc || slide.link_url) { %>
         <div class="hero-carousel-caption">
-          <span class="hero-carousel-caption-text"><%= lang === 'zh' ? (slide.caption_zh || slide.caption_en) : (slide.caption_en || slide.caption_zh) %></span>
-          <% if (slide.link_url) { %>
-            <a class="btn btn-light btn-sm" href="<%= /^\/(en|zh)(\/|$)/.test(slide.link_url) || !/^\//.test(slide.link_url) ? slide.link_url : '/' + lang + slide.link_url %>"><%= lang === 'zh' ? '了解更多' : 'Learn more' %> →</a>
-          <% } %>
+          <% if (title) { %><span class="hero-carousel-caption-text"><%= title %></span><% } %>
+          <% if (desc) { %><div class="hero-caption-desc"><%- desc %></div><% } %>
+          <% if (slide.link_url) { %><a class="btn btn-light btn-sm" href="<%= href(slide.link_url) %>"><%= label(slide, 1, 'Learn more', '了解更多') %> →</a><% } %>
         </div>
         <% } %>
       </div>
@@ -96,7 +92,7 @@
   </div>
   <div class="hero-carousel-dots" role="tablist" aria-label="<%= lang === 'zh' ? '選擇橫幅' : 'Choose slide' %>">
     <% slides.forEach(function(slide, i) {
-      const alt = (lang === 'zh') ? (slide.caption_zh || slide.caption_en) : (slide.caption_en || slide.caption_zh);
+      const alt = pickT(slide);
     %>
     <button type="button" class="hero-carousel-dot <%= i === 0 ? 'is-active' : '' %>" role="tab" aria-selected="<%= String(i === 0) %>" aria-label="<%= escapeAttr(alt) %> — <%= lang === 'zh' ? '第' + (i + 1) + '張' : 'slide ' + (i + 1) %>" data-carousel-dot="<%= i %>"></button>
     <% }) %>

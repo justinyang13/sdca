@@ -1,12 +1,14 @@
 <%
   const nm = (p) => p ? (p.english_first_name + ' ' + p.english_last_name + (p.chinese_name ? ' ' + p.chinese_name : '')) : '';
 %>
+<div class="portal-welcome-bar"><h1 class="portal-welcome"><%= b('Welcome, ', '歡迎您，') %><%= U.person.english_first_name %></h1>
+  <p class="muted"><%= U.access.roles.map(function(r){ return one(r.name_en, r.name_zh); }).join(' · ') %></p></div>
 <% if (admin) { %>
 <section class="dash">
   <h1><%= b('Admin dashboard', '管理員首頁') %><% if (year) { %> <small>· <%= year.label %></small><% } %></h1>
   <div class="stat-grid">
     <a class="stat" href="<%= url('/manage/families') %>"><strong><%= admin.families %></strong><span><%= b('Families', '家庭') %></span></a>
-    <a class="stat" href="<%= url('/manage/persons') %>"><strong><%= admin.persons %></strong><span><%= b('People', '人員') %></span></a>
+    <a class="stat" href="<%= url('/manage/persons') %>"><strong><%= admin.persons %></strong><span><%= b('Directory', '通訊錄') %></span></a>
     <a class="stat" href="<%= url('/manage/enrollments') %>"><strong><%= admin.students %></strong><span><%= b('Students this year', '本學年學生') %></span></a>
     <a class="stat" href="<%= url('/manage/school_classes') %>"><strong><%= admin.classes %></strong><span><%= b('Classes', '班級') %></span></a>
     <a class="stat" href="<%= url('/manage/users') %>"><strong><%= admin.users %></strong><span><%= b('Users', '用戶') %></span></a>
@@ -27,16 +29,16 @@
 </section>
 <% } %>
 
-<% if (secretary) { %>
+<% if (secretary) { const isSec = U.access.roleCodes.includes('secretary'); %>
 <section class="dash">
-  <h1><%= b('Secretary Resources', '秘書專區') %><% if (!admin && year) { %> <small>· <%= year.label %></small><% } %></h1>
+  <h1><%= isSec ? b('Secretary Resources', '秘書專區') : b('Registration status', '註冊狀況') %><% if (!admin && year) { %> <small>· <%= year.label %></small><% } %></h1>
   <% if (secretary.tools) { %>
   <p class="btn-row">
-    <% if (can('persons.list')) { %><a class="btn btn-ghost" href="<%= url('/manage/persons') %>"><%= b('List All People', '人員名單') %></a><% } %>
-    <% if (can('reports.class_roster')) { %><a class="btn btn-ghost" href="<%= url('/class-roster') %>"><%= b('Class Roster', '班級人數清單') %></a><% } %>
+    <% if (can('persons.list')) { %><a class="btn btn-ghost" href="<%= url('/manage/persons') %>"><%= b('Directory', '通訊錄') %></a><% } %>
+    <% if (can('reports.class_roster')) { %><a class="btn btn-ghost" href="<%= url('/class-roster') %>"><%= b('Classes', '班級') %></a><% } %>
     <% if (can('volunteer_list.list')) { %><a class="btn btn-ghost" href="<%= url('/manage/volunteer_list') %>"><%= b('Volunteer List', '義工名單') %></a><% } %>
     <% if (can('student_list.list')) { %><a class="btn btn-ghost" href="<%= url('/manage/student_list') %>"><%= b('Student List', '學生名單') %></a><% } %>
-    <% if (can('placement.assign')) { %><a class="btn btn-ghost" href="<%= url('/placement') %>"><%= b('Class Placement', '分班') %> (<%= secretary.unplaced %>)</a><% } %>
+    <% if (can('placement.assign')) { %><a class="btn btn-ghost" href="<%= url('/manage/enrollments?f_placement=unplaced') %>"><%= b('Class Placement', '分班') %> (<%= secretary.unplaced %>)</a><% } %>
   </p><% } %>
   <div class="portal-card"><h2><%= b('Registrations waiting for payment', '等待付款的註冊') %></h2>
     <% if (!secretary.pendingPay.length) { %><p class="muted"><%= b('None.', '沒有。') %></p><% } else { %>
@@ -49,7 +51,7 @@
 
 <% if (finance) { %>
 <section class="dash">
-  <h1><%= b('Finance', '財務') %><% if (year) { %> <small>· <%= year.label %></small><% } %></h1>
+  <h1><%= b('Finance Resources', '財務專區') %><% if (year) { %> <small>· <%= year.label %></small><% } %></h1>
   <p class="btn-row"><a class="btn btn-primary" href="<%= url('/finance/payment') %>"><%= b('Enter Payment', '輸入付款') %></a>
     <a class="btn btn-ghost" href="<%= url('/finance/manual/new') %>"><%= b('New Manual Transaction', '新增手動交易') %></a>
     <a class="btn btn-ghost" href="<%= url('/fees') %>"><%= b('Fees for a School Year', '學年費用設定') %></a>
@@ -68,7 +70,7 @@
 
 <% if (pta) { %>
 <section class="dash">
-  <h1><%= b('Volunteers', '義工') %></h1>
+  <h1><%= b('PTA Resources', '家長會專區') %></h1>
   <p class="btn-row"><a class="btn btn-ghost" href="<%= url('/manage/volunteer_signups') %>"><%= b('Volunteer Sign-ups', '義工報名') %></a>
     <a class="btn btn-ghost" href="<%= url('/manage/volunteer_jobs') %>"><%= b('Volunteer Jobs', '義工工作') %></a>
     <% if (can('volunteer_list.list')) { %><a class="btn btn-ghost" href="<%= url('/manage/volunteer_list') %>"><%= b('Volunteer List', '義工名單') %></a><% } %>
@@ -79,6 +81,12 @@
 </section>
 <% } %>
 
+<% resources.forEach(function(sec){ %>
+<section class="dash role-resources" data-role="<%= sec.code %>">
+  <h1><%= b(sec.title.en, sec.title.zh) %><% if (year) { %> <small>· <%= year.label %></small><% } %></h1>
+  <p class="btn-row"><% sec.links.forEach(function(l){ %><a class="btn btn-ghost" href="<%= l.href %>"><%= b(l.en, l.zh) %></a> <% }) %></p>
+</section>
+<% }) %>
 <% if (instructor) { %>
 <section class="dash">
   <h1><%= b('Instructor Resources', '教師專區') %></h1>
@@ -95,6 +103,11 @@
   <% families.forEach(function(F){ %><%- include('_family', { F: F, staffView: false, canRegister: canRegister, me: U.person }) %><% }) %>
 <% } %>
 
+<% if (classNews && classNews.length) { %>
+<section class="dash"><h2><%= b('Class Announcements', '班級通告') %> <a class="btn btn-ghost btn-sm" href="<%= url('/class-announcements') %>"><%= b('See all', '全部') %></a></h2>
+  <% classNews.forEach(function(p){ %><div class="portal-card class-post"><span class="pill"><%= p.class_code %></span> <strong><%= one(p.title_en, p.title_zh) %></strong><p class="muted"><%= fmtDateTime(p.created_at) %></p></div><% }) %>
+</section>
+<% } %>
 <% if (volunteer) { %>
 <section class="dash"><h2><%= b('My volunteer sign-up', '我的義工報名') %></h2>
   <% if (!volunteer.length) { %><p class="muted"><%= b('No volunteer sign-up yet.', '尚未報名。') %></p><% } %>
@@ -131,6 +144,6 @@
     <p class="muted"><%= b('Total credits earned', '累計學分') %>: <strong><%= student.grades.reduce(function(s, g){ return s + (g.letter_grade && g.letter_grade !== 'F' ? Number(g.credits || 0) : 0); }, 0) %></strong></p><% } %></div>
 </section>
 <% } %>
-<% if (!admin && !secretary && !finance && !pta && !instructor && !(typeof families !== 'undefined' && families) && !volunteer && !student) { %>
+<% if (!resources.length && !(classNews && classNews.length) && !admin && !secretary && !finance && !pta && !instructor && !(typeof families !== 'undefined' && families) && !volunteer && !student) { %>
   <p class="muted"><%= b('Your account has no pages yet. Please contact the school office.', '您的帳戶尚無可用頁面，請聯絡學校辦公室。') %></p>
 <% } %>

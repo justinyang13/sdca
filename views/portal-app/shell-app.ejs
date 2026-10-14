@@ -1,32 +1,6 @@
-<%# Portal shell with the sidebar. locals: inner, nav, U, b, one, url, flash, title %>
+<%# Portal shell: the menus live in the portal header (portal-header.ejs). locals: inner, flash %>
 <section class="section portal-app-section" data-portal>
   <div class="container portal-app">
-    <aside class="portal-side" aria-label="<%= b('Portal menu', '入口選單') %>">
-      <div class="portal-welcome">
-        <span class="portal-welcome-label"><%= b('Welcome', '歡迎您') %></span>
-        <strong><%= U.person.english_first_name %> <%= U.person.english_last_name %> <%= U.person.chinese_name %></strong>
-        <span class="portal-role-pills"><% U.access.roles.forEach(function(r){ %><span class="pill"><%= one(r.name_en, r.name_zh) %></span><% }) %></span>
-      </div>
-      <details class="portal-menu" data-portal-menu>
-      <summary><%= b('Menu', '選單') %></summary>
-      <nav class="portal-nav">
-        <ul><li><a href="<%= nav.home.href %>"><%= b(nav.home.en, nav.home.zh) %></a></li></ul>
-        <% nav.menu.forEach(function(g){ const open = g.items.some(function(i){ return current && i.href.split('?')[0] === ('/' + lang + current.replace(/^\/[a-z]{2}/, '')); }); %>
-        <details class="portal-group" <%= open ? 'open' : '' %>>
-          <summary><%= b(g.en, g.zh) %></summary>
-          <ul><% g.items.forEach(function(i){ %><li><a href="<%= i.href %>"<%- i.blank ? ' target="_blank" rel="noopener"' : '' %>><%= b(i.en, i.zh) %></a></li><% }) %></ul>
-        </details>
-        <% }) %>
-        <% nav.staff.forEach(function(g, gi){ %>
-        <details class="portal-group">
-          <summary><%= b(g.title.en, g.title.zh) %></summary>
-          <ul><% g.items.forEach(function(i){ %><li><a href="<%= i.href %>"><%= b(i.en, i.zh) %></a></li><% }) %></ul>
-        </details>
-        <% }) %>
-        <ul class="portal-signout"><li><form method="post" action="<%= url('/signout') %>"><%- csrfField() %><button type="submit" class="linklike"><%= b('Sign Out', '登出') %></button></form></li></ul>
-      </nav>
-      </details>
-    </aside>
     <div class="portal-main">
       <% if (flash) { %><div class="portal-flash portal-flash-<%= flash.type || 'ok' %>" role="status"><%= flash.msg %></div><% } %>
       <%- inner %>
@@ -34,4 +8,4 @@
   </div>
 </section>
 <div data-session-timeout="<%= idleMinutes %>" data-ping="<%= url('/ping') %>" data-lang="<%= lang %>" hidden></div>
-<script src="/js/session-timeout.js?v=1" defer></script>
+<script src="<%= asset('/js/session-timeout.js') %>" defer></script>

@@ -16,12 +16,21 @@ async function login(user, lang = 'en') {
 }
 const get = async (jar, path) => { const r = await fetch(BASE + path, { redirect: 'manual', headers: { cookie: jar.h } }); jar.set(r); const body = await r.text(); return { status: r.status, body, loc: r.headers.get('location') }; };
 const PLAN = {
-  'demo.admin': ['/en/portal', '/en/portal/manage/persons', '/en/portal/manage/families', '/en/portal/manage/users', '/en/portal/manage/roles', '/en/portal/manage/roles/2/permissions', '/en/portal/manage/school_classes', '/en/portal/manage/enrollments', '/en/portal/manage/transactions', '/en/portal/manage/registrations', '/en/portal/manage/fee_schedules', '/en/portal/fees', '/en/portal/placement', '/en/portal/reports', '/en/portal/class-roster', '/en/portal/manage/events', '/en/portal/events-calendar', '/en/portal/class-roster?sort=n&dir=desc', '/en/portal/manage/student_list', '/en/portal/manage/volunteer_list', '/en/portal/manage/student_list/export.csv', '/en/portal/manage/student_list', '/en/portal/manage/portal_audit', '/en/portal/manage/email_outbox', '/en/portal/manage/persons/new', '/en/portal/manage/persons/1', '/en/portal/people/1', '/en/portal/families/1', '/en/portal/manage/volunteer_jobs', '/en/portal/manage/credit_grades', '/en/portal/finance/payment', '/en/portal/finance/manual/new?family=1', '/zh/portal'],
-  'demo.secretary': ['/en/portal', '/en/portal/manage/persons', '/en/portal/placement', '/en/portal/reports', '/en/portal/manage/student_list', '/en/portal/manage/volunteer_list', '/en/portal/manage/student_list/export.csv', '/en/portal/finance/payment', '/en/portal/families/new'],
-  'demo.accountant': ['/en/portal', '/en/portal/manage/transactions', '/en/portal/fees', '/en/portal/finance/manual/new'],
+  'demo.admin': ['/en/portal', '/en/portal/manage/persons', '/en/portal/manage/families', '/en/portal/manage/users', '/en/portal/manage/roles', '/en/portal/manage/roles/2/permissions', '/en/portal/class-roster', '/en/portal/manage/enrollments', '/en/portal/manage/transactions', '/en/portal/manage/registrations', '/en/portal/manage/fee_schedules', '/en/portal/fees', '/en/portal/manage/enrollments?f_placement=unplaced', '/en/portal/reports', '/en/portal/class-roster', '/en/portal/manage/events', '/en/portal/events-calendar', '/en/portal/class-roster?sort=n&dir=desc', '/en/portal/manage/student_list', '/en/portal/manage/volunteer_list', '/en/portal/manage/student_list/export.csv', '/en/portal/manage/student_list', '/en/portal/manage/portal_audit', '/en/portal/manage/email_outbox', '/en/portal/manage/persons/new', '/en/portal/manage/persons/1', '/en/portal/people/1', '/en/portal/families/1', '/en/portal/manage/volunteer_jobs', '/en/portal/manage/credit_grades', '/en/portal/finance/payment', '/en/portal/finance/manual/new?family=1', '/zh/portal'],
+  'demo.secretary': ['/en/portal', '/en/portal/manage/persons', '/en/portal/manage/enrollments?f_placement=unplaced', '/en/portal/reports', '/en/portal/manage/student_list', '/en/portal/manage/volunteer_list', '/en/portal/manage/student_list/export.csv', '/en/portal/finance/payment', '/en/portal/families/new'],
+  'demo.accountant': ['/en/portal', '/en/portal/finance/reports', '/en/portal/finance/reports?report=aging', '/en/portal/finance/reports?report=summary', '/en/portal/finance/reports?report=scrip', '/en/portal/manage/transactions', '/en/portal/fees', '/en/portal/finance/manual/new'],
   'demo.pta': ['/en/portal', '/en/portal/manage/volunteer_signups', '/en/portal/manage/volunteer_list', '/en/portal/manage/volunteer_list/export.csv'],
-  'demo.principal': ['/en/portal', '/en/portal/manage/school_classes', '/en/portal/reports'],
-  'demo.teacher1': ['/en/portal', '/en/portal/classes/1'],
+  'demo.principal': ['/en/portal', '/en/portal/class-roster', '/en/portal/reports'],
+  'demo.teacher1': ['/en/portal', '/en/portal/classes/1', '/en/portal/class-announcements'],
+  'demo.president': ['/en/portal', '/en/portal/manage/board_members', '/en/portal/manage/slides', '/en/portal/manage/announcements', '/en/portal/class-announcements', '/en/portal/finance/reports'],
+  'demo.treasurer': ['/en/portal', '/en/portal/finance/payment', '/en/portal/finance/reports'],
+  'demo.scrip': ['/en/portal', '/en/portal/finance/manual/new', '/en/portal/finance/reports?report=scrip'],
+  'demo.operation': ['/en/portal', '/en/portal/manage/rooms', '/en/portal/class-roster'],
+  'demo.editorial': ['/en/portal', '/en/portal/manage/slides', '/en/portal/manage/announcements'],
+  'demo.activity': ['/en/portal', '/en/portal/events-calendar'],
+  'demo.ptadirector': ['/en/portal', '/en/portal/manage/volunteer_list'],
+  'demo.vicepresident': ['/en/portal', '/en/portal/manage/registrations'],
+  'demo.boardsecretary': ['/en/portal', '/en/portal/manage/events'],
   'demo.parent01': ['/en/portal', '/en/portal/transactions', '/en/portal/volunteer', '/en/portal/families/1', '/en/portal/families/1/register', '/en/portal/families/1/add-child', '/en/portal/families/1/edit', '/zh/portal', '/en/portal/change-password', '/en/portal/waiver'],
   'demo.student01': ['/en/portal'],
 };

@@ -1,5 +1,6 @@
 // src/portal/auth.js — portal login, lockout, reset/invitation tokens, email outbox, family lookups.
 import crypto from 'node:crypto';
+import { nowUtc } from '../datetime.js';
 import { hashPassword, verifyPassword } from '../admin/auth.js';
 import { audit } from './crud.js';
 import { loadAccess } from './perm.js';
@@ -8,8 +9,8 @@ const MAX_FAILS = 5;
 const LOCK_MINUTES = 15;
 export const RESET_HOURS = 6;
 export const INVITE_HOURS = 72;
-const iso = (d) => d.toISOString().replace('T', ' ').slice(0, 19);
-const nowIso = () => iso(new Date());
+const iso = (d) => nowUtc(d);
+const nowIso = () => nowUtc();
 const sha = (s) => crypto.createHash('sha256').update(s).digest('hex');
 
 export function queueEmail(db, { to, template, subject, body, relatedType = '', relatedId = null }) {

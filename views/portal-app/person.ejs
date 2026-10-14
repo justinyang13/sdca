@@ -2,7 +2,7 @@
   const nmP = (p) => p ? (p.english_first_name + ' ' + p.english_last_name + (p.chinese_name ? ' ' + p.chinese_name : '')) : '';
 %>
 <div class="portal-head"><h1><%= nmP(person) %></h1>
-  <div class="portal-actions"><a class="btn btn-ghost" href="<%= url('/manage/persons') %>">‹ <%= b('People', '人員') %></a>
+  <div class="portal-actions"><a class="btn btn-ghost" href="<%= url('/manage/persons') %>">‹ <%= b('Directory', '通訊錄') %></a>
     <% if (canUpdate) { %><a class="btn btn-ghost" href="<%= url('/manage/persons/' + person.id) %>"><%= b('Staff edit (all fields)', '員工編輯') %></a><% } %></div></div>
 <div class="portal-card"><h2><%= b('Person', '個人資料') %></h2>
   <dl class="kv">

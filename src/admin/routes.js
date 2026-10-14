@@ -13,6 +13,8 @@ import { uploader, uploadDir } from './uploads.js';
 import { loginLimiter } from '../middleware/index.js';
 import { csrfMiddleware } from '../middleware/csrf.js';
 import { config } from '../config.js';
+import { asset } from '../asset-version.js';
+import { nowUtc } from '../datetime.js';
 
 const ADMIN_CSS = '/css/admin.css';
 
@@ -88,6 +90,7 @@ export function registerAdminRoutes(app, { db }) {
     const shell = ejs.render(fs.readFileSync(path.join(views, 'layout.ejs'), 'utf8'), {
       title: locals.title || 'SDCA Admin',
       body: html,
+      asset,
       idleMinutes: config.sessionIdleMinutes,
       user: req.session.user,
       csrfToken: csrf,
@@ -145,7 +148,7 @@ export function registerAdminRoutes(app, { db }) {
       INSERT INTO sessions (sid, data, expires) VALUES (?, ?, ?)
       ON CONFLICT(sid) DO UPDATE SET data = excluded.data, expires = excluded.expires
     `).run(sid, data, expires);
-    db.prepare('UPDATE admin_users SET last_login = ? WHERE id = ?').run(new Date().toISOString(), user.id);
+    db.prepare('UPDATE admin_users SET last_login = ? WHERE id = ?').run(nowUtc(), user.id);
     audit(db, user.username, 'login', 'admin_users', String(user.id));
     res.redirect(req.body?.next || '/admin/dashboard');
   });
@@ -213,7 +216,7 @@ export function registerAdminRoutes(app, { db }) {
 
   // ---------- Generic list helper ----------
   function listRows(table, orderBy) {
-    return db.prepare(`SELECT * FROM ${table}${table === 'events' ? ' WHERE deleted_at IS NULL' : ''} ORDER BY ${orderBy}`).all();
+    return db.prepare(`SELECT * FROM ${table}${table === 'events' || table === 'slides' || table === 'announcements' ? ' WHERE deleted_at IS NULL' : ''} ORDER BY ${orderBy}`).all();
   }
   function getRow(table, id) {
     return db.prepare(`SELECT * FROM ${table} WHERE id = ?`).get(id);
@@ -680,12 +683,12 @@ export function registerAdminRoutes(app, { db }) {
       const value = String(v ?? '');
       const existing = db.prepare('SELECT key FROM settings WHERE key = ?').get(key);
       if (existing) {
-        if (field === 'en') db.prepare('UPDATE settings SET value_en=?, updated_at=? WHERE key=?').run(value, new Date().toISOString(), key);
-        else if (field === 'zh') db.prepare('UPDATE settings SET value_zh=?, updated_at=? WHERE key=?').run(value, new Date().toISOString(), key);
+        if (field === 'en') db.prepare('UPDATE settings SET value_en=?, updated_at=? WHERE key=?').run(value, nowUtc(), key);
+        else if (field === 'zh') db.prepare('UPDATE settings SET value_zh=?, updated_at=? WHERE key=?').run(value, nowUtc(), key);
       } else {
         const other = field === 'en' ? '' : value;
         db.prepare('INSERT INTO settings (key, value_en, value_zh, updated_at) VALUES (?,?,?,?)')
-          .run(key, field === 'en' ? value : other, field === 'zh' ? value : other, new Date().toISOString());
+          .run(key, field === 'en' ? value : other, field === 'zh' ? value : other, nowUtc());
       }
       audit(db, req.session.user.username, 'update', 'settings', key);
     }
@@ -700,7 +703,7 @@ export function registerAdminRoutes(app, { db }) {
   app.post('/admin/inbox/:id/status', csrfMiddleware, (req, res) => {
     const status = ['new','read','archived'].includes(req.body?.status) ? req.body.status : 'read';
     db.prepare('UPDATE contact_messages SET status=?, updated_at=? WHERE id=?')
-      .run(status, new Date().toISOString(), req.params.id);
+      .run(status, nowUtc(), req.params.id);
     audit(db, req.session.user.username, 'update', 'contact_messages', req.params.id);
     res.redirect('/admin/inbox');
   });
