@@ -325,3 +325,29 @@ a.pcal-day:hover { background: var(--blue, #210488); color: #fff; }
 .assign-fields { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .assign-fields .ref-wrap { flex: 1 1 200px; }
 .assign-fields .ref-wrap input { width: 100%; }
+
+/* school overview charts (plain HTML/CSS bars) */
+.chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; margin: 16px 0; }
+.chart h2 small { font-weight: 400; color: var(--muted, #667085); }
+.bar-row { display: grid; grid-template-columns: 64px 1fr 56px; gap: 8px; align-items: center; margin: 5px 0; font-size: .9rem; }
+.bar-label { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-label.wide { grid-column: 1; }
+.chart .bar-row:has(.bar-label.wide) { grid-template-columns: 130px 1fr 36px; }
+.bar-track { position: relative; display: flex; height: 16px; background: #eef0f6; border-radius: 4px; overflow: hidden; }
+.bar-fill { display: block; height: 100%; background: var(--blue, #210488); }
+.bar-fill.over { background: #b3112a; }
+.bar-cap { position: absolute; top: 0; bottom: 0; width: 2px; background: #111; opacity: .55; }
+.bar-val { text-align: right; font-variant-numeric: tabular-nums; color: #344054; }
+.chart-note { font-size: .8rem; color: #667085; margin: 8px 0 0; }
+.col-chart { display: flex; align-items: flex-end; gap: 14px; height: 190px; padding-top: 8px; }
+.col { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; min-width: 0; }
+.col-bar { display: block; width: 100%; max-width: 56px; background: var(--blue, #210488); border-radius: 4px 4px 0 0; min-height: 2px; }
+.col-val { font-weight: 700; font-size: .9rem; margin-bottom: 3px; }
+.col-label { font-size: .78rem; color: #475467; margin-top: 5px; white-space: nowrap; }
+.stack { display: flex; height: 26px; border-radius: 6px; overflow: hidden; background: #eef0f6; }
+.seg { display: block; height: 100%; }
+.seg-0 { background: #210488; } .seg-1 { background: #5b8def; } .seg-2 { background: #1a7f4b; } .seg-3 { background: #b45309; } .seg-4 { background: #7a1fa2; }
+.legend { list-style: none; padding: 0; margin: 10px 0 0; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .88rem; }
+.legend .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+
+.chart-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }

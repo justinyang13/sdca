@@ -79,8 +79,8 @@ export function buildNav(portal, lang) {
     const special = [];
     if (can(a, 'events.list')) special.push({ en: 'Events', zh: '活動', href: P('/manage/events') });
     if (can(a, 'announcements.list')) special.push({ en: 'Public Announcements', zh: '公開通告', href: P('/manage/announcements') });
-    if (can(a, 'slides.list')) special.push({ en: 'Hero Slides', zh: '首頁橫幅', href: P('/manage/slides') });
     if (can(a, 'class_announcements.list') || can(a, 'class_announcements.post_own') || can(a, 'class_announcements.view_own')) special.push({ en: 'Class Announcements', zh: '班級通告', href: P('/class-announcements') });
+    if (can(a, 'slides.list')) special.push({ en: 'Hero Slides', zh: '首頁橫幅', href: P('/manage/slides') });
     if (can(a, 'student_list.list') || can(a, 'volunteer_list.list') || can(a, 'transactions.list')) special.push({ en: 'Reports', zh: '報表', href: P('/reports') });
     if (special.length) groups.push({ title: { en: 'Staff Tools', zh: '員工工具' }, items: special });
     for (const g of GROUPS) {
@@ -91,7 +91,7 @@ export function buildNav(portal, lang) {
       if (g.key === 'academics') {
         // Classes (the class page) · Enrollment (class placement lives in its rows) · Textbooks, then the rest
         const take = (href) => { const i = items.findIndex((x) => x.href === P(href)); return i < 0 ? null : items.splice(i, 1)[0]; };
-        const ordered = [can(a, 'class.view_own') ? { en: 'My Classes', zh: '我的班級', href: P('/my-classes') } : null, can(a, 'reports.class_roster') ? { en: 'Classes', zh: '班級', href: P('/class-roster') } : null, take('/manage/enrollments')].filter(Boolean);
+        const ordered = [can(a, 'reports.class_roster') ? { en: 'Classes', zh: '班級', href: P('/class-roster') } : null, take('/manage/enrollments')].filter(Boolean);
         items.splice(0, items.length, ...ordered, ...items);
       }
       if (g.key === 'finance') {
@@ -102,6 +102,10 @@ export function buildNav(portal, lang) {
           can(a, 'finance.record_payment') ? { en: 'Payment', zh: '付款', href: P('/finance/payment') } : null, take('/manage/withdrawals')].filter(Boolean);
         const extra = [can(a, 'fees.configure') ? { en: 'Fees for a School Year', zh: '學年費用設定', href: P('/fees') } : null, can(a, 'finance.reports') ? { en: 'Finance Reports', zh: '財務報表', href: P('/finance/reports') } : null].filter(Boolean);
         items.splice(0, items.length, ...ordered, ...extra, ...items);
+      }
+      if (g.key === 'people') {   // Board Members right after Families
+        const bi = items.findIndex((x) => x.href === P('/manage/board_members')), fi = items.findIndex((x) => x.href === P('/manage/families'));
+        if (bi >= 0 && fi >= 0) { const [bm] = items.splice(bi, 1); items.splice(items.findIndex((x) => x.href === P('/manage/families')) + 1, 0, bm); }
       }
       if (g.key === 'admin' && can(a, 'roles.manage')) items.push({ en: 'Roles & Permissions', zh: '角色與權限', href: P('/manage/roles') });
       if (items.length) groups.push({ title: g.label, items });

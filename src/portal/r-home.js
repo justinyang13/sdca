@@ -48,7 +48,7 @@ export function registerHomeRoutes(app, { db, page, requireLogin, requirePerm, i
     if (!req.portal) return res.redirect(P(req, '/signin'));
     const a = req.portal.access;
     const year = currentYear(db);
-    const w = { classNews: [], resources: resourcesFor(a, can, (p) => P(req, p)), year, admin: null, secretary: null, finance: null, pta: null, instructor: null, families: null, canRegister: false, volunteer: null, student: null };
+    const w = { overview: null, classNews: [], resources: resourcesFor(a, can, (p) => P(req, p)), year, admin: null, secretary: null, finance: null, pta: null, instructor: null, families: null, canRegister: false, volunteer: null, student: null };
     const count = (sql, ...args) => db.prepare(sql).get(...args).n;
     const personId = req.portal.person.id;
     w.classNews = (can(a, 'class_announcements.view_own') || can(a, 'class_announcements.post_own')) && !can(a, 'class_announcements.list') ? visibleAnnouncements(db, req.portal, { limit: 3 }) : [];
@@ -64,6 +64,52 @@ export function registerHomeRoutes(app, { db, page, requireLogin, requirePerm, i
         recent: db.prepare("SELECT a.at, a.action, a.table_name, a.row_id, COALESCE(u.username,'') AS username FROM portal_audit a LEFT JOIN users u ON u.id = a.user_id ORDER BY a.id DESC LIMIT 8").all(),
         outbox: count('SELECT COUNT(*) n FROM email_outbox WHERE deleted_at IS NULL'),
       };
+    }
+    if (a.roleCodes.some((c) => c.startsWith('board_') || c === 'secretary') || w.admin) {   // every board member, the school secretary and the admin see the same school totals as the admin dashboard
+      const allow = (e) => can(a, `${e}.list`);
+      w.overview = {
+        families: count('SELECT COUNT(*) n FROM families WHERE deleted_at IS NULL'),
+        persons: count('SELECT COUNT(*) n FROM persons WHERE deleted_at IS NULL'),
+        users: count('SELECT COUNT(*) n FROM users WHERE deleted_at IS NULL'),
+        students: year ? count("SELECT COUNT(*) n FROM enrollments WHERE school_year_id = ? AND status IN ('registered','placed') AND deleted_at IS NULL", year.id) : 0,
+        classes: year ? count('SELECT COUNT(*) n FROM school_classes WHERE school_year_id = ? AND deleted_at IS NULL', year.id) : 0,
+        regs: year ? db.prepare("SELECT status, COUNT(*) n FROM registrations WHERE school_year_id = ? AND deleted_at IS NULL GROUP BY status").all(year.id) : [],
+        transactions: year ? count('SELECT COUNT(*) n FROM transactions WHERE school_year_id = ? AND voided_at IS NULL AND deleted_at IS NULL', year.id) : 0,
+        events: count('SELECT COUNT(*) n FROM events WHERE deleted_at IS NULL'),
+        more: [
+          { n: count('SELECT COUNT(*) n FROM announcements WHERE published = 1 AND deleted_at IS NULL'), en: 'Announcements', zh: '公開通告', path: '/manage/announcements', ok: allow('announcements') },
+          { n: count('SELECT COUNT(*) n FROM class_announcements WHERE deleted_at IS NULL'), en: 'Class announcements', zh: '班級通告', path: '/class-announcements', ok: allow('class_announcements') },
+          { n: year ? count('SELECT COUNT(DISTINCT person_id) n FROM volunteer_signups WHERE school_year_id = ? AND deleted_at IS NULL', year.id) : 0, en: 'Volunteers', zh: '義工', path: '/manage/volunteer_signups', ok: allow('volunteer_signups') },
+          { n: year ? count("SELECT COUNT(DISTINCT ca.person_id) n FROM class_assignments ca JOIN assignment_roles ar ON ar.id = ca.assignment_role_id WHERE ca.school_year_id = ? AND ar.code = 'room_parent' AND ca.deleted_at IS NULL", year.id) : 0, en: 'Room parents', zh: '班媽/班爸', path: '/class-roster', ok: can(a, 'reports.class_roster') },
+          { n: year ? count("SELECT COUNT(DISTINCT ca.person_id) n FROM class_assignments ca JOIN assignment_roles ar ON ar.id = ca.assignment_role_id WHERE ca.school_year_id = ? AND ar.code <> 'room_parent' AND ca.deleted_at IS NULL", year.id) : 0, en: 'Teachers and assistants', zh: '老師與助教', path: '/class-roster', ok: can(a, 'reports.class_roster') },
+          { n: count("SELECT COUNT(DISTINCT person_id) n FROM board_members WHERE deleted_at IS NULL AND (start_date IS NULL OR start_date <= date('now','localtime')) AND (end_date IS NULL OR end_date >= date('now','localtime'))"), en: 'Board members', zh: '理事', path: '/manage/board_members', ok: allow('board_members') },
+        ],
+        links: { families: allow('families'), persons: allow('persons'), students: allow('enrollments'), classes: allow('classes') || allow('school_classes'), users: allow('users'), regs: allow('registrations'), transactions: allow('transactions'), events: allow('events') },
+      };
+      const o = w.overview;
+      const tiles = [
+        { n: o.families, en: 'Families', zh: '家庭', path: '/manage/families', ok: o.links.families },
+        { n: o.persons, en: 'Directory', zh: '通訊錄', path: '/manage/persons', ok: o.links.persons },
+        { n: o.students, en: 'Students this year', zh: '本學年學生', path: '/manage/enrollments', ok: o.links.students },
+        { n: o.classes, en: 'Classes', zh: '班級', path: '/manage/school_classes', ok: o.links.classes },
+        { n: o.users, en: 'Users', zh: '用戶', path: '/manage/users', ok: o.links.users },
+        { n: o.transactions, en: 'Transactions this year', zh: '本學年交易', path: '/manage/transactions', ok: o.links.transactions },
+        { n: o.events, en: 'Events', zh: '活動', path: '/manage/events', ok: o.links.events },
+        ...o.more,
+      ];
+      const enrolled = "e.status IN ('registered','placed') AND e.deleted_at IS NULL";
+      o.charts = {
+        classes: year ? db.prepare(`SELECT sc.code, sc.name_en, sc.name_zh, sc.capacity, (SELECT COUNT(*) FROM enrollments e WHERE e.school_class_id = sc.id AND ${enrolled}) AS n
+          FROM school_classes sc WHERE sc.school_year_id = ? AND sc.deleted_at IS NULL ORDER BY sc.code`).all(year.id) : [],
+        years: db.prepare(`SELECT y.label, (SELECT COUNT(*) FROM enrollments e WHERE e.school_year_id = y.id AND ${enrolled}) AS n FROM school_years y WHERE y.deleted_at IS NULL ORDER BY y.label`).all(),
+        jobs: year ? db.prepare(`SELECT j.name_en, j.name_zh,
+            SUM(CASE WHEN s.status = 'requested' THEN 1 ELSE 0 END) AS requested, SUM(CASE WHEN s.status = 'assigned' THEN 1 ELSE 0 END) AS assigned, SUM(CASE WHEN s.status = 'completed' THEN 1 ELSE 0 END) AS completed
+          FROM volunteer_signups s JOIN volunteer_jobs j ON j.id = COALESCE(s.assigned_job_id, s.job_id)
+          WHERE s.school_year_id = ? AND s.deleted_at IS NULL AND s.status <> 'declined' GROUP BY j.id ORDER BY j.sort, j.name_en`).all(year.id) : [],
+      };
+      if (w.admin) tiles.push({ n: w.admin.outbox, en: 'Emails (demo outbox)', zh: '郵件 (示範寄件匣)', path: '/manage/email_outbox', ok: allow('email_outbox') });
+      const zh = lang(req) === 'zh';
+      o.tiles = tiles.sort((x, y) => (zh ? x.zh.localeCompare(y.zh, 'zh-Hant') : x.en.localeCompare(y.en)));
     }
     if (can(a, 'dashboard.secretary') || can(a, 'dashboard.principal')) {
       w.secretary = {
@@ -125,7 +171,6 @@ export function registerHomeRoutes(app, { db, page, requireLogin, requirePerm, i
     if (can(a, 'reports.class_roster') || can(a, 'classes.view')) return true;
     return can(a, 'class.view_own') && myClassIds(db, req.portal.person.id, { currentOnly: false }).includes(Number(classId));
   };
-  app.get(`${R}/my-classes`, requireLogin, (req, res) => res.redirect(P(req)));
   app.get(`${R}/classes/:id`, requireLogin, (req, res) => {
     const cls = db.prepare(`SELECT sc.*, ct.name_en AS ct_en, ct.name_zh AS ct_zh, ct.is_credit, rm.code AS room, y.label AS year_label FROM school_classes sc JOIN class_types ct ON ct.id = sc.class_type_id
       JOIN school_years y ON y.id = sc.school_year_id LEFT JOIN rooms rm ON rm.id = sc.room_id WHERE sc.id = ? AND sc.deleted_at IS NULL`).get(Number(req.params.id));

@@ -135,7 +135,7 @@ export const ENTITIES = {
     ],
   },
   board_positions: {
-    table: 'board_positions', perm: 'board_positions', group: 'people',
+    table: 'board_positions', perm: 'board_positions', group: 'admin',
     label: L('Board Positions', '理事職務'), singular: L('Board position', '理事職務'), defaultSort: 'sort',
     labelSql: 'r.name_en',
     note: L('The titles on the public Board of Directors page. Each gives its holder a portal role.', '公開「理事會」頁面上的職稱；擔任者會獲得對應的入口網站角色。'),
@@ -294,7 +294,7 @@ export const ENTITIES = {
     ],
   },
   school_years: {
-    table: 'school_years', perm: 'school_years', group: 'setup',
+    table: 'school_years', perm: 'school_years', group: 'admin',
     label: L('School Years', '學年'), singular: L('School Year', '學年'), defaultSort: 'label', defaultDir: 'desc', labelSql: 'r.label',
     fields: [
       f('school_id', 'School', '學校', 'ref', { ref: 'schools', required: true }),

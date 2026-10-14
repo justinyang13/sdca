@@ -38,7 +38,7 @@ const BOARD_ROLES = [
     ...S('portal.staff'), ...E('events', CRUD), ...E('announcements', CRUD), ...E('class_announcements', CRUD), ...E('volunteer_list', READ), ...E('student_list', READ), ...SETUP_READ] },
   { code: 'board_operation', position: 'Operation Director', zh: '業務組理事', pzh: '業務組理事', sort: 28, desc: 'Operations: classrooms, textbooks, classes and rosters.', grants: [
     ...S('portal.staff', 'reports.class_roster'), ...E('rooms', CRUD), ...E('textbooks', CRUD), ...E('classes', CRUD), ...E('assignments', CRUD), ...E('enrollments', READ), ...E('student_list', READ), ...E('volunteer_list', READ), ...E('events', READ), ...SETUP_READ] },
-].map((r) => ({ code: r.code, en: `${r.position} (Board)`, zh: `${r.zh} (理事)`, staff: 1, sort: r.sort, type: 'board', desc: r.desc, grants: r.grants, boardPosition: r.position, boardPositionZh: r.pzh }));
+].map((r) => ({ ...r, grants: [...r.grants, ...E('slides', CRUD)] })).map((r) => ({ code: r.code, en: `${r.position} (Board)`, zh: `${r.zh} (理事)`, staff: 1, sort: r.sort, type: 'board', desc: r.desc, grants: r.grants, boardPosition: r.position, boardPositionZh: r.pzh }));
 
 /** Board positions in the public order; each one maps to a role above. */
 export const BOARD_POSITIONS = BOARD_ROLES.map((r, i) => ({ code: r.code.replace(/^board_/, ''), name_en: r.boardPosition, name_zh: r.boardPositionZh, role_code: r.code, sort: i + 1 }));

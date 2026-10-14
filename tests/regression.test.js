@@ -86,3 +86,57 @@ test('regression: Volunteer Sign-ups wraps date/status cells and School Years ke
   const v = await c.get('/en/portal/manage/volunteer_signups'); assert.equal(v.status, 200); assert.doesNotMatch(v.text, /<td data-col="signed_up_at" class="[^"]*\bnw\b/);
   const y = await c.get('/en/portal/manage/school_years'); assert.match(y.text, /<td data-col="label" class="[^"]*\bnw\b[^"]*" style="min-width:130px"/);
 });
+test('every board position can open Hero Slides and sees it in the menu', async () => {
+  const boards = ['president', 'vicepresident', 'boardsecretary', 'treasurer', 'editorial', 'ptadirector', 'scrip', 'activity', 'operation'].map((n) => `demo.${n}`);
+  for (const u of boards) assert.ok(creds[u], `${u} exists`);
+  for (const u of boards) {
+    const c = await as(u);
+    assert.equal((await c.get('/en/portal/manage/slides')).status, 200, u);
+    assert.match((await c.get('/en/portal')).text, /\/portal\/manage\/slides"/, `${u} menu`);
+  }
+});
+test('Hero Slides sits directly above Reports in Staff Tools', async () => {
+  const t = (await (await as('demo.admin')).get('/en/portal')).text;
+  const links = [...t.matchAll(/<a [^>]*href="([^"]+)"/g)].map((m) => m[1]);
+  const i = links.indexOf('/en/portal/manage/slides');
+  assert.ok(i > 0); assert.equal(links[i + 1], '/en/portal/reports');
+});
+test('Board Positions lives in the Admin menu; Board Members follows Families in Directory', async () => {
+  const links = async (u) => [...(await (await as(u)).get('/en/portal')).text.matchAll(/<a [^>]*href="([^"]+)"/g)].map((m) => m[1]);
+  const a = await links('demo.admin');
+  assert.ok(a.indexOf('/en/portal/manage/board_positions') > a.indexOf('/en/portal/manage/payment_methods') || a.includes('/en/portal/manage/board_positions'));
+  const fi = a.indexOf('/en/portal/manage/families'); assert.equal(a[fi + 1], '/en/portal/manage/board_members');
+  assert.ok(!(await links('demo.president')).includes('/en/portal/manage/board_positions'), 'not in a board member menu');
+});
+test('every board member sees the school overview totals and the registrations widget', async () => {
+  for (const n of ['secretary', 'parentsecretary', 'president', 'vicepresident', 'boardsecretary', 'treasurer', 'editorial', 'ptadirector', 'scrip', 'activity', 'operation']) {
+    const t = (await (await as(`demo.${n}`)).get('/en/portal')).text;
+    for (const w of ['Families', 'Directory', 'Students this year', 'Classes', 'Users', 'Transactions this year', 'Events', 'Announcements', 'Class announcements', 'Volunteers', 'Room parents', 'Teachers and assistants', 'Board members', 'Registration status']) assert.match(t, new RegExp(`<(span|h2)>${w}( <small>|</)`), `${n}: ${w}`);
+    assert.doesNotMatch(t, /Admin dashboard/);
+    const labels = [...t.slice(t.indexOf('School overview'), t.indexOf('chart-grid')).matchAll(/<span>([^<]+)<\/span>/g)].map((m) => m[1]);
+    assert.deepEqual(labels, [...labels].sort((x, y) => x.localeCompare(y)), `${n}: tiles sorted A-Z`);
+  }
+});
+test('school overview charts: enrollment by class, students by year, registration status, volunteer jobs', async () => {
+  for (const n of ['president', 'treasurer', 'secretary']) {
+    const t = (await (await as(`demo.${n}`)).get('/en/portal')).text;
+    for (const h of ['Enrollment by class', 'Students by school year', 'Registration status', 'Volunteer jobs']) assert.match(t, new RegExp(`<h2>${h}`), `${n}: ${h}`);
+    assert.ok((t.match(/class="bar-row"/g) || []).length >= 3, 'bars rendered');
+    assert.ok((t.match(/class="col-bar"/g) || []).length >= 2, 'a column per school year');
+    assert.match(t, /class="seg seg-0"/);
+  }
+  assert.match((await (await as('demo.president')).get('/zh/portal')).text, /各班人數/);
+});
+test('overview: Registration status sits right above Students by school year in one column', async () => {
+  const t = (await (await as('demo.president')).get('/en/portal')).text;
+  const r = t.indexOf('Registration status'), y = t.indexOf('Students by school year'), col = t.lastIndexOf('class="chart-col"', r);
+  assert.ok(col > 0 && col < r && r < y && y < t.indexOf('Volunteer jobs'));
+  assert.ok(!t.slice(r, y).includes('Enrollment by class'));
+});
+test('admin dashboard has the school overview (tiles A-Z, charts) plus its setup and activity cards', async () => {
+  const t = (await (await as('demo.admin')).get('/en/portal')).text;
+  assert.match(t, /School overview/); assert.match(t, /Admin dashboard/); assert.match(t, /Emails \(demo outbox\)/);
+  for (const h of ['Enrollment by class', 'Students by school year', 'Registration status', 'Volunteer jobs', 'Set up the school', 'Recent activity']) assert.match(t, new RegExp(`<h2>${h.replace(/[()]/g, '\\$&')}`), h);
+  assert.ok(t.indexOf('School overview') < t.indexOf('Admin dashboard'));
+  assert.equal((t.match(/class="stat-grid"/g) || []).length, 1, 'no second tile grid');
+});
