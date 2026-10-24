@@ -9,8 +9,8 @@
  {
   "q_en": "How do I register my child? Is there an online portal?",
   "q_zh": "如何為孩子註冊？有網上註冊嗎？",
-  "a_en": "New families sign up and returning students sign in through the registration portal at https://register.sandiegochineseschool.com (also reachable from the Enroll page). Questions: Office.SDCA@gmail.com or (858) 205-7322.",
-  "a_zh": "新家庭註冊與舊生登入請使用註冊網站 https://register.sandiegochineseschool.com（也可從註冊頁面進入）。如有問題請洽 Office.SDCA@gmail.com 或 (858) 205-7322。",
+  "a_en": "New families sign up and returning students sign in through the registration portal at https://register.sandiegochineseschool.com (also reachable from the Enroll page). Questions: {{office_email}} or {{office_phone}}.",
+  "a_zh": "新家庭註冊與舊生登入請使用註冊網站 https://register.sandiegochineseschool.com（也可從註冊頁面進入）。如有問題請洽 {{office_email}} 或 {{office_phone}}。",
   "url": "/en/enroll"
  },
  {
@@ -23,8 +23,8 @@
  {
   "q_en": "How do I contact the school office?",
   "q_zh": "如何聯絡學校辦公室？",
-  "a_en": "Email Office.SDCA@gmail.com or call (858) 205-SDCA (7322). You can also text @sdcaparent to 81010.",
-  "a_zh": "電郵 Office.SDCA@gmail.com，或致電 (858) 205-SDCA (7322)。也可傳簡訊 @sdcaparent 至 81010。",
+  "a_en": "Email {{office_email}} or call (858) 205-SDCA (7322). You can also text @sdcaparent to 81010.",
+  "a_zh": "電郵 {{office_email}}，或致電 (858) 205-SDCA (7322)。也可傳簡訊 @sdcaparent 至 81010。",
   "url": "/en/contact"
  },
  {

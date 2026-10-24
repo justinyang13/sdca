@@ -8,6 +8,7 @@ import {
 } from './auth.js';
 import { verifyPassword } from '../admin/auth.js';
 import { recordLogin } from '../login-events.js';
+import { pickLang } from '../i18n/index.js';
 
 export const DEMO_EMAIL = process.env.PORTAL_EMAIL_MODE !== 'smtp';
 
@@ -20,7 +21,7 @@ export function registerAuthRoutes(app, { db, page, requireLogin, isStaticBuild 
   app.get(`${R}/signin`, skipStatic, (req, res) => {
     if (req.portal) return go(req, res, '');
     let error = null;
-    if (req.cookies?.sdca_timedout) { res.clearCookie('sdca_timedout', { path: '/' }); error = req.params.lang === 'zh' ? '因閒置過久，已自動登出，請重新登入。' : 'You were signed out because of inactivity. Please sign in again.'; }
+    if (req.cookies?.sdca_timedout) { res.clearCookie('sdca_timedout', { path: '/' }); error = pickLang(req.params.lang, 'You were signed out because of inactivity. Please sign in again.', '因閒置過久，已自動登出，請重新登入。'); }
     page(req, res, 'signin.ejs', { error, username: '' }, { title: 'Sign In', shell: 'bare' });
   });
   app.post(`${R}/signin`, skipStatic, loginLimiter, csrfMiddleware, (req, res) => {

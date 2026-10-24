@@ -9,27 +9,24 @@ import path from 'node:path';
 import ejs from 'ejs';
 import { config } from './config.js';
 import { createLimiter } from './middleware/index.js';
-import { imgUrl } from './helpers.js';
+import { imgUrl, setting, pageBySlug } from './helpers.js';
 import { portedCtx, usePorted } from './ported.js';
+import { pickLang } from './i18n/index.js';
+import { officeContact } from './school.js';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const PHONE_RE = /^[0-9+()\s.-]{7,20}$/;
 
 function jsonLdSchool(db, lang) {
-  const get = (k) => {
-    const r = db.prepare('SELECT value_en, value_zh FROM settings WHERE key = ?').get(k);
-    if (!r) return '';
-    if (lang === 'zh') return r.value_zh || r.value_en || '';
-    return r.value_en || r.value_zh || '';
-  };
+  const get = (k) => setting(db, k, lang);
   return {
     '@context': 'https://schema.org',
     '@type': 'School',
     name: get('school_name_en') || 'San Diego Chinese Academy',
     alternateName: 'SDCA',
     foundingDate: get('founded_year') || '1988',
-    telephone: get('phone_digits') || '(858) 205-7322',
-    email: get('email_office') || 'Office.SDCA@gmail.com',
+    telephone: officeContact(db).phone,
+    email: officeContact(db).email,
     address: {
       '@type': 'PostalAddress',
       postalCode: '92191-0093',
@@ -47,19 +44,8 @@ function jsonLdWebPage(lang, title, desc) {
     '@type': 'WebPage',
     name: title,
     description: desc,
-    inLanguage: lang === 'zh' ? 'zh-Hant' : 'en',
+    inLanguage: pickLang(lang, 'en', 'zh-Hant'),
   };
-}
-
-function setting(db, key, lang) {
-  const r = db.prepare('SELECT value_en, value_zh FROM settings WHERE key = ?').get(key);
-  if (!r) return '';
-  if (lang === 'zh') return r.value_zh || r.value_en || '';
-  return r.value_en || r.value_zh || '';
-}
-
-function pageBySlug(db, slug) {
-  return db.prepare('SELECT * FROM pages WHERE slug = ?').get(slug) || null;
 }
 
 function contactSettings(db, lang) {
@@ -94,7 +80,6 @@ export function registerPublicRoutes(app, bridge) {
     const routePath = opts.path.replace('/:lang', '');
     return function handler(req, res) {
       const lang = req.params.lang;
-      if (!SUPPORTED.includes(lang)) return res.status(404).send('Not found');
       const tFn = (k) => t(lang, k);
       const renderPart = makeRenderPart(lang);
       const ctx = { lang, t: tFn, renderPart, db, imgUrl, ...(opts.ctx ? opts.ctx(req, lang) : {}) };
@@ -118,9 +103,7 @@ export function registerPublicRoutes(app, bridge) {
     path: '/:lang',
     viewFile: 'home.ejs',
     ctx: (req, lang) => ({
-      tagline: lang === 'zh'
-        ? '非營利語言學校，自 1988 年起教授華語和中華文化'
-        : 'Non-profit language school teaching Mandarin and Chinese culture since 1988',
+      tagline: pickLang(lang, 'Non-profit language school teaching Mandarin and Chinese culture since 1988', '非營利語言學校，自 1988 年起教授華語和中華文化'),
       heroImg: 'anniversary-30th',
       heroAltEn: 'SDCA community celebrating the 30th anniversary together',
       heroAltZh: '聖地牙哥中華學苑社群共同慶祝 30 週年',
@@ -166,31 +149,25 @@ export function registerPublicRoutes(app, bridge) {
         accreditation: setting(db, 'accreditation', lang),
       },
     }),
-    title: (lang) => lang === 'zh' ? 'SDCA — 聖地牙哥中華學苑' : 'SDCA — San Diego Chinese Academy',
-    desc: (lang) => lang === 'zh'
-      ? '非營利語言學校，自 1988 年起教授華語和中華文化'
-      : 'Non-profit language school teaching Mandarin and Chinese culture since 1988',
+    title: (lang) => pickLang(lang, 'SDCA — San Diego Chinese Academy', 'SDCA — 聖地牙哥中華學苑'),
+    desc: (lang) => pickLang(lang, 'Non-profit language school teaching Mandarin and Chinese culture since 1988', '非營利語言學校，自 1988 年起教授華語和中華文化'),
     jsonLd: (lang) => jsonLdSchool(db, lang),
   }));
 
   // ---------- About (4 routes) ----------
   const aboutRoutes = [
     { slug: 'about', path: '/about', view: 'about.ejs',
-      t: lang => lang === 'zh' ? '關於 SDCA' : 'About SDCA',
-      d: lang => lang === 'zh' ? '了解聖地牙哥中華學苑的使命、歷史與價值觀。'
-                              : 'Learn about our mission, history and values.' },
+      t: lang => pickLang(lang, 'About SDCA', '關於 SDCA'),
+      d: lang => pickLang(lang, 'Learn about our mission, history and values.', '了解聖地牙哥中華學苑的使命、歷史與價值觀。') },
     { slug: 'about-board', path: '/about/board', view: 'about-board.ejs',
-      t: lang => lang === 'zh' ? 'SDCA 董事會' : 'SDCA Board of Directors',
-      d: lang => lang === 'zh' ? '認識領導聖地牙哥中華學苑的九位董事。'
-                              : 'Meet the nine board members who govern SDCA.' },
+      t: lang => pickLang(lang, 'SDCA Board of Directors', 'SDCA 董事會'),
+      d: lang => pickLang(lang, 'Meet the nine board members who govern SDCA.', '認識領導聖地牙哥中華學苑的九位董事。') },
     { slug: 'about-staff', path: '/about/staff', view: 'about-staff.ejs',
-      t: lang => lang === 'zh' ? 'SDCA 師資' : 'SDCA Staff',
-      d: lang => lang === 'zh' ? '認識我們的校長與師資團隊。'
-                              : 'Our principal, instructors and program leads.' },
+      t: lang => pickLang(lang, 'SDCA Staff', 'SDCA 師資'),
+      d: lang => pickLang(lang, 'Our principal, instructors and program leads.', '認識我們的校長與師資團隊。') },
     { slug: 'about-principal', path: '/about/principal', view: 'about-principal.ejs',
-      t: lang => lang === 'zh' ? 'SDCA 校長的話' : "SDCA Principal's Message",
-      d: lang => lang === 'zh' ? '歡迎來到聖地牙哥中華學苑。'
-                              : 'A welcome from our principal.' },
+      t: lang => pickLang(lang, "SDCA Principal's Message", 'SDCA 校長的話'),
+      d: lang => pickLang(lang, 'A welcome from our principal.', '歡迎來到聖地牙哥中華學苑。') },
   ];
   for (const r of aboutRoutes) {
     app.get(`/:lang${r.path}`, makePage({
@@ -225,25 +202,20 @@ export function registerPublicRoutes(app, bridge) {
   // ---------- Programs (5 routes) ----------
   const programRoutes = [
     { slug: 'programs', path: '/programs', view: 'programs.ejs',
-      t: lang => lang === 'zh' ? 'SDCA 課程' : 'SDCA Programs',
-      d: lang => lang === 'zh' ? '從學前班到 12 年級，加上成人與休閒課程。'
-                              : 'Pre-K through Grade 12 plus adult and recreational programs.' },
+      t: lang => pickLang(lang, 'SDCA Programs', 'SDCA 課程'),
+      d: lang => pickLang(lang, 'Pre-K through Grade 12 plus adult and recreational programs.', '從學前班到 12 年級，加上成人與休閒課程。') },
     { slug: 'programs-classes', path: '/programs/classes', view: 'programs-classes.ejs',
-      t: lang => lang === 'zh' ? 'SDCA 課程與分班' : 'SDCA Classes & Placement',
-      d: lang => lang === 'zh' ? '課程說明與分班方式。'
-                              : 'Class descriptions and how placement works.' },
+      t: lang => pickLang(lang, 'SDCA Classes & Placement', 'SDCA 課程與分班'),
+      d: lang => pickLang(lang, 'Class descriptions and how placement works.', '課程說明與分班方式。') },
     { slug: 'programs-tcml', path: '/programs/tcml', view: 'programs-tcml.ejs',
-      t: lang => lang === 'zh' ? '成人華語文班（TCML）' : 'Adult Chinese — TCML',
-      d: lang => lang === 'zh' ? '適合 18 歲以上的社區中文班。'
-                              : 'Community-based adult Chinese classes for 18+.' },
+      t: lang => pickLang(lang, 'Adult Chinese — TCML', '成人華語文班（TCML）'),
+      d: lang => pickLang(lang, 'Community-based adult Chinese classes for 18+.', '適合 18 歲以上的社區中文班。') },
     { slug: 'programs-recreational', path: '/programs/recreational', view: 'programs-recreational.ejs',
-      t: lang => lang === 'zh' ? 'SDCA 休閒文化課程' : 'SDCA Recreational & Culture',
-      d: lang => lang === 'zh' ? '舞蹈、瑜伽、棒球與文化活動。'
-                              : 'Dance, yoga, baseball and cultural activities.' },
+      t: lang => pickLang(lang, 'SDCA Recreational & Culture', 'SDCA 休閒文化課程'),
+      d: lang => pickLang(lang, 'Dance, yoga, baseball and cultural activities.', '舞蹈、瑜伽、棒球與文化活動。') },
     { slug: 'programs-ta', path: '/programs/ta', view: 'programs-ta.ejs',
-      t: lang => lang === 'zh' ? 'SDCA 教學助理計畫' : 'SDCA TA Program',
-      d: lang => lang === 'zh' ? '成為 SDCA 教學助理並獲得津貼。'
-                              : 'Become a TA at SDCA and earn a stipend.' },
+      t: lang => pickLang(lang, 'SDCA TA Program', 'SDCA 教學助理計畫'),
+      d: lang => pickLang(lang, 'Become a TA at SDCA and earn a stipend.', '成為 SDCA 教學助理並獲得津貼。') },
   ];
   for (const r of programRoutes) {
     app.get(`/:lang${r.path}`, makePage({
@@ -287,7 +259,7 @@ export function registerPublicRoutes(app, bridge) {
   app.get('/:lang/portal', (req, res) => res.redirect(301, `/${req.params.lang}/portal/signin`));
   app.get('/:lang/portal/:page', (req, res, next) => {
     const meta = PORTAL_PAGES[req.params.page];
-    if (!meta || !SUPPORTED.includes(req.params.lang)) return next();
+    if (!meta) return next();
     const file = path.join(config.viewsDir, 'portal', `${req.params.page}.html`);
     if (!fs.existsSync(file)) return next();
     const L = req.params.lang;
@@ -322,10 +294,9 @@ export function registerPublicRoutes(app, bridge) {
         },
       };
     },
-    title: (lang) => lang === 'zh' ? 'SDCA 報名註冊' : 'SDCA Enrollment',
-    desc: (lang) => lang === 'zh' ? '2026-27 學年度註冊說明。'
-                                  : 'How to register for the 2026-27 academic year.',
-    jsonLd: (lang) => jsonLdWebPage(lang, lang === 'zh' ? 'SDCA 報名註冊' : 'SDCA Enrollment', 'Enroll'),
+    title: (lang) => pickLang(lang, 'SDCA Enrollment', 'SDCA 報名註冊'),
+    desc: (lang) => pickLang(lang, 'How to register for the 2026-27 academic year.', '2026-27 學年度註冊說明。'),
+    jsonLd: (lang) => jsonLdWebPage(lang, pickLang(lang, 'SDCA Enrollment', 'SDCA 報名註冊'), 'Enroll'),
   }));
 
   // ---------- Contact (GET) ----------
@@ -339,16 +310,14 @@ export function registerPublicRoutes(app, bridge) {
       ...portedCtx(db, 'contact', lang),
       _settings: contactSettings(db, lang),
     }),
-    title: (lang) => lang === 'zh' ? 'SDCA 聯絡我們' : 'Contact SDCA',
-    desc: (lang) => lang === 'zh' ? '詢問報名、課程或活動相關問題。'
-                                  : 'Send us a question about enrollment, programs or events.',
+    title: (lang) => pickLang(lang, 'Contact SDCA', 'SDCA 聯絡我們'),
+    desc: (lang) => pickLang(lang, 'Send us a question about enrollment, programs or events.', '詢問報名、課程或活動相關問題。'),
     jsonLd: (lang) => jsonLdSchool(db, lang),
   }));
 
   // ---------- Contact (POST) ----------
   app.post('/:lang/contact', createLimiter({ max: Number(process.env.CONTACT_RATE_LIMIT || 5), windowMs: 60 * 60 * 1000 }), (req, res) => {
     const lang = req.params.lang;
-    if (!SUPPORTED.includes(lang)) return res.status(404).send('Not found');
     const tFn = (k) => t(lang, k);
     const renderPart = makeRenderPart(lang);
     const b = req.body || {};
@@ -371,7 +340,7 @@ export function registerPublicRoutes(app, bridge) {
 
     const baseOpts = {
       lang, t: tFn, renderPart,
-      title: lang === 'zh' ? 'SDCA 聯絡我們' : 'Contact SDCA',
+      title: pickLang(lang, 'Contact SDCA', 'SDCA 聯絡我們'),
       description: '',
       canonical: `/${lang}/contact`, enUrl: '/en/contact', zhUrl: '/zh/contact',
       ...renderShell(lang, { langPath: '/contact' }),
@@ -420,9 +389,8 @@ export function registerPublicRoutes(app, bridge) {
         },
       };
     },
-    title: (lang) => lang === 'zh' ? 'SDCA 支持中華學苑' : 'Support SDCA',
-    desc: (lang) => lang === 'zh' ? '透過支票或 PayPal 進行可報稅捐款。'
-                                  : 'Make a tax-deductible donation by check or PayPal.',
+    title: (lang) => pickLang(lang, 'Support SDCA', 'SDCA 支持中華學苑'),
+    desc: (lang) => pickLang(lang, 'Make a tax-deductible donation by check or PayPal.', '透過支票或 PayPal 進行可報稅捐款。'),
     jsonLd: (lang) => jsonLdSchool(db, lang),
   }));
 
@@ -439,9 +407,8 @@ export function registerPublicRoutes(app, bridge) {
         _settings: { email_vp: setting(db, 'email_vp', lang) },
       };
     },
-    title: (lang) => lang === 'zh' ? 'SDCA 贊助商' : 'SDCA Sponsors',
-    desc: (lang) => lang === 'zh' ? '感謝我們的贊助商。'
-                                  : 'Thank you to our generous sponsors.',
-    jsonLd: (lang) => jsonLdWebPage(lang, lang === 'zh' ? 'SDCA 贊助商' : 'SDCA Sponsors', 'Sponsors'),
+    title: (lang) => pickLang(lang, 'SDCA Sponsors', 'SDCA 贊助商'),
+    desc: (lang) => pickLang(lang, 'Thank you to our generous sponsors.', '感謝我們的贊助商。'),
+    jsonLd: (lang) => jsonLdWebPage(lang, pickLang(lang, 'SDCA Sponsors', 'SDCA 贊助商'), 'Sponsors'),
   }));
 }

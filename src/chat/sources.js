@@ -2,6 +2,7 @@
 // A doc is { source, title, text, url }. Add a source here to give the bot new knowledge.
 import fs from 'node:fs';
 import { blocksToText } from './text.js';
+import { officeContact } from '../school.js';
 
 const faqPath = new URL('./faq.json', import.meta.url);
 
@@ -56,9 +57,12 @@ const announcements = {
 const faq = {
   name: 'faq',
   audiences: ['public'],
-  load() {
+  load(db) {
+    // {{office_email}} / {{office_phone}} in the FAQ text come from the admin settings, so there is one place to change them
+    const c = officeContact(db);
+    const fill = (s) => s.replaceAll('{{office_email}}', c.email).replaceAll('{{office_phone}}', c.phone);
     const items = JSON.parse(fs.readFileSync(faqPath, 'utf8'));
-    return items.map((f) => ({ source: 'faq', title: f.q_en, text: `Q: ${f.q_en}\n${f.q_zh}\nA: ${f.a_en}\n${f.a_zh}`, url: f.url || '', boost: 2 }));
+    return items.map((f) => ({ source: 'faq', title: f.q_en, text: fill(`Q: ${f.q_en}\n${f.q_zh}\nA: ${f.a_en}\n${f.a_zh}`), url: f.url || '', boost: 2 }));
   },
 };
 

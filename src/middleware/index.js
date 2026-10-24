@@ -72,7 +72,8 @@ export function buildHelmet() {
   });
 }
 
-export function applyBaseMiddleware(app) {
+/** `db` is the app's database: sessions are stored there (so a test app never touches the live database). */
+export function applyBaseMiddleware(app, { db = openDb() } = {}) {
   app.disable('x-powered-by');
   app.use(buildHelmet());
   app.use((req, res, next) => { res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()'); next(); });
@@ -99,7 +100,6 @@ export function applyBaseMiddleware(app) {
   });
 
   // session — SQLite-backed (survives restarts; Phase 6 adds the admin).
-  const db = openDb();
   app.use(session({
     store: createSessionStore(db),
     secret: config.sessionSecret,

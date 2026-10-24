@@ -3,6 +3,7 @@
 import { can } from './perm.js';
 import { EVENT_CATEGORIES } from './entities.js';
 import { portalHelpers } from './util.js';
+import { pickLang } from '../i18n/index.js';
 
 const pad = (n) => String(n).padStart(2, '0');
 const ymd = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -33,7 +34,7 @@ export function registerEventRoutes(app, { db, page, requireLogin }) {
     }
     const mk = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
     page(req, res, 'events-calendar.ejs', {
-      weeks, monthLabel: first.toLocaleDateString(req.params.lang === 'zh' ? 'zh-TW' : 'en-US', { month: 'long', year: 'numeric' }),
+      weeks, monthLabel: first.toLocaleDateString(pickLang(req.params.lang, 'en-US', 'zh-TW'), { month: 'long', year: 'numeric' }),
       prev: mk(new Date(first.getFullYear(), first.getMonth() - 1, 1)), next: mk(new Date(first.getFullYear(), first.getMonth() + 1, 1)),
       thisMonth: mk(now), categories: EVENT_CATEGORIES, canCreate: can(req.portal.access, 'events.create'), canEdit: can(req.portal.access, 'events.update') || can(req.portal.access, 'events.view'),
     }, { title: 'Event Calendar' });

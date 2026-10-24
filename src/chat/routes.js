@@ -1,6 +1,8 @@
 // src/chat/routes.js — POST /api/chat (server-sent events). The only HTTP surface of the chat service.
 import { createLimiter } from '../middleware/index.js';
 import { todayLocal } from '../datetime.js';
+import { officeContact } from '../school.js';
+import { dailyLimitMessage } from './messages.js';
 import { answer } from './orchestrator.js';
 import { createRetriever } from './retriever.js';
 import { ollamaProvider } from './provider-ollama.js';
@@ -31,12 +33,12 @@ export function registerChatRoutes(app, { db, provider = ollamaProvider(), retri
     res.on('close', () => ctl.abort());
     const send = (o) => res.write(`data: ${JSON.stringify(o)}\n\n`);
     if (overCap()) {
-      send({ type: 'delta', text: lang === 'zh' ? '抱歉，小幫手今天的使用量已滿。請聯絡學校辦公室：Office.SDCA@gmail.com 或 (858) 205-7322。' : 'Sorry, the assistant has reached its limit for today. Please contact the school office: Office.SDCA@gmail.com or (858) 205-7322.' });
+      send({ type: 'delta', text: dailyLimitMessage(lang === 'zh' ? 'zh' : 'en', officeContact(db)) });
       send({ type: 'done' });
       return res.end();
     }
     try {
-      for await (const ev of answer({ message, history: hist, lang: lang === 'zh' ? 'zh' : 'en', retriever, provider, signal: ctl.signal })) send(ev);
+      for await (const ev of answer({ message, history: hist, lang: lang === 'zh' ? 'zh' : 'en', retriever, provider, contact: officeContact(db), signal: ctl.signal })) send(ev);
     } catch (e) {
       if (!ctl.signal.aborted) { console.error('[chat]', e.message); send({ type: 'error' }); }
     }

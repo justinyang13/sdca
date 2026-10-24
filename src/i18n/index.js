@@ -31,3 +31,13 @@ export function t(lang, key) {
 }
 
 export { SUPPORTED };
+
+/** The wording for a language: pickLang(lang, 'English text', '中文'). */
+export const pickLang = (lang, en, zh) => (lang === 'zh' ? zh : en);
+
+/** A bilingual database row's field in the page language, falling back to the other language when it is empty: localized(row, 'title', lang). */
+export function localized(row, name, lang) {
+  const en = row[`${name}_en`];
+  const zh = row[`${name}_zh`];
+  return (lang === 'zh' ? zh || en : en || zh) || '';
+}

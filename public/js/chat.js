@@ -1,8 +1,8 @@
 // chat.js — floating chat widget. Talks only to POST /api/chat (SSE); knows nothing about sources or models.
 const zh = document.documentElement.lang.startsWith('zh');
 const T = zh
-  ? { title: '學苑小幫手', hello: '您好！我可以回答關於聖地牙哥中華學苑的問題，例如註冊、課程與聯絡方式。', ph: '請輸入問題…', send: '送出', note: 'AI 助理，回答可能有誤，重要事項請洽辦公室。', err: '抱歉，目前無法回答。請聯絡辦公室：Office.SDCA@gmail.com', src: '相關頁面', open: '開啟聊天', close: '關閉' }
-  : { title: 'SDCA Assistant', hello: 'Hi! I can answer questions about San Diego Chinese Academy: registration, classes, contact info and more.', ph: 'Ask a question…', send: 'Send', note: 'AI assistant — may make mistakes. For anything important, contact the office.', err: 'Sorry, I can’t answer right now. Please contact the office: Office.SDCA@gmail.com', src: 'Related pages', open: 'Open chat', close: 'Close' };
+  ? { title: '學苑小幫手', hello: '您好！我可以回答關於聖地牙哥中華學苑的問題，例如註冊、課程與聯絡方式。', ph: '請輸入問題…', send: '送出', note: 'AI 助理，回答可能有誤，重要事項請洽辦公室。', err: '抱歉，目前無法回答。請稍後再試，或前往', contact: '聯絡我們頁面', src: '相關頁面', open: '開啟聊天', close: '關閉' }
+  : { title: 'SDCA Assistant', hello: 'Hi! I can answer questions about San Diego Chinese Academy: registration, classes, contact info and more.', ph: 'Ask a question…', send: 'Send', note: 'AI assistant — may make mistakes. For anything important, contact the office.', err: 'Sorry, I can’t answer right now. Please try again later or use the ', contact: 'Contact page', src: 'Related pages', open: 'Open chat', close: 'Close' };
 
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; };
 const fab = el('button', 'chat-fab', '💬'); fab.type = 'button'; fab.setAttribute('aria-label', T.open);
@@ -58,6 +58,6 @@ form.onsubmit = async (e) => {
       bot.append(box);
     }
     history.push({ role: 'user', content: q }, { role: 'assistant', content: text });
-  } catch { bot.textContent = T.err; }
+  } catch { bot.textContent = T.err; const a = el('a', '', T.contact); a.href = zh ? '/zh/contact' : '/en/contact'; bot.append(a, zh ? '。' : '.'); }
   btn.disabled = false; input.focus();
 };

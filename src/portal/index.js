@@ -1,6 +1,7 @@
 // src/portal/index.js — mounts the portal (families, registration, finance, volunteers, roles & permissions) under /:lang/portal.
 import { SUPPORTED } from '../i18n/index.js';
-import { makeRenderer, ensureCsrf } from './render.js';
+import { makeRenderer } from './render.js';
+import { ensureCsrf } from '../middleware/csrf.js';
 import { portalSession } from './auth.js';
 import { registerAuthRoutes } from './r-auth.js';
 import { registerManageRoutes } from './r-manage.js';
@@ -20,7 +21,6 @@ export function registerPortalRoutes(app, { db, makeRenderPart, renderShell, t }
   const isStaticBuild = (req) => req.get('x-static-build') === '1';
 
   // language guard + session user + csrf cookie for every /:lang/portal/* request
-  app.use('/:lang/portal', (req, res, next) => (SUPPORTED.includes(req.params.lang) ? next() : next('route')));
   app.use('/:lang/portal', portalSession(db));
   app.use('/:lang/portal', (req, res, next) => { ensureCsrf(req, res); next(); });
 

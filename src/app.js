@@ -5,11 +5,11 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import fs from 'node:fs';
 import ejs from 'ejs';
 import { config } from './config.js';
-import { t, SUPPORTED } from './i18n/index.js';
+import { t, SUPPORTED, pickLang, localized } from './i18n/index.js';
 import { applyBaseMiddleware } from './middleware/index.js';
 import { openDb } from './db/open.js';
 import * as H from './helpers.js';
-import { imageManifest, withPdfTargets, assetUrl, withAssetUrls } from './helpers.js';
+import { imageManifest, assetUrl, mdToHtml } from './helpers.js';
 import { blockHelpers } from './block-helpers.js';
 import { registerPublicRoutes } from './routes-public.js';
 import { registerPhase5Routes } from './routes-phase5.js';
@@ -22,8 +22,6 @@ import { fmtLong, fmtTime, fmtEventWhen, fmtMonthYear, fmtDate, todayLocal } fro
 import { lookupRedirect } from './redirects.js';
 import { portedCtx } from './ported.js';
 import { buildSitemap } from './sitemap.js';
-import { marked } from 'marked';
-import sanitizeHtml from 'sanitize-html';
 
 function renderError(app, res, status, lang, opts = {}) {
   const view = ['404', '500', '403', '400'].includes(String(status)) ? String(status) : '500';
@@ -48,6 +46,8 @@ export function createApp({ db = openDb() } = {}) {
   app.set('views', config.viewsDir);
   app.locals.t = t;
   app.locals.langs = SUPPORTED;
+  // every route with a :lang segment: anything but a supported language skips the route (and ends in the 404 page)
+  app.param('lang', (req, res, next, lang) => (SUPPORTED.includes(lang) ? next() : next('route')));
 
   // Helper for templates: render a partial (views/partials/*.ejs) with locals.
   // Wraps locals as `L` to avoid colliding with partial top-level `const`
@@ -75,17 +75,8 @@ export function createApp({ db = openDb() } = {}) {
     };
   }
 
-  // Render markdown to safe HTML (marked + sanitize-html).
-  function renderMarkdown(md) {
-    if (!md) return '';
-    const raw = marked.parse(md, { mangle: false, headerIds: false, breaks: false });
-    return withAssetUrls(withPdfTargets(sanitizeHtml(raw, {
-      allowedTags: ['h1','h2','h3','h4','h5','p','ul','ol','li','strong','em','del',
-        'a','code','pre','blockquote','table','thead','tbody','tr','th','td','br','hr','span','img','details','summary'],
-      allowedAttributes: { a: ['href','title','rel','target'], img: ['src','alt','width','height'] },
-      allowedSchemes: ['http','https','mailto','tel'],
-    })));
-  }
+  // Render markdown to safe HTML (the shared pipeline in helpers.js).
+  const renderMarkdown = mdToHtml;
 
   // Render a views/pages/*.ejs template with `renderPart` and `renderMarkdown`
   // available in scope (so page templates can render markdown bodies).
@@ -99,7 +90,7 @@ export function createApp({ db = openDb() } = {}) {
   app.use(express.json({ limit: '1mb' }));
   app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
-  applyBaseMiddleware(app);
+  applyBaseMiddleware(app, { db });
 
   // Public pages: remember whether a portal user is signed in (footer shows "Portal Logout"), and make every
   // public button that goes to the portal sign-in / new-family pages sign the current portal user out first
@@ -161,7 +152,7 @@ export function createApp({ db = openDb() } = {}) {
           lang,
           t: tFn,
           renderPart,
-          title: lang === 'zh' ? 'SDCA 樣式指南' : 'SDCA Style Guide',
+          title: pickLang(lang, 'SDCA Style Guide', 'SDCA 樣式指南'),
           description: 'SDCA design system style guide.',
           body,
           header: shell.header,
@@ -203,12 +194,11 @@ export function createApp({ db = openDb() } = {}) {
   // tree but no dedicated route (e.g. /en/classroom-map). Runs last, 404s otherwise.
   app.get('/:lang/:slug', function (req, res, next) {
     const lang = req.params.lang;
-    if (!SUPPORTED.includes(lang)) return next();
     const { pg, blocks, useBlocks, adminHtml, bodyNote } = portedCtx(db, req.params.slug, lang);
     if (!pg || !useBlocks) return next();
     const tFn = (k) => t(lang, k);
     const renderPart = makeRenderPart(lang);
-    const title = lang === 'zh' ? (pg.title_zh || pg.title_en) : (pg.title_en || pg.title_zh);
+    const title = localized(pg, 'title', lang);
     const body = pageView('ported.ejs', { lang, t: tFn, renderPart, db, pg, blocks, useBlocks, adminHtml, bodyNote });
     res.render('layouts/main.ejs', {
       lang, t: tFn, renderPart,

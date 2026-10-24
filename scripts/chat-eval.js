@@ -8,12 +8,15 @@ import { openDb } from '../src/db/open.js';
 import { createRetriever } from '../src/chat/retriever.js';
 import { ollamaProvider } from '../src/chat/provider-ollama.js';
 import { answer } from '../src/chat/orchestrator.js';
+import { officeContact } from '../src/school.js';
 
 const arg = (k) => { const i = process.argv.indexOf(`--${k}`); return i > 0 ? process.argv[i + 1] : null; };
 const questions = JSON.parse(fs.readFileSync(new URL('../tests/chat-eval/questions.json', import.meta.url), 'utf8'))
   .filter((q) => (!arg('set') || q.set === arg('set')) && (!arg('id') || q.id === arg('id')) && (!arg('lang') || q.lang === arg('lang')));
 const url = arg('url');
-const retriever = url ? null : createRetriever(openDb());
+const db = url ? null : openDb();
+const retriever = url ? null : createRetriever(db);
+const contact = url ? null : officeContact(db);
 const provider = url ? null : ollamaProvider();
 
 async function ask(q) {
@@ -26,7 +29,7 @@ async function ask(q) {
       if (ev.type === 'delta') text += ev.text; else if (ev.type === 'sources') sources = ev.sources;
     }
   } else {
-    for await (const ev of answer({ message: q.q, history: q.history || [], lang: q.lang, retriever, provider })) {
+    for await (const ev of answer({ message: q.q, history: q.history || [], lang: q.lang, retriever, provider, contact })) {
       if (ev.type === 'delta') text += ev.text; else if (ev.type === 'sources') sources = ev.sources;
     }
   }

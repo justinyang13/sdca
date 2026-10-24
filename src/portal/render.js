@@ -1,7 +1,6 @@
 // src/portal/render.js — renders portal pages inside the site layout (header/footer + portal sidebar).
 import fs from 'node:fs';
 import path from 'node:path';
-import crypto from 'node:crypto';
 import ejs from 'ejs';
 import { config } from '../config.js';
 import { asset } from '../asset-version.js';
@@ -9,7 +8,9 @@ import { imageManifest } from '../helpers.js';
 import { fmtDate, fmtDateTime, fmtLocalDateTime, utcToLocalParts, fmtLong, fmtTime } from '../datetime.js';
 import { ENTITIES, GROUPS } from './entities.js';
 import { can } from './perm.js';
+import { ensureCsrf } from '../middleware/csrf.js';
 import { money } from './fees.js';
+import { pickLang } from '../i18n/index.js';
 
 const dir = path.join(config.viewsDir, 'portal-app');
 export const esc = (x) => String(x ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -41,12 +42,6 @@ function tpl(name) {
   const file = path.join(dir, name);
   if (!config.isProduction || !cache.has(file)) cache.set(file, fs.readFileSync(file, 'utf8'));
   return { src: cache.get(file), file };
-}
-
-export function ensureCsrf(req, res) {
-  let tok = req.cookies?.sdca_csrf;
-  if (!tok) { tok = crypto.randomBytes(32).toString('hex'); res.cookie('sdca_csrf', tok, { httpOnly: true, sameSite: 'Lax', path: '/', secure: !!req.secure }); req.cookies = { ...(req.cookies || {}), sdca_csrf: tok }; }
-  return tok;
 }
 
 /** Documents and pages shown under the Resources menu (and its landing page). */
@@ -130,10 +125,10 @@ export function makeRenderer({ makeRenderPart, renderShell, t, db }) {
     const tFn = (k) => t(lang, k);
     const csrf = ensureCsrf(req, res);
     let flash = req.session?.portalFlash || null;
-    if (!flash && req.cookies?.sdca_loggedout) { flash = { type: 'ok', msg: lang === 'zh' ? '您已登出入口網站。' : 'You have been signed out of the portal.' }; res.clearCookie('sdca_loggedout', { path: '/' }); }
+    if (!flash && req.cookies?.sdca_loggedout) { flash = { type: 'ok', msg: pickLang(lang, 'You have been signed out of the portal.', '您已登出入口網站。') }; res.clearCookie('sdca_loggedout', { path: '/' }); }
     if (req.session?.portalFlash) delete req.session.portalFlash;
     const b = (en, zh) => (lang === 'zh' ? zh || en : en);
-    const one = (en, zh) => (lang === 'zh' ? zh || en : en);
+    const one = b;
     // Stored labels look like "三年級(3rd Grade)"; show only the selected language.
     const gl = (label) => { const m = /^(.*?)\s*\((.*)\)\s*$/.exec(label || ''); return m ? (lang === 'zh' ? m[1] : m[2]) : (label || ''); };
     const url = (p = '') => `/${lang}/portal${p}`;
@@ -153,7 +148,7 @@ export function makeRenderer({ makeRenderPart, renderShell, t, db }) {
     // signed-in portal pages get their own header (hamburger menu + profile menu) and a slim footer — never the public site menu
     let portalChrome = {};
     if (shellName === 'app') {
-      const alt = lang === 'zh' ? 'en' : 'zh';
+      const alt = pickLang(lang, 'zh', 'en');
       const ctx = { ...base, nav, current: req.path, altLangUrl: `/${alt}${req.langPath || '/portal'}${req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : ''}`, altLangLabel: alt === 'zh' ? '中文' : 'EN' };
       const hd = tpl('portal-header.ejs'); const ft = tpl('portal-footer.ejs');
       portalChrome = { header: ejs.render(hd.src, ctx, { filename: hd.file }), footer: ejs.render(ft.src, ctx, { filename: ft.file }) };

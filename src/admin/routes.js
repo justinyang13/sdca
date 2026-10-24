@@ -4,18 +4,18 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import ejs from 'ejs';
-import sanitizeHtml from 'sanitize-html';
+import { sanitizeRich } from '../sanitize.js';
 import { t, SUPPORTED } from '../i18n/index.js';
 import { assetUrl } from '../helpers.js';
 import { verifyPassword } from './auth.js';
-import crypto from 'node:crypto';
 import { uploader, uploadDir, verifyUploadContent } from './uploads.js';
 import { loginLimiter } from '../middleware/index.js';
-import { csrfMiddleware } from '../middleware/csrf.js';
+import { csrfMiddleware, csrfTokenFrom, ensureCsrf } from '../middleware/csrf.js';
 import { config } from '../config.js';
 import { asset } from '../asset-version.js';
 import { nowUtc } from '../datetime.js';
 import { recordLogin, loginSummary } from '../login-events.js';
+import { isLocked, recordFailure, clearFailures } from '../auth/lockout.js';
 
 const ADMIN_CSS = '/css/admin.css';
 
@@ -37,10 +37,6 @@ function requireLogin(req, res, next) {
   res.status(401).render('admin/login-shell.ejs', { body, csrfToken: csrf, t: (k) => t('en', k) });
 }
 
-function csrfTokenFrom(req) {
-  return req.cookies?.sdca_csrf || '';
-}
-
 function audit(db, user, action, entity, entity_id) {
   db.prepare('INSERT INTO audit_log (user, action, entity, entity_id) VALUES (?, ?, ?, ?)')
     .run(String(user || ''), String(action), String(entity), String(entity_id || ''));
@@ -60,12 +56,7 @@ function csv(headers, rows) {
 
 // ---------- body field sanitization for markdown bodies ----------
 function sanitizeBody(s) {
-  if (!s) return '';
-  return sanitizeHtml(String(s), {
-    allowedTags: ['h1','h2','h3','h4','h5','h6','p','ul','ol','li','strong','em','del','a','code','pre','blockquote','table','thead','tbody','tr','th','td','br','hr','span','img','details','summary'],
-    allowedAttributes: { a: ['href','title','rel','target'], img: ['src','alt','width','height'] },
-    allowedSchemes: ['http','https','mailto','tel'],
-  });
+  return s ? sanitizeRich(s) : '';
 }
 
 // ---------- text field (plain) ----------
@@ -78,12 +69,6 @@ function text(s) {
  * `db` is required.
  */
 /** Only same-site /admin paths are allowed after sign-in (no open redirect). */
-/** CSRF double-submit cookie: HttpOnly (the forms get the token from the server) and Secure whenever the request came in over https. */
-const setCsrfCookie = (req, res, tok) => res.cookie('sdca_csrf', tok, { httpOnly: true, sameSite: 'Lax', path: '/', secure: !!req.secure });
-
-const ADMIN_MAX_FAILS = 5;
-const ADMIN_LOCK_MINUTES = 15;
-
 export const safeNext = (n) => (/^\/admin(\/[A-Za-z0-9_\-./]*)?$/.test(String(n || '')) ? String(n) : '/admin/dashboard');
 
 export function registerAdminRoutes(app, { db }) {
@@ -116,11 +101,7 @@ export function registerAdminRoutes(app, { db }) {
   // ---------- Login ----------
   app.get('/admin', (req, res) => {
     if (req.session && req.session.user) return res.redirect('/admin/dashboard');
-    let csrf = req.cookies?.sdca_csrf;
-    if (!csrf) {
-      csrf = crypto.randomBytes(32).toString('hex');
-      setCsrfCookie(req, res, csrf);
-    }
+    const csrf = ensureCsrf(req, res);
     const body = ejs.render(fs.readFileSync(path.join(views, 'login.ejs'), 'utf8'), {
       csrfToken: csrf, error: null, nextPath: '/admin/dashboard',
     });
@@ -131,11 +112,7 @@ export function registerAdminRoutes(app, { db }) {
   });
 
   app.get('/admin/login', (req, res) => {
-    let csrf = req.cookies?.sdca_csrf;
-    if (!csrf) {
-      csrf = crypto.randomBytes(32).toString('hex');
-      setCsrfCookie(req, res, csrf);
-    }
+    const csrf = ensureCsrf(req, res);
     renderAdmin(req, res, 'login.ejs', { error: null, nextPath: safeNext(req.query.next) });
   });
 
@@ -143,18 +120,12 @@ export function registerAdminRoutes(app, { db }) {
     const username = String(req.body?.username || '').trim();
     const password = String(req.body?.password || '');
     const user = db.prepare('SELECT * FROM admin_users WHERE username = ?').get(username);
-    const locked = !!(user && user.locked_until && user.locked_until > nowUtc());
+    const locked = isLocked(user);
     const passwordOk = verifyPassword(password, user ? user.password_hash : 'aa:bb');   // always hash, so timing does not reveal the username
     if (!user || locked || !passwordOk) {
       let detail = user ? 'wrong password' : 'unknown username';
       if (user && locked) detail = 'account locked';
-      else if (user) {
-        const fails = (user.failed_attempts || 0) + 1;
-        if (fails >= ADMIN_MAX_FAILS) {
-          db.prepare('UPDATE admin_users SET failed_attempts = 0, locked_until = ? WHERE id = ?').run(nowUtc(new Date(Date.now() + ADMIN_LOCK_MINUTES * 60000)), user.id);
-          detail = 'wrong password; account locked';
-        } else db.prepare('UPDATE admin_users SET failed_attempts = ? WHERE id = ?').run(fails, user.id);
-      }
+      else if (user && recordFailure(db, 'admin_users', user)) detail = 'wrong password; account locked';
       recordLogin(db, { area: 'admin', event: 'login_failed', username, userId: user?.id ?? null, ip: req.ip, userAgent: req.get('user-agent'), detail });
       const err = 'Invalid username or password';   // the same message for every failure, locked or not
       return renderAdmin(req, res, 'login.ejs', { error: err, nextPath: safeNext(req.body?.next) }, 401);
@@ -164,7 +135,8 @@ export function registerAdminRoutes(app, { db }) {
     req.session.regenerate((regenErr) => {
       if (regenErr) return res.status(500).type('text').send('Session error');
       req.session.user = { id: user.id, username: user.username, role: user.role };
-      db.prepare('UPDATE admin_users SET last_login = ?, failed_attempts = 0, locked_until = NULL WHERE id = ?').run(nowUtc(), user.id);
+      clearFailures(db, 'admin_users', user.id);
+      db.prepare('UPDATE admin_users SET last_login = ? WHERE id = ?').run(nowUtc(), user.id);
       audit(db, user.username, 'login', 'admin_users', String(user.id));
       recordLogin(db, { area: 'admin', event: 'login', username: user.username, userId: user.id, ip: req.ip, userAgent: req.get('user-agent') });
       req.session.save(() => res.redirect(next));
@@ -197,9 +169,8 @@ export function registerAdminRoutes(app, { db }) {
     }
     // If the CSRF cookie is missing (e.g. a test client that POSTs directly),
     // issue one and redirect back to the page so the user can re-submit.
-    if (!req.cookies?.sdca_csrf) {
-      const tok = crypto.randomBytes(32).toString('hex');
-      setCsrfCookie(req, res, tok);
+    if (!csrfTokenFrom(req)) {
+      ensureCsrf(req, res);
       return res.redirect(req.path);
     }
     return next();

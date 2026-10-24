@@ -14,6 +14,7 @@ import { lookupRedirect } from './redirects.js';
 import { bodyFor, setting } from './helpers.js';
 import { todayLocal } from './datetime.js';
 import { portedCtx, usePorted } from './ported.js';
+import { pickLang, localized } from './i18n/index.js';
 
 const PER_PAGE = 12;
 const ANN_KINDS = ['all', 'weekly', 'news', 'press', 'notice'];
@@ -53,14 +54,9 @@ export function registerPhase5Routes(app, bridge) {
     });
   }
 
-  function pickTitle(r, lang) {
-    return lang === 'zh' ? (r.title_zh || r.title_en || '') : (r.title_en || r.title_zh || '');
-  }
-
   // ---------- /news (tabs + pagination) ----------
   app.get('/:lang/news', function (req, res) {
     const lang = req.params.lang;
-    if (!SUPPORTED.includes(lang)) return notFound(req, res);
     const kind = ANN_KINDS.includes(req.query.kind) ? req.query.kind : 'all';
     const pgNum = Math.max(1, parseInt(req.query.page || '1', 10) || 1);
 
@@ -77,14 +73,13 @@ export function registerPhase5Routes(app, bridge) {
 
     page(lang, req, res, '/news', 'news.ejs',
       { news: { kind, page: pgNum, perPage: PER_PAGE, total, anns } },
-      lang === 'zh' ? '新聞與通告' : 'News & Announcements',
-      lang === 'zh' ? '每週通告、新聞、媒體剪報與通知。' : 'Weekly announcements, news, press archive and notices.');
+      pickLang(lang, 'News & Announcements', '新聞與通告'),
+      pickLang(lang, 'Weekly announcements, news, press archive and notices.', '每週通告、新聞、媒體剪報與通知。'));
   });
 
   // ---------- /news/:slug ----------
   app.get('/:lang/news/:slug', function (req, res) {
     const lang = req.params.lang;
-    if (!SUPPORTED.includes(lang)) return notFound(req, res);
     const ann = db.prepare(
       `SELECT a.*, d.slug AS doc_slug, d.file_path AS doc_path, d.bytes AS doc_bytes,
               d.title_en AS doc_title_en, d.title_zh AS doc_title_zh
@@ -97,7 +92,7 @@ export function registerPhase5Routes(app, bridge) {
       title_en: ann.doc_title_en, title_zh: ann.doc_title_zh,
     } : null;
     const bodyHtml = renderMarkdown(
-      lang === 'zh' ? (ann.body_zh || ann.body_en) : (ann.body_en || ann.body_zh));
+      localized(ann, 'body', lang));
     const related = db.prepare(
       `SELECT slug, title_en, title_zh, published_at FROM announcements
        WHERE published = 1 AND deleted_at IS NULL AND slug != ? ORDER BY pinned DESC, published_at DESC LIMIT 5`
@@ -105,13 +100,13 @@ export function registerPhase5Routes(app, bridge) {
 
     page(lang, req, res, `/news/${ann.slug}`, 'news-detail.ejs',
       { ann, doc, bodyHtml, related },
-      pickTitle(ann, lang),
-      lang === 'zh' ? (ann.summary_zh || ann.summary_en || '') : (ann.summary_en || ann.summary_zh || ''),
+      localized(ann, 'title', lang),
+      localized(ann, 'summary', lang),
       {
         '@context': 'https://schema.org', '@type': 'Article',
-        headline: pickTitle(ann, lang),
+        headline: localized(ann, 'title', lang),
         datePublished: ann.published_at,
-        inLanguage: lang === 'zh' ? 'zh-Hant' : 'en',
+        inLanguage: pickLang(lang, 'en', 'zh-Hant'),
       });
   });
 
@@ -126,11 +121,9 @@ export function registerPhase5Routes(app, bridge) {
 
   // The old /events list and /events/view/month pages are merged into /calendar ("Events and Calendar").
   app.get('/:lang/events', function (req, res) {
-    if (!SUPPORTED.includes(req.params.lang)) return notFound(req, res);
     res.redirect(301, `/${req.params.lang}/calendar?view=list`);
   });
   app.get('/:lang/events/view/month', function (req, res) {
-    if (!SUPPORTED.includes(req.params.lang)) return notFound(req, res);
     res.redirect(301, `/${req.params.lang}/calendar${req.query.month ? '?month=' + encodeURIComponent(String(req.query.month)) : ''}`);
   });
 
@@ -140,13 +133,12 @@ export function registerPhase5Routes(app, bridge) {
     if (req.method !== 'GET' && req.method !== 'HEAD') return next();
     if (!String(req.params.slug || '').endsWith('.ics')) return next();
     const lang = req.params.lang;
-    if (!SUPPORTED.includes(lang)) return notFound(req, res);
     const slug = req.params.slug.slice(0, -4); // strip .ics
     const ev = db.prepare('SELECT * FROM events WHERE slug = ? AND deleted_at IS NULL AND published = 1').get(slug);
     if (!ev) return notFound(req, res);
     const ics = icsForEvents([{
-      title: pickTitle(ev, lang),
-      description: lang === 'zh' ? (ev.description_zh || ev.description_en || '') : (ev.description_en || ev.description_zh || ''),
+      title: localized(ev, 'title', lang),
+      description: localized(ev, 'description', lang),
       location: ev.location || '',
       starts_at: ev.starts_at,
       ends_at: ev.ends_at,
@@ -161,21 +153,20 @@ export function registerPhase5Routes(app, bridge) {
   // ---------- /events/:slug ----------
   app.get('/:lang/events/:slug', function (req, res) {
     const lang = req.params.lang;
-    if (!SUPPORTED.includes(lang)) return notFound(req, res);
     const ev = db.prepare('SELECT * FROM events WHERE slug = ? AND deleted_at IS NULL AND published = 1').get(req.params.slug);
     if (!ev) return notFound(req, res);
     const bodyHtml = renderMarkdown(
-      lang === 'zh' ? (ev.description_zh || ev.description_en) : (ev.description_en || ev.description_zh));
+      localized(ev, 'description', lang));
     const related = db.prepare(
       `SELECT * FROM events WHERE deleted_at IS NULL AND published = 1 AND slug != ? ORDER BY starts_at DESC LIMIT 4`
     ).all(ev.slug);
     page(lang, req, res, `/events/${ev.slug}`, 'event-detail.ejs',
       { ev, bodyHtml, related },
-      pickTitle(ev, lang),
-      lang === 'zh' ? (ev.description_zh || ev.description_en || '') : (ev.description_en || ev.description_zh || ''),
+      localized(ev, 'title', lang),
+      localized(ev, 'description', lang),
       {
         '@context': 'https://schema.org', '@type': 'Event',
-        name: pickTitle(ev, lang),
+        name: localized(ev, 'title', lang),
         startDate: ev.starts_at,
         endDate: ev.ends_at || undefined,
         location: ev.location ? { '@type': 'Place', name: ev.location } : undefined,
@@ -185,7 +176,6 @@ export function registerPhase5Routes(app, bridge) {
   // ---------- /calendar ----------
   app.get('/:lang/calendar', function (req, res) {
     const lang = req.params.lang;
-    if (!SUPPORTED.includes(lang)) return notFound(req, res);
     const docs = db.prepare(
       `SELECT * FROM documents WHERE published = 1 AND category = 'calendar'
        ORDER BY school_year DESC, sort, id`
@@ -204,25 +194,24 @@ export function registerPhase5Routes(app, bridge) {
     const mk = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
     page(lang, req, res, '/calendar', 'calendar.ejs',
       { docs, events, view, month: first, gridStart, gridEnd, prevMonth: mk(new Date(first.getFullYear(), first.getMonth() - 1, 1)), nextMonth: mk(new Date(first.getFullYear(), first.getMonth() + 1, 1)), thisMonth: mk(new Date()) },
-      lang === 'zh' ? '活動與行事曆' : 'Events and Calendar',
-      lang === 'zh' ? '學年活動、行事曆與重要日期。' : 'School-year events, the calendar and key dates.');
+      pickLang(lang, 'Events and Calendar', '活動與行事曆'),
+      pickLang(lang, 'School-year events, the calendar and key dates.', '學年活動、行事曆與重要日期。'));
   });
 
   // ---------- /media ----------
   app.get('/:lang/media', function (req, res) {
     const lang = req.params.lang;
-    if (!SUPPORTED.includes(lang)) return notFound(req, res);
     const photos = db.prepare(`SELECT * FROM media_items WHERE kind = 'photo' AND image != '' ORDER BY taken_at DESC, id`).all();
     const videos = db.prepare(`SELECT * FROM media_items WHERE kind = 'video' AND url != '' ORDER BY id`).all();
     const albums = db.prepare(`SELECT * FROM media_items WHERE kind = 'album' AND url != '' ORDER BY id`).all();
     const heroSlides = db.prepare('SELECT * FROM slides WHERE published = 1 ORDER BY sort, id').all();
     page(lang, req, res, '/media', usePorted(db, 'media', 'media.ejs'),
       { photos, videos, albums, heroSlides, ...portedCtx(db, 'media', lang), _pg: db.prepare('SELECT * FROM pages WHERE slug = ?').get('media') || { title_en: 'Media', title_zh: '影音媒體' } },
-      lang === 'zh' ? '照片與影片' : 'Photos & Videos',
-      lang === 'zh' ? 'SDCA 課堂、節慶與活動的精彩瞬間。' : 'Moments from SDCA classrooms, festivals and events.',
+      pickLang(lang, 'Photos & Videos', '照片與影片'),
+      pickLang(lang, 'Moments from SDCA classrooms, festivals and events.', 'SDCA 課堂、節慶與活動的精彩瞬間。'),
       {
         '@context': 'https://schema.org', '@type': 'ImageGallery',
-        name: lang === 'zh' ? 'SDCA 照片集' : 'SDCA photo gallery',
+        name: pickLang(lang, 'SDCA photo gallery', 'SDCA 照片集'),
         image: photos.map((p) => p.image ? (p.image.startsWith('/') ? p.image : `/img/${p.image.replace(/^img\//, '')}`) : null).filter(Boolean),
       });
   });
@@ -230,7 +219,6 @@ export function registerPhase5Routes(app, bridge) {
   // ---------- /media/archive (Phase 8b — uncurated old-site photos) ----------
   app.get('/:lang/media/archive', function (req, res) {
     const lang = req.params.lang;
-    if (!SUPPORTED.includes(lang)) return notFound(req, res);
     const photos = db.prepare(
       'SELECT * FROM archive_photos WHERE published = 1 ORDER BY taken_year DESC, sort, id'
     ).all();
@@ -249,8 +237,8 @@ export function registerPhase5Routes(app, bridge) {
     }));
     page(lang, req, res, '/media/archive', 'media-archive.ejs',
       { groups, total: photos.length },
-      lang === 'zh' ? '照片檔案' : 'Photo Archive',
-      lang === 'zh' ? '原網站保存的真實活動照片。' : 'Real event photos preserved from the original SDCA website.',
+      pickLang(lang, 'Photo Archive', '照片檔案'),
+      pickLang(lang, 'Real event photos preserved from the original SDCA website.', '原網站保存的真實活動照片。'),
       { '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'SDCA Photo Archive' });
   });
 
@@ -268,7 +256,6 @@ export function registerPhase5Routes(app, bridge) {
   for (const r of PARENT_ROUTES) {
     app.get(`/:lang${r.path}`, function (req, res) {
       const lang = req.params.lang;
-      if (!SUPPORTED.includes(lang)) return notFound(req, res);
       const pg = db.prepare('SELECT * FROM pages WHERE slug = ?').get(r.slug);
       const relatedDocs = db.prepare(
         `SELECT * FROM documents WHERE published = 1 AND category = ? ORDER BY sort, id LIMIT 6`
@@ -281,15 +268,14 @@ export function registerPhase5Routes(app, bridge) {
       const view = r.slug === 'parents-volunteer' ? 'volunteer.ejs' : 'parents.ejs';
       page(lang, req, res, r.path, view,
         { page: pg, relatedDocs, subLinks, mdBody: bf.html, bodyNote: bf.note, ...portedCtx(db, r.slug, lang) },
-        pg ? pickTitle(pg, lang) : (lang === 'zh' ? '家長專區' : 'Parents'),
-        lang === 'zh' ? 'SDCA 家長專區：手冊、志工、書券與表單。' : 'SDCA parent resources: handbook, volunteer, scrip and forms.');
+        pg ? localized(pg, 'title', lang) : (pickLang(lang, 'Parents', '家長專區')),
+        pickLang(lang, 'SDCA parent resources: handbook, volunteer, scrip and forms.', 'SDCA 家長專區：手冊、志工、書券與表單。'));
     });
   }
 
   // ---------- /documents ----------
   app.get('/:lang/documents', function (req, res) {
     const lang = req.params.lang;
-    if (!SUPPORTED.includes(lang)) return notFound(req, res);
     const cat = DOC_CATS.includes(req.query.cat) ? req.query.cat : 'all';
     const q = String(req.query.q || '').trim();
     const cats = db.prepare(
@@ -306,8 +292,8 @@ export function registerPhase5Routes(app, bridge) {
     const docs = db.prepare(sql).all(...params);
     page(lang, req, res, '/documents', 'documents.ejs',
       { docs, cat, q, cats: cats.map((c) => ({ id: c.category, count: c.c })) },
-      lang === 'zh' ? '文件與表單' : 'Documents & Forms',
-      lang === 'zh' ? '學年行事曆、手冊、比賽規則、每週 PDF 等。' : 'School calendars, handbooks, contest rules, weekly PDFs and more.');
+      pickLang(lang, 'Documents & Forms', '文件與表單'),
+      pickLang(lang, 'School calendars, handbooks, contest rules, weekly PDFs and more.', '學年行事曆、手冊、比賽規則、每週 PDF 等。'));
   });
 
   // ---------- Inline PDF delivery (Phase 8) ----------
@@ -347,7 +333,6 @@ export function registerPhase5Routes(app, bridge) {
   // ---------- /documents/:slug (serves the PDF when present) ----------
   app.get('/:lang/documents/:slug', function (req, res) {
     const lang = req.params.lang;
-    if (!SUPPORTED.includes(lang)) return notFound(req, res);
     const doc = db.prepare('SELECT * FROM documents WHERE slug = ? AND published = 1').get(req.params.slug);
     if (!doc) return notFound(req, res);
     if (serveDocFile(req, res, doc, { disposition: 'inline' })) return;
@@ -356,11 +341,11 @@ export function registerPhase5Routes(app, bridge) {
     ).all(doc.category, doc.slug);
     page(lang, req, res, `/documents/${doc.slug}`, 'document-detail.ejs',
       { doc, relatedDocs: related },
-      lang === 'zh' ? (doc.title_zh || doc.title_en) : (doc.title_en || doc.title_zh),
+      localized(doc, 'title', lang),
       doc.category || 'SDCA document',
       {
         '@context': 'https://schema.org', '@type': 'Document',
-        name: lang === 'zh' ? (doc.title_zh || doc.title_en) : (doc.title_en || doc.title_zh),
+        name: localized(doc, 'title', lang),
         encodingFormat: doc.mime,
       });
   });
@@ -368,7 +353,6 @@ export function registerPhase5Routes(app, bridge) {
   // ---------- /archive (Phase 8 — content preservation) ----------
   app.get('/:lang/archive', function (req, res) {
     const lang = req.params.lang;
-    if (!SUPPORTED.includes(lang)) return notFound(req, res);
     const pg = db.prepare('SELECT * FROM pages WHERE slug = ?').get('archive');
     const bf = pg ? bodyFor(pg, lang) : { html: '', note: null };
     // Archived PDFs: older documents not in the main library (school-year specific,
@@ -378,18 +362,17 @@ export function registerPhase5Routes(app, bridge) {
     ).all();
     page(lang, req, res, '/archive', 'content-page.ejs',
       { pg, mdBody: bf.html, bodyNote: bf.note, archivedDocs },
-      lang === 'zh' ? '檔案' : 'Archive',
-      lang === 'zh' ? '保存原網站的舊文章、通告與 PDF。' : 'Older posts, notices and PDFs from the original site.',
+      pickLang(lang, 'Archive', '檔案'),
+      pickLang(lang, 'Older posts, notices and PDFs from the original site.', '保存原網站的舊文章、通告與 PDF。'),
       {
         '@context': 'https://schema.org', '@type': 'CollectionPage',
-        name: lang === 'zh' ? 'SDCA 檔案' : 'SDCA Archive',
+        name: pickLang(lang, 'SDCA Archive', 'SDCA 檔案'),
       });
   });
 
   // ---------- /programs/bell (Bell Schedule & Textbooks) ----------
   app.get('/:lang/programs/bell', function (req, res) {
     const lang = req.params.lang;
-    if (!SUPPORTED.includes(lang)) return notFound(req, res);
     const bellTimes = setting(db, 'bell_times', lang);
     const classDays = setting(db, 'class_days', lang);
     const textbooks = db.prepare(
@@ -407,34 +390,32 @@ export function registerPhase5Routes(app, bridge) {
     const allDocs = [...textbooks, ...calendar];
     page(lang, req, res, '/programs/bell', 'content-page.ejs',
       { pg: { title_en: 'Bell Schedule & Textbooks', title_zh: '鐘點表與教材' }, mdBody: bodyHtml, bodyNote: null, archivedDocs: allDocs },
-      lang === 'zh' ? '鐘點表與教材' : 'Bell Schedule & Textbooks',
-      lang === 'zh' ? '上課時間、教材清單與教室地圖。' : 'Class times, textbook lists and classroom maps.',
+      pickLang(lang, 'Bell Schedule & Textbooks', '鐘點表與教材'),
+      pickLang(lang, 'Class times, textbook lists and classroom maps.', '上課時間、教材清單與教室地圖。'),
       null);
   });
 
   // ---------- /search?q= ----------
   app.get('/:lang/search', function (req, res) {
     const lang = req.params.lang;
-    if (!SUPPORTED.includes(lang)) return notFound(req, res);
     const q = String(req.query.q || '').trim();
     const { rows, engine } = searchContent(db, q, { limit: 30, lang });
     page(lang, req, res, '/search', 'search.ejs',
       { q, rows, engine },
-      lang === 'zh' ? '搜尋' : 'Search',
-      lang === 'zh' ? '搜尋 SDCA 網站。' : 'Search the SDCA website.');
+      pickLang(lang, 'Search', '搜尋'),
+      pickLang(lang, 'Search the SDCA website.', '搜尋 SDCA 網站。'));
   });
 
   // ---------- /privacy, /disclaimer ----------
   for (const slug of ['privacy', 'disclaimer']) {
     app.get(`/:lang/${slug}`, function (req, res) {
       const lang = req.params.lang;
-      if (!SUPPORTED.includes(lang)) return notFound(req, res);
       const pg = db.prepare('SELECT * FROM pages WHERE slug = ?').get(slug);
       const bf = pg ? bodyFor(pg, lang) : { html: '', note: null };
       page(lang, req, res, `/${slug}`, usePorted(db, slug, 'static-page.ejs'),
         { pg, mdBody: bf.html, bodyNote: bf.note, ...portedCtx(db, slug, lang) },
-        pg ? pickTitle(pg, lang) : slug,
-        lang === 'zh' ? 'SDCA 法律頁面。' : 'SDCA legal page.');
+        pg ? localized(pg, 'title', lang) : slug,
+        pickLang(lang, 'SDCA legal page.', 'SDCA 法律頁面。'));
     });
   }
 

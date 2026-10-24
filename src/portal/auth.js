@@ -4,9 +4,8 @@ import { nowUtc } from '../datetime.js';
 import { hashPassword, verifyPassword } from '../admin/auth.js';
 import { audit } from './crud.js';
 import { loadAccess } from './perm.js';
+import { isLocked, recordFailure, clearFailures } from '../auth/lockout.js';
 
-const MAX_FAILS = 5;
-const LOCK_MINUTES = 15;
 export const RESET_HOURS = 6;
 export const INVITE_HOURS = 72;
 const iso = (d) => nowUtc(d);
@@ -31,19 +30,16 @@ export function attemptLogin(db, username, password, ip = '') {
   // whether a username exists, is locked, disabled or pending. Those states show only after the right password.
   const ok = verifyPassword(password, u ? u.password_hash : 'aa:bb');
   if (!u) return { ok: false, error: 'invalid' };
-  const locked = !!(u.locked_until && u.locked_until > nowIso());
+  const locked = isLocked(u);
   if (!ok) {
-    if (u.status === 'active' && !locked) {
-      const fails = (u.failed_attempts || 0) + 1;
-      if (fails >= MAX_FAILS) db.prepare('UPDATE users SET failed_attempts = 0, locked_until = ? WHERE id = ?').run(iso(new Date(Date.now() + LOCK_MINUTES * 60000)), u.id);
-      else db.prepare('UPDATE users SET failed_attempts = ? WHERE id = ?').run(fails, u.id);
-    }
+    if (u.status === 'active' && !locked) recordFailure(db, 'users', u);
     audit(db, 'users', u.id, 'login_failed', null, null, u.id, ip);
     return { ok: false, error: 'invalid' };
   }
   if (u.status === 'disabled' || u.status === 'pending') return { ok: false, error: u.status };
   if (locked) return { ok: false, error: 'locked' };
-  db.prepare('UPDATE users SET failed_attempts = 0, locked_until = NULL, last_login_at = ? WHERE id = ?').run(nowIso(), u.id);
+  clearFailures(db, 'users', u.id);
+  db.prepare('UPDATE users SET last_login_at = ? WHERE id = ?').run(nowIso(), u.id);
   audit(db, 'users', u.id, 'login', null, null, u.id, ip);
   return { ok: true, user: u };
 }

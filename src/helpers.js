@@ -2,8 +2,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { marked } from 'marked';
-import sanitizeHtml from 'sanitize-html';
+import { sanitizeRich } from './sanitize.js';
 import { config } from './config.js';
+import { localized } from './i18n/index.js';
 
 /**
  * Load the image manifest once. Returns { name: {sw, sh, alt_en, alt_zh, files:[{file,w,h}], role, source} }
@@ -51,9 +52,7 @@ export function imgUrl(v) {
 /** Get a settings row value for the given language (falls back to the other language). */
 export function setting(db, key, lang) {
   const row = db.prepare('SELECT value_en, value_zh FROM settings WHERE key = ?').get(key);
-  if (!row) return '';
-  if (lang === 'zh') return row.value_zh || row.value_en || '';
-  return row.value_en || row.value_zh || '';
+  return row ? localized(row, 'value', lang) : '';
 }
 
 /** Fetch a page row by slug. */
@@ -65,18 +64,7 @@ export function pageBySlug(db, slug) {
 export function mdToHtml(md, { title = '' } = {}) {
   if (!md) return '';
   const raw = marked.parse(md, { mangle: false, headerIds: false, breaks: false });
-  return withAssetUrls(withPdfTargets(sanitizeHtml(raw, {
-    allowedTags: [
-      'h1', 'h2', 'h3', 'h4', 'h5', 'p', 'ul', 'ol', 'li', 'strong', 'em', 'del',
-      'a', 'code', 'pre', 'blockquote', 'table', 'thead', 'tbody', 'tr', 'th', 'td',
-      'br', 'hr', 'span', 'img', 'details', 'summary',
-    ],
-    allowedAttributes: {
-      a: ['href', 'title', 'rel', 'target'],
-      img: ['src', 'alt', 'width', 'height'],
-    },
-    allowedSchemes: ['http', 'https', 'mailto', 'tel'],
-  })));
+  return withAssetUrls(withPdfTargets(sanitizeRich(raw)));
 }
 
 /**
