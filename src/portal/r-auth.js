@@ -7,6 +7,7 @@ import {
   attemptLogin, queueEmail, createPasswordReset, findReset, findInvitation, phoneMatchesFamily, phoneMatchesPerson, setPassword, markUsed, passwordPolicyError,
 } from './auth.js';
 import { verifyPassword } from '../admin/auth.js';
+import { recordLogin } from '../login-events.js';
 
 export const DEMO_EMAIL = process.env.PORTAL_EMAIL_MODE !== 'smtp';
 
@@ -24,6 +25,7 @@ export function registerAuthRoutes(app, { db, page, requireLogin, isStaticBuild 
   });
   app.post(`${R}/signin`, skipStatic, loginLimiter, csrfMiddleware, (req, res) => {
     const r = attemptLogin(db, s(req.body.username), String(req.body.password || ''), req.ip);
+    recordLogin(db, { area: 'portal', event: r.ok ? 'login' : 'login_failed', username: s(req.body.username), userId: r.ok ? r.user.id : null, ip: req.ip, userAgent: req.get('user-agent'), detail: r.ok ? '' : r.error });
     if (!r.ok) {
       const msg = { locked: 'Account temporarily locked. Try again in 15 minutes. 帳戶暫時鎖定，請十五分鐘後再試。', pending: 'Account not activated yet. 帳戶尚未啟用。', disabled: 'Account disabled. 帳戶已停用。' }[r.error]
         || 'Invalid username or password. 用戶名稱或密碼錯誤。';
@@ -39,6 +41,7 @@ export function registerAuthRoutes(app, { db, page, requireLogin, isStaticBuild 
   });
   app.post(`${R}/signout`, csrfMiddleware, (req, res) => {
     const l = lang(req);
+    if (req.portal) recordLogin(db, { area: 'portal', event: 'logout', username: req.portal.user.username, userId: req.portal.user.id, ip: req.ip, userAgent: req.get('user-agent') });
     req.session.regenerate(() => res.redirect(`/${l}/portal/signin`));
   });
 

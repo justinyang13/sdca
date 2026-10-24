@@ -22,6 +22,7 @@ async function main() {
     if (pass !== pass2) { console.error('Passwords do not match'); process.exit(1); }
   }
   if (!user || !pass) { console.error('Username and password are required'); process.exit(1); }
+  if (pass.length < 12 || pass.toLowerCase() === user.toLowerCase()) { console.error('Admin password must be at least 12 characters and not the username'); process.exit(1); }
   const db = openDb();
   migrate(db);
   const existing = db.prepare('SELECT id FROM admin_users WHERE username = ?').get(user);

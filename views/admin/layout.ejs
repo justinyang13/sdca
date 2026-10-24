@@ -28,6 +28,7 @@
       <a href="/admin/inbox">Inbox</a>
       <a href="/admin/subscribers">Subs</a>
       <a href="/admin/audit">Audit</a>
+      <% if (user && user.role === 'admin') { %><a href="/admin/logins">Logins</a><% } %>
     </nav>
     <div class="admin-user">
       <span class="admin-user-name"><%= user && user.username ? user.username : 'guest' %></span>

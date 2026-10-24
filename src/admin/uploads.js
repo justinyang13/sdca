@@ -50,3 +50,24 @@ export const uploader = multer({
     return cb(null, true);
   },
 });
+
+const startsWith = (b, bytes) => bytes.every((x, i) => b[i] === x);
+const MAGIC = {
+  '.pdf': (b) => startsWith(b, [0x25, 0x50, 0x44, 0x46]),
+  '.png': (b) => startsWith(b, [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+  '.jpg': (b) => startsWith(b, [0xff, 0xd8, 0xff]),
+  '.jpeg': (b) => startsWith(b, [0xff, 0xd8, 0xff]),
+  '.docx': (b) => startsWith(b, [0x50, 0x4b, 0x03, 0x04]),
+  '.xlsx': (b) => startsWith(b, [0x50, 0x4b, 0x03, 0x04]),
+};
+
+/** After multer saved the file: its first bytes must match its extension, otherwise delete it (req.file is cleared, req.uploadRejected set). */
+export function verifyUploadContent(req, res, next) {
+  const f = req.file;
+  if (!f) return next();
+  let head = Buffer.alloc(0);
+  try { const fd = fs.openSync(f.path, 'r'); head = Buffer.alloc(16); fs.readSync(fd, head, 0, 16, 0); fs.closeSync(fd); } catch { /* unreadable: reject below */ }
+  const ok = MAGIC[extOf(f.originalname)];
+  if (!ok || !ok(head)) { fs.rmSync(f.path, { force: true }); req.file = undefined; req.uploadRejected = true; }
+  next();
+}

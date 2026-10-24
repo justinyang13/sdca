@@ -73,9 +73,9 @@ test('helpers: mdToHtml sanitises (no scripts, handlers or javascript: links) an
 });
 
 // ------------------------------------------------------------------ passwords, CSV, coercion, validation
-test('auth: password policy (8+ characters) and scrypt hashing', async () => {
+test('auth: password policy (10+ characters with a letter and a number) and scrypt hashing', async () => {
   const { passwordPolicyError } = await import('../src/portal/auth.js'); const { hashPassword, verifyPassword } = await import('../src/admin/auth.js');
-  assert.ok(passwordPolicyError('short')); assert.ok(passwordPolicyError('')); assert.ok(passwordPolicyError(null)); assert.equal(passwordPolicyError('longenough'), null);
+  assert.ok(passwordPolicyError('short')); assert.ok(passwordPolicyError('')); assert.ok(passwordPolicyError(null)); assert.ok(passwordPolicyError('longenough'), 'needs a number'); assert.ok(passwordPolicyError('1234567890'), 'needs a letter'); assert.ok(passwordPolicyError('abc12345'), 'under 10'); assert.equal(passwordPolicyError('longenough1'), null);
   const h = hashPassword('secret-pass'); assert.notEqual(h, 'secret-pass'); assert.ok(verifyPassword('secret-pass', h)); assert.equal(verifyPassword('wrong', h), false);
   assert.equal(h === hashPassword('secret-pass'), false, 'salted'); assert.equal(verifyPassword('x', ''), false); assert.equal(verifyPassword('x', 'garbage'), false); assert.equal(verifyPassword('x', 'aa:bb'), false, 'wrong-length hash is a clean "no", not an error');
 });

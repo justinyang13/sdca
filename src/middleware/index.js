@@ -75,6 +75,7 @@ export function buildHelmet() {
 export function applyBaseMiddleware(app) {
   app.disable('x-powered-by');
   app.use(buildHelmet());
+  app.use((req, res, next) => { res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()'); next(); });
   app.use(compression());
   // General page/asset limiter is OFF by default (a photo page loads 200+ images and
   // tripped it, breaking images). Set RATE_LIMIT=<n> to enable. Form/login limiters stay on.

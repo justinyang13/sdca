@@ -1,0 +1,71 @@
+<%# logins.ejs — sign-in activity for the admin site and the family portal (admins only) %>
+<h1>Login activity</h1>
+<p class="muted">Admin site and family portal sign-ins and sign-outs. Idle time-outs are not recorded as sign-outs. Times are UTC. Earlier admin sign-ins were imported without an IP address.</p>
+
+<div class="cards">
+  <div class="card"><strong><%= logins7 %></strong><br>sign-ins, last 7 days</div>
+  <div class="card"><strong><%= failed7 %></strong><br>failed attempts, last 7 days</div>
+  <div class="card"><strong><%= ips7 %></strong><br>different IP addresses, last 7 days</div>
+</div>
+
+<form method="get" action="/admin/logins" class="filters">
+  <label>Area
+    <select name="area">
+      <option value="">All</option>
+      <option value="admin" <%= filters.area === 'admin' ? 'selected' : '' %>>Admin site</option>
+      <option value="portal" <%= filters.area === 'portal' ? 'selected' : '' %>>Family portal</option>
+    </select></label>
+  <label>Event
+    <select name="event">
+      <option value="">All</option>
+      <option value="login" <%= filters.event === 'login' ? 'selected' : '' %>>Sign-in</option>
+      <option value="login_failed" <%= filters.event === 'login_failed' ? 'selected' : '' %>>Failed</option>
+      <option value="logout" <%= filters.event === 'logout' ? 'selected' : '' %>>Sign-out</option>
+    </select></label>
+  <label>Period
+    <select name="days">
+      <option value="">All time</option>
+      <option value="1" <%= String(filters.days) === '1' ? 'selected' : '' %>>Last 24 hours</option>
+      <option value="7" <%= String(filters.days) === '7' ? 'selected' : '' %>>Last 7 days</option>
+      <option value="30" <%= String(filters.days) === '30' ? 'selected' : '' %>>Last 30 days</option>
+    </select></label>
+  <label>User or IP <input type="text" name="q" value="<%= filters.q %>" maxlength="60"></label>
+  <button type="submit" class="btn">Filter</button>
+</form>
+
+<% if (failedIps.length) { %>
+<h2>IP addresses with 3+ failed attempts (7 days)</h2>
+<table class="table">
+  <thead><tr><th>IP</th><th>Failed</th><th>Last attempt</th></tr></thead>
+  <tbody><% for (const r of failedIps) { %><tr><td><%= r.ip %></td><td><%= r.n %></td><td><%= r.last_at %></td></tr><% } %></tbody>
+</table>
+<% } %>
+
+<h2>Recent activity <span class="muted">(<%= rows.length %> shown, newest first)</span></h2>
+<table class="table">
+  <thead><tr><th>When (UTC)</th><th>Area</th><th>Event</th><th>User</th><th>IP</th><th>Detail</th><th>Browser</th></tr></thead>
+  <tbody>
+    <% for (const r of rows) { %>
+    <tr>
+      <td><%= r.at %></td>
+      <td><%= r.area === 'admin' ? 'Admin site' : 'Family portal' %></td>
+      <td><%= { login: 'Sign-in', login_failed: 'FAILED', logout: 'Sign-out' }[r.event] %></td>
+      <td><%= r.username || '—' %></td>
+      <td><%= r.ip || '—' %></td>
+      <td><%= r.detail || '' %></td>
+      <td title="<%= r.user_agent %>"><%= (r.user_agent || '').slice(0, 40) %></td>
+    </tr>
+    <% } %>
+    <% if (!rows.length) { %><tr><td colspan="7">Nothing matches.</td></tr><% } %>
+  </tbody>
+</table>
+
+<h2>Last sign-in per account</h2>
+<table class="table">
+  <thead><tr><th>Area</th><th>User</th><th>Last sign-in (UTC)</th><th>Sign-ins</th></tr></thead>
+  <tbody>
+    <% for (const r of lastSeen) { %>
+    <tr><td><%= r.area === 'admin' ? 'Admin site' : 'Family portal' %></td><td><%= r.username %></td><td><%= r.last_login %></td><td><%= r.logins %></td></tr>
+    <% } %>
+  </tbody>
+</table>

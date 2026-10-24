@@ -20,22 +20,29 @@ export function queueEmail(db, { to, template, subject, body, relatedType = '', 
 }
 
 export function passwordPolicyError(pw) {
-  if (!pw || String(pw).length < 8) return 'Password must be at least 8 characters 密碼至少八個字';
+  if (!pw || String(pw).length < 10) return 'Password must be at least 10 characters 密碼至少十個字';
+  if (!/[A-Za-z]/.test(pw) || !/\d/.test(pw)) return 'Password must contain a letter and a number 密碼須包含字母與數字';
   return null;
 }
 
 export function attemptLogin(db, username, password, ip = '') {
   const u = db.prepare('SELECT * FROM users WHERE username = ? AND deleted_at IS NULL').get(String(username || '').trim());
-  if (!u) { verifyPassword('x', 'aa:bb'); return { ok: false, error: 'invalid' }; }
-  if (u.status === 'disabled' || u.status === 'pending') return { ok: false, error: u.status };
-  if (u.locked_until && u.locked_until > nowIso()) return { ok: false, error: 'locked' };
-  if (!verifyPassword(password, u.password_hash)) {
-    const fails = (u.failed_attempts || 0) + 1;
-    if (fails >= MAX_FAILS) db.prepare('UPDATE users SET failed_attempts = 0, locked_until = ? WHERE id = ?').run(iso(new Date(Date.now() + LOCK_MINUTES * 60000)), u.id);
-    else db.prepare('UPDATE users SET failed_attempts = ? WHERE id = ?').run(fails, u.id);
+  // Always hash, and answer a wrong password the same way whatever the account's state, so the response never reveals
+  // whether a username exists, is locked, disabled or pending. Those states show only after the right password.
+  const ok = verifyPassword(password, u ? u.password_hash : 'aa:bb');
+  if (!u) return { ok: false, error: 'invalid' };
+  const locked = !!(u.locked_until && u.locked_until > nowIso());
+  if (!ok) {
+    if (u.status === 'active' && !locked) {
+      const fails = (u.failed_attempts || 0) + 1;
+      if (fails >= MAX_FAILS) db.prepare('UPDATE users SET failed_attempts = 0, locked_until = ? WHERE id = ?').run(iso(new Date(Date.now() + LOCK_MINUTES * 60000)), u.id);
+      else db.prepare('UPDATE users SET failed_attempts = ? WHERE id = ?').run(fails, u.id);
+    }
     audit(db, 'users', u.id, 'login_failed', null, null, u.id, ip);
-    return { ok: false, error: fails >= MAX_FAILS ? 'locked' : 'invalid' };
+    return { ok: false, error: 'invalid' };
   }
+  if (u.status === 'disabled' || u.status === 'pending') return { ok: false, error: u.status };
+  if (locked) return { ok: false, error: 'locked' };
   db.prepare('UPDATE users SET failed_attempts = 0, locked_until = NULL, last_login_at = ? WHERE id = ?').run(nowIso(), u.id);
   audit(db, 'users', u.id, 'login', null, null, u.id, ip);
   return { ok: true, user: u };
