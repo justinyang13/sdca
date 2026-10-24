@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="<%= asset('/css/phase5.css') %>">
   <link rel="stylesheet" href="<%= asset('/css/portal.css') %>">
   <link rel="stylesheet" href="<%= asset('/css/portal-app.css') %>">
+  <link rel="stylesheet" href="<%= asset('/css/chat.css') %>">
 <% if (typeof jsonLd !== 'undefined' && jsonLd) { %>
   <script type="application/ld+json"><%- JSON.stringify(jsonLd) %></script>
 <% } %>
@@ -52,5 +53,6 @@
   <script type="module" src="<%= asset('/js/portal.js') %>" defer></script>
   <script type="module" src="<%= asset('/js/portal-app.js') %>" defer></script>
   <script type="module" src="<%= asset('/js/hero-carousel.js') %>" defer></script>
+  <script type="module" src="<%= asset('/js/chat.js') %>" defer></script>
 </body>
 </html>

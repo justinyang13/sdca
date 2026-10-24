@@ -15,12 +15,18 @@ import { createUser, createPerson, createFamily, addFamilyMember } from '../src/
 import { computeRegistration } from '../src/portal/fees.js';
 import { gradeLabel } from '../src/portal/grades.js';
 import { audit } from '../src/portal/crud.js';
+import { config } from '../src/config.js';
+import { isLiveTarget, DEMO_TABLES } from '../src/db/guard.js';
 
 /** Password of every demo account (demo data only; override with DEMO_PASSWORD). */
 const DEMO_PASSWORD = process.env.DEMO_PASSWORD || 'Demo@sdca!';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DEMO = process.argv.includes('--demo');
+if (DEMO && isLiveTarget()) {
+  console.error('Refusing to load demo data into the live database (data/sdca.db). Use: npm run demo:seed  (DATASET=demo -> data/demo.db)');
+  process.exit(1);
+}
 const db = openDb();
 applyMigrations(db);
 const q = (sql, ...a) => db.prepare(sql).run(...a);
@@ -98,6 +104,7 @@ function seedLookups() {
 }
 
 function seedFees() {
+  if (isLiveTarget()) return;   // placeholder fees never go into the live DB; staff enter the real ones
   const types = Object.fromEntries(all('SELECT id, code FROM class_types').map((c) => [c.code, c.id]));
   for (const y of all('SELECT * FROM school_years WHERE label IN (?,?,?)', '2025-2026', '2026-2027', '2027-2028')) {
     if (one('SELECT id FROM fee_schedules WHERE school_year_id = ? AND deleted_at IS NULL', y.id)) continue;
@@ -116,7 +123,7 @@ function seedFees() {
       ['service_fee', 'Service Fee (refundable after volunteer duty)', '代勞費 (完成義工後退還)', 10000, 'family', null, null, null, null, 10],
       ['scrip_deposit', 'Scrip Deposit', '禮券訂金', 0, 'family', null, null, null, null, 11],
     ];
-    for (const r of rows) q('INSERT INTO fee_schedules (school_year_id, code, name_en, name_zh, amount_cents, applies_to, class_type_id, percent, from_nth_child, deadline, active, sort) VALUES (?,?,?,?,?,?,?,?,?,?,1,?)',
+    for (const r of rows) q('INSERT INTO fee_schedules (school_year_id, code, name_en, name_zh, amount_cents, applies_to, class_type_id, percent, from_nth_child, deadline, active, sort, is_demo) VALUES (?,?,?,?,?,?,?,?,?,?,1,?,1)',
       y.id, r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9]);
     // withdrawal fee schedule, expressed in the year's own dates
     const d = (base, n) => { const t = new Date(base + 'T00:00:00Z'); t.setUTCDate(t.getUTCDate() + n); return t.toISOString().slice(0, 10); };
@@ -373,6 +380,7 @@ function demo() {
   const loginFile = process.env.PORTAL_LOGINS_FILE || path.join(ROOT, 'data', 'PORTAL-DEMO-LOGINS.txt');
   fs.writeFileSync(loginFile, out.join('\n') + '\n');
   const count = (t) => one(`SELECT COUNT(*) n FROM ${t}`).n;
+  for (const t of DEMO_TABLES) q(`UPDATE ${t} SET is_demo = 1`);   // everything in these tables came from this demo load
   console.log(`demo loaded: ${count('families')} families, ${count('persons')} people, ${count('enrollments')} enrollments, ${count('transactions')} transactions, ${count('users')} users`);
   console.log('logins → data/PORTAL-DEMO-LOGINS.txt');
 }
@@ -382,6 +390,7 @@ db.exec('BEGIN');
 try {
   seedLookups();
   if (DEMO) demo();
+  if (config.dataset === 'demo') q("UPDATE settings SET value_en = 'demo' WHERE key = 'dataset'");
   db.exec('COMMIT');
 } catch (e) { db.exec('ROLLBACK'); throw e; }
 console.log(`portal reference data ready (${one('SELECT COUNT(*) n FROM permissions').n} permissions, ${one('SELECT COUNT(*) n FROM roles').n} roles)`);

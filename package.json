@@ -9,6 +9,8 @@
   },
   "scripts": {
     "start": "node src/server.js",
+    "start:demo": "DATASET=demo PORT=3300 node src/server.js",
+    "demo:seed": "DATASET=demo node scripts/portal-seed.js --demo",
     "dev": "NODE_ENV=development node --watch src/server.js",
     "test": "node --test tests/",
     "migrate": "node src/db/run-migrate.js",

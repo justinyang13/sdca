@@ -36,7 +36,10 @@ export const config = {
   sessionIdleMinutes: Math.max(1, Number(process.env.SESSION_IDLE_MINUTES) || 30),
   root,
   dataDir: process.env.DATA_DIR || path.join(root, 'data'),
-  dbFile: process.env.DB_FILE || path.join(root, 'data', 'sdca.db'),
+  /** 'live' (real school data, default) or 'demo' (invented people/classes/fees). Each has its own DB file; see src/db/guard.js. */
+  dataset: process.env.DATASET === 'demo' ? 'demo' : 'live',
+  dbFile: process.env.DB_FILE || path.join(process.env.DATA_DIR || path.join(root, 'data'), process.env.DATASET === 'demo' ? 'demo.db' : 'sdca.db'),
+  liveDbFile: path.join(process.env.DATA_DIR || path.join(root, 'data'), 'sdca.db'),
   publicDir: path.join(root, 'public'),
   viewsDir: path.join(root, 'views'),
   storageDir: path.join(root, 'storage'),

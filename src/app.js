@@ -13,6 +13,7 @@ import { imageManifest, withPdfTargets, assetUrl, withAssetUrls } from './helper
 import { blockHelpers } from './block-helpers.js';
 import { registerPublicRoutes } from './routes-public.js';
 import { registerPhase5Routes } from './routes-phase5.js';
+import { registerChatRoutes } from './chat/routes.js';
 import { registerAdminRoutes } from './admin/routes.js';
 import { registerPortalRoutes } from './portal/index.js';
 import { markPortalButtons } from './portal/public-links.js';
@@ -120,6 +121,8 @@ export function createApp({ db = openDb() } = {}) {
 
   // files requested with ?v=<hash> (see asset()) never change under that URL → cache them for a year; everything else for an hour
   app.use(express.static(config.publicDir, { maxAge: '1h', etag: true, setHeaders: (res) => { if (res.req?.query?.v) res.setHeader('Cache-Control', 'public, max-age=31536000, immutable'); } }));
+
+  registerChatRoutes(app, { db });
 
   // ---------- Admin (mounted before /:lang routing) ----------
   registerAdminRoutes(app, { db });

@@ -1,0 +1,37 @@
+[
+ {
+  "q_en": "When is the first day of school and registration for 2026-27?",
+  "q_zh": "2026-27學年何時開學與註冊？",
+  "a_en": "The first day of school is September 13, 2026, which is also in-person registration day at the office. We no longer accept registration by mail.",
+  "a_zh": "2026年9月13日開學，當天請到辦公室辦理註冊。我們不再接受郵寄註冊。",
+  "url": "/en/enroll"
+ },
+ {
+  "q_en": "How do I register my child? Is there an online portal?",
+  "q_zh": "如何為孩子註冊？有網上註冊嗎？",
+  "a_en": "New families sign up and returning students sign in through the registration portal at https://register.sandiegochineseschool.com (also reachable from the Enroll page). Questions: Office.SDCA@gmail.com or (858) 205-7322.",
+  "a_zh": "新家庭註冊與舊生登入請使用註冊網站 https://register.sandiegochineseschool.com（也可從註冊頁面進入）。如有問題請洽 Office.SDCA@gmail.com 或 (858) 205-7322。",
+  "url": "/en/enroll"
+ },
+ {
+  "q_en": "Where is the school and when are classes held?",
+  "q_zh": "學校在哪裡？何時上課？",
+  "a_en": "SDCA meets on Sunday afternoons at La Jolla Country Day School in La Jolla. Mailing address: P.O. Box 910093, San Diego, CA 92191-0093. Please do not call La Jolla Country Day School; call the SDCA office instead.",
+  "a_zh": "學苑於週日下午在拉荷亞鄉村日校 (La Jolla Country Day School) 上課。郵寄地址：P.O. Box 910093, San Diego, CA 92191-0093。請勿致電拉荷亞鄉村日校，請聯絡學苑辦公室。",
+  "url": "/en/contact"
+ },
+ {
+  "q_en": "How do I contact the school office?",
+  "q_zh": "如何聯絡學校辦公室？",
+  "a_en": "Email Office.SDCA@gmail.com or call (858) 205-SDCA (7322). You can also text @sdcaparent to 81010.",
+  "a_zh": "電郵 Office.SDCA@gmail.com，或致電 (858) 205-SDCA (7322)。也可傳簡訊 @sdcaparent 至 81010。",
+  "url": "/en/contact"
+ },
+ {
+  "q_en": "What classes does SDCA offer?",
+  "q_zh": "學苑開設哪些班級？",
+  "a_en": "SDCA teaches Mandarin and Chinese culture from Pre-K to Grade 12, plus adults. Class types: Pre-K, ZhuYin, PinYin, Regular, Bilingual, Credit and Adult classes.",
+  "a_zh": "學苑提供學前班到十二年級及成人的中文與文化課程，班級包括：學前班、注音班、拼音班、普通班、雙語班、學分班、成人班。",
+  "url": "/en/programs/classes"
+ }
+]
