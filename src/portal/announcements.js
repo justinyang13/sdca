@@ -6,12 +6,13 @@ import { placementVisible } from './r-home.js';
 import { audit } from './crud.js';
 import { queueEmail } from './auth.js';
 import { nowUtc } from '../datetime.js';
+import { classIdsForYear } from '../queries/classes.js';
 
 /** Ids of the classes (this school year) the signed-in user may READ announcements of. */
 export function readableClassIds(db, portal) {
   const a = portal.access; const year = currentYear(db);
   if (!year) return [];
-  if (canAll(a, 'class_announcements.list')) return db.prepare('SELECT id FROM school_classes WHERE school_year_id = ? AND deleted_at IS NULL').all(year.id).map((r) => r.id);
+  if (canAll(a, 'class_announcements.list')) return classIdsForYear(db, year.id);
   const ids = new Set();
   if (can(a, 'class_announcements.post_own')) myClassIds(db, portal.person.id).forEach((id) => ids.add(id));
   const showPlacement = placementVisible(year);
@@ -32,7 +33,7 @@ export function readableClassIds(db, portal) {
 export function postableClassIds(db, portal) {
   const a = portal.access; const year = currentYear(db);
   if (!year) return [];
-  if (canAll(a, 'class_announcements.create')) return db.prepare('SELECT id FROM school_classes WHERE school_year_id = ? AND deleted_at IS NULL').all(year.id).map((r) => r.id);
+  if (canAll(a, 'class_announcements.create')) return classIdsForYear(db, year.id);
   return can(a, 'class_announcements.post_own') ? myClassIds(db, portal.person.id) : [];
 }
 

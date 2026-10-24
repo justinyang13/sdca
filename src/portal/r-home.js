@@ -12,6 +12,8 @@ import { buildOverview, showsOverview } from './overview.js';
 import { visibleAnnouncements } from './announcements.js';
 import { todayLocal, nowUtc } from '../datetime.js';
 import { portalHelpers } from './util.js';
+import { hasSchoolInfo } from '../queries/families.js';
+import { waiverDocuments } from '../queries/volunteers.js';
 
 export function placementVisible(year, today = todayLocal()) {
   if (!year?.first_day) return true;
@@ -34,7 +36,7 @@ export function familyView(db, familyId, { staff = false } = {}) {
         WHERE ca.school_class_id = e.school_class_id AND ar.code = 'primary_instructor' AND ca.deleted_at IS NULL LIMIT 1) AS teacher
       FROM enrollments e LEFT JOIN school_classes sc ON sc.id = e.school_class_id LEFT JOIN rooms rm ON rm.id = sc.room_id LEFT JOIN class_types ct ON ct.id = e.class_type_id
       WHERE e.student_person_id = ? AND e.school_year_id = ? AND e.deleted_at IS NULL AND e.status <> 'withdrawn'`).get(c.id, year.id) : null;
-    const info = year ? db.prepare('SELECT 1 FROM student_school_info WHERE student_person_id = ? AND school_year_id = ? AND deleted_at IS NULL').get(c.id, year.id) : null;
+    const info = year ? (hasSchoolInfo(db, c.id, year.id) || null) : null;
     return { ...c, enrollment: en, showPlacement: visible && en?.school_class_id, hasSchoolInfo: !!info };
   });
   const registrations = year ? db.prepare(`SELECT * FROM registrations WHERE family_id = ? AND school_year_id = ? AND status <> 'cancelled' AND deleted_at IS NULL ORDER BY id DESC`).all(familyId, year.id) : [];
@@ -174,7 +176,7 @@ export function registerHomeRoutes(app, { db, page, requireLogin, requirePerm, i
     page(req, res, 'html-page.ejs', { html: fs.readFileSync(file, 'utf8').replace(/\{\{L\}\}/g, lang(req)), title: 'Privacy Policy' }, { title: 'Privacy Policy', shell: req.portal ? 'app' : 'bare' });
   });
   app.get(`${R}/waiver`, (req, res) => {
-    const docs = db.prepare('SELECT * FROM waiver_documents WHERE deleted_at IS NULL ORDER BY sort, id').all();
+    const docs = waiverDocuments(db);
     page(req, res, 'waiver.ejs', { docs }, { title: 'Waiver', shell: req.portal ? 'app' : 'bare' });
   });
 }

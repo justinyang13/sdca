@@ -1,5 +1,6 @@
 // src/portal/creators.js — helpers that create users, people, families (used by routes and the demo seed).
 import { hashPassword } from '../admin/auth.js';
+import { grantRole } from '../queries/users.js';
 
 export function createUser(db, { personId, username, password, roleCodes = ['parent'], type = 'parent', lang = 'en', actorId = null }) {
   const ut = db.prepare('SELECT id FROM user_types WHERE code = ?').get(type)?.id || null;
@@ -8,7 +9,7 @@ export function createUser(db, { personId, username, password, roleCodes = ['par
   const uid = Number(r.lastInsertRowid);
   for (const code of roleCodes) {
     const rid = db.prepare('SELECT id FROM roles WHERE code = ?').get(code)?.id;
-    if (rid) db.prepare('INSERT INTO user_roles (user_id, role_id, created_by, updated_by) VALUES (?,?,?,?)').run(uid, rid, actorId, actorId);
+    if (rid) grantRole(db, uid, rid, actorId);
   }
   return uid;
 }

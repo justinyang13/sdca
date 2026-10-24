@@ -1,6 +1,6 @@
 <%
   const L = lang;
-  const alt = lang === 'zh' ? 'en' : 'zh';
+  const alt = pickLang(lang, 'zh', 'en');
   const current = (typeof langPath !== 'undefined' && langPath) || '/';
   const year = new Date().getFullYear();
 %>

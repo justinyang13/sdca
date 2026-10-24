@@ -37,3 +37,9 @@
 - Board (9), rooms (22) and 2026-27 classes (18) from the Board page and the 2026-27 classroom map (checked on the rendered page image); fees and withdrawal schedule from `reg-notice.pdf` (2026-27 Registration Notice; it has no scrip-deposit line, so none entered). Persons for board members carry a placeholder gender (not recorded). Teachers, capacities and textbooks are NOT loaded (no current source).
 - Events already matched `2026-27-school-calendar.pdf` (84 calendar rows vs 75 active events, multi-day breaks merged); removed the stray admin "Test" event (soft delete).
 - Chat ignores PDFs about earlier school years (year detected from the text; scripts/extract-pdfs.py). Old registration notices (2019-20, 2020-21) had different tuition. Bump `CURRENT_YEAR_START` in src/chat/sources.js each July.
+
+## 2026-10-24 — Refactor (steps 1–6)
+- One render service (src/web/render.js) for public pages; routes import it instead of receiving a bridge object. Routes renamed by feature: routes-pages.js, routes-content.js.
+- Admin content screens are declared in src/admin/entities.js and built by src/admin/crud.js. Delete is now a soft delete (deleted_at) for events, slides and announcements (their public queries already hide deleted rows); other tables are still removed.
+- Repeated SQL lives in src/queries/*.js (named queries). Shared helpers: sanitize.js, auth/lockout.js, school.js (office contact from settings), i18n pickLang/localized (also available in templates).
+- Tests: tests/support/portalApp.js and adminApp.js replace per-file boot code. Known failing check: parity (3 pages differ from the old site: about-board image, parents-volunteer text, enroll links).

@@ -8,6 +8,9 @@ import { gradeLabel, gradeFromBirth, ageOn, startYear } from './grades.js';
 import { queueEmail } from './auth.js';
 import { portalHelpers } from './util.js';
 import { suggestFor, previousVolunteerJobs, copySchoolInfo, gradeNumber } from './rereg.js';
+import { familyWithAddress, familyName } from '../queries/families.js';
+import { registrationById } from '../queries/registrations.js';
+import { activeJobs, familySignups, addSignups, waiverDocuments } from '../queries/volunteers.js';
 
 const n2 = (s) => String(s || '').trim();
 
@@ -16,8 +19,8 @@ export function registerRegistrationRoutes(app, { db, page, requireLogin }) {
   const R = '/:lang/portal';
   const mayRegister = (req, fid) => (can(req.portal.access, 'registration.own') && ownsFamily(db, req.portal.person.id, fid)) || staffCan(req, 'registrations.update');
   const mayView = (req, fid) => mayRegister(req, fid) || staffCan(req, 'registrations.view') || (can(req.portal.access, 'transactions.own') && ownsFamily(db, req.portal.person.id, fid));
-  const regOf = (id) => db.prepare('SELECT * FROM registrations WHERE id = ? AND deleted_at IS NULL').get(Number(id));
-  const famName = (fid) => db.prepare(`SELECT p.english_last_name || ' ' || p.english_first_name || ' ' || p.chinese_name AS n FROM family_members fm JOIN persons p ON p.id = fm.person_id WHERE fm.family_id = ? AND fm.relationship = 'parent_one' AND fm.deleted_at IS NULL`).get(fid)?.n || `Family #${fid}`;
+  const regOf = (id) => registrationById(db, id);
+  const famName = (fid) => familyName(db, fid);
 
   // The year being registered for: ?year= / posted year when it is open (or staff), otherwise the current year.
   const yearOf = (req) => {
@@ -40,14 +43,14 @@ export function registerRegistrationRoutes(app, { db, page, requireLogin }) {
     const draft = db.prepare("SELECT * FROM registrations WHERE family_id = ? AND school_year_id = ? AND status = 'draft' AND deleted_at IS NULL ORDER BY id DESC").get(fid, year.id);
     const draftItems = draft ? new Map(db.prepare('SELECT * FROM registration_items WHERE registration_id = ?').all(draft.id).map((i) => [i.student_person_id, i])) : new Map();
     const preschoolEligible = db.prepare("SELECT 1 FROM enrollments e JOIN class_types ct ON ct.id = e.class_type_id WHERE e.school_year_id = ? AND ct.code = 'preschool' AND e.student_person_id IN (SELECT person_id FROM family_members WHERE family_id = ?)").get(year.id, fid) ? true : false;
-    const jobs = db.prepare('SELECT * FROM volunteer_jobs WHERE active = 1 AND deleted_at IS NULL ORDER BY sort, id').all();
-    const mine = db.prepare('SELECT * FROM volunteer_signups WHERE family_id = ? AND school_year_id = ? AND deleted_at IS NULL ORDER BY priority').all(fid, year.id);
+    const jobs = activeJobs(db);
+    const mine = familySignups(db, fid, year.id);
     const types = db.prepare('SELECT * FROM class_types WHERE deleted_at IS NULL ORDER BY sort').all().filter((c) => c.code !== 'adult');
     // re-registration: what we know from last year, per child (class type, next grade, graduated?) and the volunteer choices
     const plan = new Map(selectable.map((k) => [k.id, suggestFor(db, k, year)]));
     const rereg = !draft && [...plan.values()].some((p) => p.hadPrevious);
     const prevJobs = rereg && !mine.length ? previousVolunteerJobs(db, fid, year) : [];
-    const fam = db.prepare('SELECT f.*, a.street, a.city, a.state, a.zipcode FROM families f LEFT JOIN addresses a ON a.id = f.address_id WHERE f.id = ?').get(fid);
+    const fam = familyWithAddress(db, fid);
     page(req, res, 'register-1.ejs', {
       plan, rereg, prevJobs, fam, gl2: gradeNumber,
       fid, year, kids, already: already.map((k) => ({ ...k, enrollment: enr.get(k.id) })), selectable, draftItems, types, jobs, preschoolEligible, mine,
@@ -99,7 +102,7 @@ export function registerRegistrationRoutes(app, { db, page, requireLogin }) {
       // volunteer priorities (up to three) belong to the registering parent
       const parent = req.portal.person.id;
       db.prepare("UPDATE volunteer_signups SET deleted_at = datetime('now') WHERE family_id = ? AND school_year_id = ? AND deleted_at IS NULL AND status = 'requested'").run(fid, year.id);
-      prio.forEach((jid, i) => { if (jid) db.prepare('INSERT INTO volunteer_signups (family_id, person_id, school_year_id, job_id, priority, created_by, updated_by) VALUES (?,?,?,?,?,?,?)').run(fid, parent, year.id, jid, i + 1, uid, uid); });
+      addSignups(db, { familyId: fid, personId: parent, yearId: year.id, jobIds: prio, by: uid });
       const copied = copySchoolInfo(db, items.map((i) => i.studentId), year, uid);   // last year's regular-school info → this year (parent reviews it)
       audit(db, 'registrations', rid, 'draft_created', null, { students: items.length, schoolInfoCopied: copied }, uid, req.ip);
       db.exec('COMMIT');
@@ -114,7 +117,7 @@ export function registerRegistrationRoutes(app, { db, page, requireLogin }) {
     if (reg.status !== 'draft') return go(req, res, `/registrations/${reg.id}/form`);
     const year = db.prepare('SELECT * FROM school_years WHERE id = ?').get(reg.school_year_id);
     const young = db.prepare(`SELECT p.birth_date FROM registration_items ri JOIN persons p ON p.id = ri.student_person_id WHERE ri.registration_id = ?`).all(reg.id).some((r) => ageOn(r.birth_date, year.first_day) < 5);
-    const docs = db.prepare('SELECT * FROM waiver_documents WHERE deleted_at IS NULL ORDER BY sort, id').all().filter((d) => !d.applies_under_age || young);
+    const docs = waiverDocuments(db).filter((d) => !d.applies_under_age || young);
     page(req, res, 'register-2.ejs', { reg, docs, year }, { title: 'Registration — Waiver' });
   });
   app.post(`${R}/registrations/:id/waiver`, requireLogin, csrfMiddleware, (req, res) => {

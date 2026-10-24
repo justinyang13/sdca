@@ -28,7 +28,7 @@ export const config = {
   port: Number(process.env.PORT || 3000),
   host: process.env.HOST || '0.0.0.0',
   // https: true when the server is served behind a TLS terminator (or on
-  // https:// URLs directly). The Phase 1 demo runs on plain http over
+  // https:// URLs directly). The demo runs on plain http over
   // Tailscale, so this must stay false — otherwise helmet's
   // upgrade-insecure-requests CSP breaks CSS/JS.
   https: process.env.HTTPS === 'true',

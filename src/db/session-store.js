@@ -9,6 +9,7 @@ class SqliteStore extends session.Store {
     super();
     this.db = db;
     this.name = 'sdca-sqlite';
+    this.writes = 0;
   }
 
   get(sid, cb) {
@@ -23,7 +24,8 @@ class SqliteStore extends session.Store {
     try {
       this.db.prepare(`INSERT INTO sessions (sid, data, expires) VALUES (?, ?, ?)
         ON CONFLICT(sid) DO UPDATE SET data = excluded.data, expires = excluded.expires`).run(sid, JSON.stringify(sess), expiresOf(sess));
-      if (Math.random() < 0.01) this.db.prepare('DELETE FROM sessions WHERE expires IS NOT NULL AND expires < ?').run(Date.now());
+      // sweep expired sessions on every 100th write (a counter, not a dice roll, so behaviour is predictable)
+      if (++this.writes % 100 === 0) this.db.prepare('DELETE FROM sessions WHERE expires IS NOT NULL AND expires < ?').run(Date.now());
       return cb && cb(null);
     } catch (err) { return cb && cb(err); }
   }

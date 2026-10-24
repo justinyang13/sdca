@@ -5,6 +5,8 @@ import { currentYear } from './fees.js';
 import { csvEscape, audit, createRow, updateRow, softDelete } from './crud.js';
 import { ENTITIES } from './entities.js';
 import { s, dollars, num, portalHelpers } from './util.js';
+import { allSchoolYears, withdrawalRules } from '../queries/schoolYears.js';
+import { classById, classAssignmentById } from '../queries/classes.js';
 
 
 export function registerStaffRoutes(app, { db, page, requireLogin }) {
@@ -25,7 +27,7 @@ export function registerStaffRoutes(app, { db, page, requireLogin }) {
   // ---------- class roster: classes with teachers, room parents, and the assignments (add / change / remove) ----------
   const ROLE_TEACH = ['primary_instructor', 'assistant_instructor', 'teaching_assistant', 'substitute'];
   const rosterData = (req) => {
-    const years = db.prepare('SELECT * FROM school_years WHERE deleted_at IS NULL ORDER BY label DESC').all();
+    const years = allSchoolYears(db);
     const year = years.find((y) => y.id === Number(req.query.year)) || currentYear(db);
     const q = String(req.query.q || '').trim();
     const type = Number(req.query.type) || null; const status = String(req.query.status || '');
@@ -73,7 +75,7 @@ export function registerStaffRoutes(app, { db, page, requireLogin }) {
   const backToRoster = (req, res, classId, msg, type = 'ok') => { req.session.portalFlash = { type, msg }; res.redirect(`/${req.params.lang}/portal/class-roster?open=${classId}${req.body._year ? '&year=' + encodeURIComponent(req.body._year) : ''}#class-${classId}`); };
   app.post(`${R}/class-roster/assignments`, requireLogin, csrfMiddleware, (req, res) => {
     if (!staffCan(req, 'assignments.create')) return forbidden(req, res);
-    const cls = db.prepare('SELECT * FROM school_classes WHERE id = ? AND deleted_at IS NULL').get(Number(req.body.school_class_id));
+    const cls = classById(db, req.body.school_class_id);
     const person = Number(req.body.person_id); const role = Number(req.body.assignment_role_id);
     if (!cls) return go(req, res, '/class-roster');
     if (!person || !db.prepare('SELECT 1 FROM persons WHERE id = ? AND deleted_at IS NULL').get(person) || !db.prepare('SELECT 1 FROM assignment_roles WHERE id = ?').get(role))
@@ -84,7 +86,7 @@ export function registerStaffRoutes(app, { db, page, requireLogin }) {
   });
   app.post(`${R}/class-roster/assignments/:id`, requireLogin, csrfMiddleware, (req, res) => {
     if (!staffCan(req, 'assignments.update')) return forbidden(req, res);
-    const a = db.prepare('SELECT * FROM class_assignments WHERE id = ? AND deleted_at IS NULL').get(Number(req.params.id));
+    const a = classAssignmentById(db, req.params.id);
     if (!a) return go(req, res, '/class-roster');
     const role = Number(req.body.assignment_role_id) || a.assignment_role_id;
     updateRow(db, ENTITIES.class_assignments, a.id, { assignment_role_id: role, start_date: s(req.body.start_date) || null, end_date: s(req.body.end_date) || null }, req.portal.user.id, req.ip);
@@ -92,7 +94,7 @@ export function registerStaffRoutes(app, { db, page, requireLogin }) {
   });
   app.post(`${R}/class-roster/assignments/:id/delete`, requireLogin, csrfMiddleware, (req, res) => {
     if (!staffCan(req, 'assignments.delete')) return forbidden(req, res);
-    const a = db.prepare('SELECT * FROM class_assignments WHERE id = ? AND deleted_at IS NULL').get(Number(req.params.id));
+    const a = classAssignmentById(db, req.params.id);
     if (!a) return go(req, res, '/class-roster');
     softDelete(db, ENTITIES.class_assignments, a.id, req.portal.user.id, req.ip);
     backToRoster(req, res, a.school_class_id, 'Assignment removed. 已移除。');
@@ -120,10 +122,10 @@ export function registerStaffRoutes(app, { db, page, requireLogin }) {
   // ---------- fees: everything for one school year in one place ----------
   const FEE_CODES = ENTITIES.fee_schedules.fields.find((f) => f.name === 'code').options;
   function feesPage(req, res, yearId, errors = {}, status = 200) {
-    const years = db.prepare('SELECT * FROM school_years WHERE deleted_at IS NULL ORDER BY label DESC').all();
+    const years = allSchoolYears(db);
     const year = years.find((y) => y.id === yearId) || currentYear(db);
     const fees = db.prepare('SELECT f.*, ct.name_en AS ct_en FROM fee_schedules f LEFT JOIN class_types ct ON ct.id = f.class_type_id WHERE f.school_year_id = ? AND f.deleted_at IS NULL ORDER BY f.sort, f.id').all(year.id);
-    const rules = db.prepare('SELECT * FROM withdrawal_fee_rules WHERE school_year_id = ? AND deleted_at IS NULL ORDER BY sort, id').all(year.id);
+    const rules = withdrawalRules(db, year.id);
     const types = db.prepare('SELECT id, code, name_en, name_zh FROM class_types WHERE deleted_at IS NULL ORDER BY sort').all();
     page(req, res, 'fees.ejs', { years, year, fees, rules, types, codes: FEE_CODES, errors, previous: years.find((y) => y.label < year.label) }, { title: 'Fees for a School Year', status });
   }

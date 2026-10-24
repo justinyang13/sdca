@@ -6,12 +6,13 @@ import { currentYear } from './fees.js';
 import { audit } from './crud.js';
 import { portalHelpers, s } from './util.js';
 import { visibleAnnouncements, postableClassIds, readableClassIds, mayPostIn, notifyClassFamilies } from './announcements.js';
+import { classById, classAnnouncementById } from '../queries/classes.js';
 
 export function registerClassAnnouncementRoutes(app, { db, page, requireLogin }) {
   const { go, forbidden, staffCan } = portalHelpers(page);
   const R = '/:lang/portal';
   const mayUse = (req) => can(req.portal.access, 'class_announcements.list') || can(req.portal.access, 'class_announcements.post_own') || can(req.portal.access, 'class_announcements.view_own');
-  const classRow = (id) => db.prepare('SELECT * FROM school_classes WHERE id = ? AND deleted_at IS NULL').get(Number(id));
+  const classRow = (id) => classById(db, id);
   // may this user change this announcement? (poster of that class, or staff with update / delete rights)
   const mayManage = (req, ann, action) => staffCan(req, `class_announcements.${action}`) || (can(req.portal.access, 'class_announcements.post_own') && mayPostIn(db, req.portal, ann.school_class_id));
 
@@ -23,7 +24,7 @@ export function registerClassAnnouncementRoutes(app, { db, page, requireLogin })
     const postable = postableClassIds(db, req.portal);
     const classes = db.prepare(`SELECT id, code, name_en, name_zh FROM school_classes WHERE id IN (${[0, ...readableClassIds(db, req.portal)].map(() => '?').join(',')}) ORDER BY code`).all(0, ...readableClassIds(db, req.portal));
     const postClasses = classes.filter((c) => postable.includes(c.id));
-    const edit = Number(req.query.edit) ? db.prepare('SELECT * FROM class_announcements WHERE id = ? AND deleted_at IS NULL').get(Number(req.query.edit)) : null;
+    const edit = Number(req.query.edit) ? classAnnouncementById(db, req.query.edit) : null;
     page(req, res, 'class-announcements.ejs', { year, posts, classes, postClasses, classId, edit: edit && mayManage(req, edit, 'update') ? edit : null, v: {}, errors: {} }, { title: 'Class Announcements' });
   });
 
@@ -57,7 +58,7 @@ export function registerClassAnnouncementRoutes(app, { db, page, requireLogin })
   });
 
   app.post(`${R}/class-announcements/:id`, requireLogin, csrfMiddleware, (req, res) => {
-    const ann = db.prepare('SELECT * FROM class_announcements WHERE id = ? AND deleted_at IS NULL').get(Number(req.params.id));
+    const ann = classAnnouncementById(db, req.params.id);
     if (!ann || !mayManage(req, ann, 'update')) return forbidden(req, res);
     const f = fields({ ...req.body, school_class_id: ann.school_class_id });          // the class cannot be moved
     if (invalid(req, res, f, ann.id)) return;
@@ -68,7 +69,7 @@ export function registerClassAnnouncementRoutes(app, { db, page, requireLogin })
   });
 
   app.post(`${R}/class-announcements/:id/delete`, requireLogin, csrfMiddleware, (req, res) => {
-    const ann = db.prepare('SELECT * FROM class_announcements WHERE id = ? AND deleted_at IS NULL').get(Number(req.params.id));
+    const ann = classAnnouncementById(db, req.params.id);
     if (!ann || !mayManage(req, ann, 'delete')) return forbidden(req, res);
     const uid = req.portal.user.id;
     db.prepare("UPDATE class_announcements SET deleted_at = datetime('now'), updated_at = datetime('now'), updated_by = ? WHERE id = ?").run(uid, ann.id);

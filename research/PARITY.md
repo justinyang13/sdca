@@ -1,6 +1,6 @@
 # DP Parity report
 
-Base: http://localhost:3100 · Generated: 2026-10-06T04:51:35.766Z
+Base: http://localhost:3200 · Generated: 2026-10-24T23:25:29.673Z
 
 | Page | Route | Text EN | Text ZH | Order inv | Images | Links missing | Layout |
 |---|---|---|---|---|---|---|---|
@@ -19,7 +19,7 @@ Base: http://localhost:3100 · Generated: 2026-10-06T04:51:35.766Z
 | education-resource | /education-resource | 100.0% | 100.0% | 0/0 | 0/0 | 0 | ok |
 | disclaimer | /disclaimer | 100.0% | 100.0% | 0/0 | 0/0 | 0 | ok |
 | privacy | /privacy | 100.0% | 100.0% | 0/0 | 0/0 | 0 | ok |
-| enroll | /enroll | 100.0% | 100.0% | 0/0 | 1/1 | 0 | ok |
+| enroll | /enroll | 100.0% | 100.0% | 0/0 | 1/1 | 2 | ok |
 | contact | /contact | 25.0% | 25.0% | 0/0 | 0/0 | 0 | ok |
 | adult | /adult | 100.0% | 100.0% | 0/0 | 1/1 | 0 | ok |
 | student-store-schedule | /student-store-schedule | 100.0% | 100.0% | 0/0 | 1/1 | 0 | ok |

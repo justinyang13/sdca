@@ -21,7 +21,7 @@ export function createLimiter({ windowMs, max, message } = {}) {
 }
 
 /** General limiter for public pages (generous). RATE_LIMIT env overrides the
-    cap — used by the Phase 8 linkcheck crawler which legitimately makes
+    cap — used by the linkcheck crawler which legitimately makes
     hundreds of requests. */
 const GENERAL_MAX = Number(process.env.RATE_LIMIT || 300);
 export const generalLimiter = createLimiter({ max: GENERAL_MAX });
@@ -99,7 +99,7 @@ export function applyBaseMiddleware(app, { db = openDb() } = {}) {
     next();
   });
 
-  // session — SQLite-backed (survives restarts; Phase 6 adds the admin).
+  // session — SQLite-backed (survives restarts).
   app.use(session({
     store: createSessionStore(db),
     secret: config.sessionSecret,

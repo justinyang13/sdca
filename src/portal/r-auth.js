@@ -9,6 +9,8 @@ import {
 import { verifyPassword } from '../admin/auth.js';
 import { recordLogin } from '../login-events.js';
 import { pickLang } from '../i18n/index.js';
+import { userByUsername } from '../queries/users.js';
+import { familyEmailOfPerson } from '../queries/families.js';
 
 export const DEMO_EMAIL = process.env.PORTAL_EMAIL_MODE !== 'smtp';
 
@@ -60,12 +62,12 @@ export function registerAuthRoutes(app, { db, page, requireLogin, isStaticBuild 
   // ----- forgot password / reset -----
   app.get(`${R}/forgot-password`, skipStatic, (req, res) => page(req, res, 'forgot-password.ejs', { sent: false, link: null }, { title: 'Request Password Reset', shell: 'bare' }));
   app.post(`${R}/forgot-password`, skipStatic, loginLimiter, csrfMiddleware, (req, res) => {
-    const u = db.prepare('SELECT * FROM users WHERE username = ? AND deleted_at IS NULL').get(s(req.body.username));
+    const u = userByUsername(db, s(req.body.username));
     let link = null;
     if (u && u.status !== 'disabled') {
       const raw = createPasswordReset(db, u);
       link = `/${lang(req)}/portal/reset-password/${raw}`;
-      const fam = db.prepare("SELECT f.email FROM families f JOIN family_members fm ON fm.family_id = f.id WHERE fm.person_id = ? AND fm.deleted_at IS NULL LIMIT 1").get(u.person_id);
+      const fam = { email: familyEmailOfPerson(db, u.person_id) };
       const to = db.prepare('SELECT email FROM persons WHERE id = ?').get(u.person_id)?.email || fam?.email || '';
       queueEmail(db, { to, template: 'password_reset', subject: 'San Diego Chinese Academy - Password Reset 重建密碼',
         body: `Click this link within 6 hours 請於六小時內按此連結: ${link}`, relatedType: 'users', relatedId: u.id });

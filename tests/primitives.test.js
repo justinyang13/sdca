@@ -76,3 +76,18 @@ test('an unsupported :lang is a 404 on every kind of route, and supported ones s
   }
   for (const p of ['/en/news', '/zh/news', '/en/search?q=school']) assert.equal((await fetch(base + p)).status, 200, p);
 });
+
+test('session store sweeps expired sessions on every 100th write, and not before', async () => {
+  const { createSessionStore } = await import('../src/db/session-store.js');
+  const mem = newDb(':memory:');
+  mem.exec('CREATE TABLE sessions (sid TEXT PRIMARY KEY, data TEXT NOT NULL, expires INTEGER)');
+  const store = createSessionStore(mem);
+  const set = (sid, ms) => new Promise((res, rej) => store.set(sid, { cookie: { expires: new Date(Date.now() + ms).toISOString() } }, (e) => (e ? rej(e) : res())));
+  await set('expired', -1000);
+  for (let i = 0; i < 98; i++) await set(`live-${i}`, 60000);
+  assert.equal(mem.prepare("SELECT COUNT(*) n FROM sessions WHERE sid = 'expired'").get().n, 1, 'not swept before the 100th write');
+  await set('live-last', 60000);   // the 100th write
+  assert.equal(mem.prepare("SELECT COUNT(*) n FROM sessions WHERE sid = 'expired'").get().n, 0, 'swept on the 100th write');
+  assert.equal(mem.prepare('SELECT COUNT(*) n FROM sessions').get().n, 99);
+  mem.close();
+});

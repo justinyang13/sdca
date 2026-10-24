@@ -1,4 +1,4 @@
-// src/routes-public.js — Phase 4 public page routes.
+// src/routes-pages.js — the main public pages: home, about, programs, enroll, contact, support, sponsors.
 // All content (titles, bodies, people, programs, events, announcements, sponsors)
 // is read from the SQLite DB at request time. i18n provides UI chrome only.
 // Settings (phone, address, portal URLs) come from the `settings` table.
@@ -11,8 +11,10 @@ import { config } from './config.js';
 import { createLimiter } from './middleware/index.js';
 import { imgUrl, setting, pageBySlug } from './helpers.js';
 import { portedCtx, usePorted } from './ported.js';
-import { pickLang } from './i18n/index.js';
+import { t, pickLang } from './i18n/index.js';
+import { renderPage, renderMarkdown, makeRenderPart } from './web/render.js';
 import { officeContact } from './school.js';
+import { heroSlides, peopleInGroup } from './queries/content.js';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const PHONE_RE = /^[0-9+()\s.-]{7,20}$/;
@@ -69,31 +71,18 @@ function pick(page, field, lang) {
   return { text: en || zh, note: en ? null : (zh ? 'meta.lang_note_en' : null) };
 }
 
-/**
- * Register Phase 4 routes.
- * Bridge must expose: makeRenderPart, renderShell, pageView, t, db, SUPPORTED
- */
-export function registerPublicRoutes(app, bridge) {
-  const { makeRenderPart, renderShell, pageView, renderMarkdown, t, db, SUPPORTED } = bridge;
-
+/** Register the main public pages (home, about, programs, enroll, contact, support, sponsors). */
+export function registerPageRoutes(app, { db }) {
   function makePage(opts) {
     const routePath = opts.path.replace('/:lang', '');
     return function handler(req, res) {
       const lang = req.params.lang;
       const tFn = (k) => t(lang, k);
-      const renderPart = makeRenderPart(lang);
-      const ctx = { lang, t: tFn, renderPart, db, imgUrl, ...(opts.ctx ? opts.ctx(req, lang) : {}) };
-      const body = pageView(opts.viewFile, ctx);
-      const title = opts.title(lang, ctx);
-      const desc = opts.desc(lang, ctx);
-      res.render('layouts/main.ejs', {
-        lang, t: tFn, renderPart,
-        title, description: desc,
-        canonical: `/${lang}${routePath}`,
-        enUrl: `/en${routePath}`, zhUrl: `/zh${routePath}`,
-        jsonLd: opts.jsonLd ? opts.jsonLd(lang, ctx) : null,
-        body,
-        ...renderShell(lang, { langPath: routePath }),
+      const ctx = { lang, t: tFn, renderPart: makeRenderPart(lang), db, imgUrl, ...(opts.ctx ? opts.ctx(req, lang) : {}) };
+      renderPage(res, {
+        lang, view: opts.viewFile, ctx,
+        title: opts.title(lang, ctx), description: opts.desc(lang, ctx),
+        path: routePath, jsonLd: opts.jsonLd ? opts.jsonLd(lang, ctx) : null, db,
       });
     };
   }
@@ -125,7 +114,7 @@ export function registerPublicRoutes(app, bridge) {
           descEn: 'A California non-profit funded by families, sponsors and Scrip sales.',
           descZh: '由家長、贊助商與禮券收入支持的加州非營利機構。' },
       ],
-      slides: db.prepare('SELECT * FROM slides WHERE published = 1 AND deleted_at IS NULL ORDER BY sort, id').all()
+      slides: heroSlides(db)
         .map((r) => ({ ...r, html_en: renderMarkdown(r.description_en), html_zh: renderMarkdown(r.description_zh) })),
       announcements: db.prepare(
         'SELECT a.*, d.title_en AS doc_title_en, d.title_zh AS doc_title_zh, d.file_path AS doc_path '
@@ -175,8 +164,8 @@ export function registerPublicRoutes(app, bridge) {
       viewFile: usePorted(db, r.slug, r.view),
       ctx: (req, lang) => {
         const page = pageBySlug(db, r.slug);
-        const board = db.prepare('SELECT * FROM people WHERE "group" = ? ORDER BY sort, name_en').all('board');
-        const staff = db.prepare('SELECT * FROM people WHERE "group" = ? ORDER BY sort, name_en').all('staff');
+        const board = peopleInGroup(db, 'board');
+        const staff = peopleInGroup(db, 'staff');
         const principal = db.prepare('SELECT * FROM people WHERE name_en LIKE ? ORDER BY sort LIMIT 1').get('%Principal%');
         return {
           _pg: page || { title_en: r.t('en'), title_zh: r.t('zh'), body_en: '', body_zh: '' },
@@ -338,22 +327,13 @@ export function registerPublicRoutes(app, bridge) {
       if (message.length < 10) errors.message = tFn('form.required');
     }
 
-    const baseOpts = {
-      lang, t: tFn, renderPart,
+    const send = (view, ctx, status) => renderPage(res, {
+      lang, view, ctx: { t: tFn, renderPart, ...ctx }, status, path: '/contact', db,
       title: pickLang(lang, 'Contact SDCA', 'SDCA 聯絡我們'),
-      description: '',
-      canonical: `/${lang}/contact`, enUrl: '/en/contact', zhUrl: '/zh/contact',
-      ...renderShell(lang, { langPath: '/contact' }),
-    };
+    });
 
     if (!honeypotTriggered && Object.keys(errors).length) {
-      const body = pageView('contact.ejs', {
-        lang, t: tFn, renderPart, _errors: errors, _submitted: true, success: false,
-        _form: { name, email, phone, topic, message },
-        _settings: contactSettings(db, lang),
-        _errors: errors,
-      });
-      return res.status(400).render('layouts/main.ejs', { ...baseOpts, body });
+      return send('contact.ejs', { _errors: errors, _submitted: true, success: false, _form: { name, email, phone, topic, message }, _settings: contactSettings(db, lang) }, 400);
     }
 
     if (!honeypotTriggered) {
@@ -364,8 +344,7 @@ export function registerPublicRoutes(app, bridge) {
       ).run(name, email, phone, topic, message, lang, ipHash, 'new');
     }
 
-    const body = pageView('contact-success.ejs', { lang, t: tFn, renderPart, _spam: honeypotTriggered });
-    return res.status(200).render('layouts/main.ejs', { ...baseOpts, body });
+    return send('contact-success.ejs', { _spam: honeypotTriggered }, 200);
   });
 
   // ---------- Support (2 routes) ----------

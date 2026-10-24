@@ -2,6 +2,7 @@
 // Suggests, per child: the same class type (preschool → regular), the next grade, volunteer choices; copies the regular-school
 // information to the new year. Nothing is submitted automatically — the parent reviews every field in the normal wizard.
 import { gradeLabel, gradeFromBirth, startYear } from './grades.js';
+import { hasSchoolInfo } from '../queries/families.js';
 
 /** Years families can register for right now (staff switch "registration open" on in the Fees page). */
 export function openYears(db) {
@@ -48,7 +49,7 @@ export function previousVolunteerJobs(db, familyId, year) {
 export function copySchoolInfo(db, studentIds, year, userId = null) {
   let n = 0;
   for (const id of studentIds) {
-    if (db.prepare('SELECT 1 FROM student_school_info WHERE student_person_id = ? AND school_year_id = ? AND deleted_at IS NULL').get(id, year.id)) continue;
+    if (hasSchoolInfo(db, id, year.id)) continue;
     const old = db.prepare(`SELECT i.* FROM student_school_info i JOIN school_years y ON y.id = i.school_year_id
       WHERE i.student_person_id = ? AND y.label < ? AND i.deleted_at IS NULL ORDER BY y.label DESC LIMIT 1`).get(id, year.label);
     if (!old) continue;

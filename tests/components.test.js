@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import ejs from 'ejs';
 import { JSDOM } from 'jsdom';
+import { pickLang, localized } from '../src/i18n/index.js';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const src = (f) => fs.readFileSync(path.join(ROOT, 'public', 'js', f), 'utf8');
@@ -155,7 +156,7 @@ test('nav, tabs, lightbox, slider, forms and portal scripts run on a page withou
 });
 
 // ------------------------------------------------------------------ EJS partials
-const render = (file, locals = {}) => ejs.render(fs.readFileSync(path.join(ROOT, 'views', file), 'utf8'), locals, { filename: path.join(ROOT, 'views', file) });
+const render = (file, locals = {}) => ejs.render(fs.readFileSync(path.join(ROOT, 'views', file), 'utf8'), { pickLang, localized, ...locals }, { filename: path.join(ROOT, 'views', file) });
 test('partial: hero carousel renders every layout from slide records (title, description, image, link) in both languages and escapes input', () => {
   const slides = [
     { layout: 'intro', image: '/img/slides/a.jpg', caption_en: 'Welcome', caption_zh: '歡迎', html_en: '<p>EN text</p>', html_zh: '<p>中文</p>', link_url: '/about', link_label_en: 'About SDCA', image_left: '/img/l.gif', image_right: '/img/r.gif' },

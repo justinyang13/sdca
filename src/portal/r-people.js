@@ -10,6 +10,7 @@ import { familyView } from './r-home.js';
 import { createPerson, createFamily, addFamilyMember } from './r-auth.js';
 import { todayLocal } from '../datetime.js';
 import { portalHelpers } from './util.js';
+import { familyWithAddress } from '../queries/families.js';
 
 const PERSON_MAIN = ['english_last_name', 'english_first_name', 'chinese_name', 'title', 'gender', 'birth_date', 'native_language', 'regular_school', 'regular_grade'];
 const PERSON_MEDICAL = ['allergy', 'special_medical_needs'];
@@ -71,7 +72,7 @@ export function registerPeopleRoutes(app, { db, page, requireLogin }) {
   app.get(`${R}/families/:id/edit`, requireLogin, (req, res) => {
     const id = Number(req.params.id);
     if (!mayEditFamily(req, id)) return forbidden(req, res);
-    const row = db.prepare('SELECT f.*, a.street, a.city, a.state, a.zipcode FROM families f LEFT JOIN addresses a ON a.id = f.address_id WHERE f.id = ?').get(id);
+    const row = familyWithAddress(db, id);
     page(req, res, 'family-form.ejs', { values: row, errors: {}, id }, { title: 'Edit Family Address' });
   });
   app.post(`${R}/families/:id/edit`, requireLogin, csrfMiddleware, (req, res) => {

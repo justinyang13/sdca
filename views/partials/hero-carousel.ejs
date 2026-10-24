@@ -9,7 +9,7 @@
   // L.slides: rows of `slides` with html_en / html_zh (the markdown descriptions rendered and sanitised by the route).
   const slides = (typeof L !== 'undefined' && L.slides) ? L.slides : [];
   const manifest = (typeof imageManifest === 'function') ? imageManifest() : {};
-  const schoolName = (L && (L.schoolName)) || (lang === 'zh' ? '聖地牙哥中華學苑' : 'San Diego Chinese Academy');
+  const schoolName = (L && (L.schoolName)) || (pickLang(lang, 'San Diego Chinese Academy', '聖地牙哥中華學苑'));
   const escapeAttr = (v) => String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
   // an image is a name from the image library (responsive sizes) or a plain path such as /img/slides/x.jpg
   const imgFor = (name) => {
@@ -23,13 +23,13 @@
     return /^\//.test(name) ? { src: name, srcset: '', w: null, h: null } : null;
   };
   const href = (u) => (!u ? '' : !/^(\/(?!\/)|https?:\/\/|mailto:|tel:)/i.test(u) ? '#' : (/^\/(en|zh)(\/|$)/.test(u) || !/^\//.test(u)) ? u : '/' + lang + u);
-  const pickT = (s) => (lang === 'zh' ? (s.caption_zh || s.caption_en || '') : (s.caption_en || s.caption_zh || ''));
-  const pickD = (s) => (lang === 'zh' ? (s.html_zh || s.html_en || '') : (s.html_en || s.html_zh || ''));
+  const pickT = (s) => (localized(s, 'caption', lang));
+  const pickD = (s) => (localized(s, 'html', lang));
   const label = (s, n, fallbackEn, fallbackZh) => (n === 2
-    ? (lang === 'zh' ? (s.link2_label_zh || s.link2_label_en) : (s.link2_label_en || s.link2_label_zh))
-    : (lang === 'zh' ? (s.link_label_zh || s.link_label_en) : (s.link_label_en || s.link_label_zh))) || (lang === 'zh' ? fallbackZh : fallbackEn);
+    ? (localized(s, 'link2_label', lang))
+    : (localized(s, 'link_label', lang))) || (lang === 'zh' ? fallbackZh : fallbackEn);
 %>
-<section class="hero-carousel" role="region" aria-roledescription="carousel" aria-label="<%= lang === 'zh' ? '歡迎橫幅' : 'Welcome banner' %>" data-carousel>
+<section class="hero-carousel" role="region" aria-roledescription="carousel" aria-label="<%= pickLang(lang, 'Welcome banner', '歡迎橫幅') %>" data-carousel>
   <div class="hero-carousel-slides" data-carousel-slides>
     <% slides.forEach(function(slide, i) {
       const img = imgFor(slide.image);
@@ -83,14 +83,14 @@
     <% }) %>
   </div>
   <div class="hero-carousel-controls" aria-hidden="true">
-    <button type="button" class="hero-carousel-btn hero-carousel-prev" data-carousel-prev aria-label="<%= lang === 'zh' ? '上一張' : 'Previous slide' %>">
+    <button type="button" class="hero-carousel-btn hero-carousel-prev" data-carousel-prev aria-label="<%= pickLang(lang, 'Previous slide', '上一張') %>">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
     </button>
-    <button type="button" class="hero-carousel-btn hero-carousel-next" data-carousel-next aria-label="<%= lang === 'zh' ? '下一張' : 'Next slide' %>">
+    <button type="button" class="hero-carousel-btn hero-carousel-next" data-carousel-next aria-label="<%= pickLang(lang, 'Next slide', '下一張') %>">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
     </button>
   </div>
-  <div class="hero-carousel-dots" role="tablist" aria-label="<%= lang === 'zh' ? '選擇橫幅' : 'Choose slide' %>">
+  <div class="hero-carousel-dots" role="tablist" aria-label="<%= pickLang(lang, 'Choose slide', '選擇橫幅') %>">
     <% slides.forEach(function(slide, i) {
       const alt = pickT(slide);
     %>

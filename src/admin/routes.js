@@ -4,7 +4,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import ejs from 'ejs';
-import { sanitizeRich } from '../sanitize.js';
 import { t, SUPPORTED } from '../i18n/index.js';
 import { assetUrl } from '../helpers.js';
 import { verifyPassword } from './auth.js';
@@ -15,6 +14,8 @@ import { config } from '../config.js';
 import { asset } from '../asset-version.js';
 import { nowUtc } from '../datetime.js';
 import { recordLogin, loginSummary } from '../login-events.js';
+import { ENTITIES, F } from './entities.js';
+import { registerAdminCrud } from './crud.js';
 import { isLocked, recordFailure, clearFailures } from '../auth/lockout.js';
 
 const ADMIN_CSS = '/css/admin.css';
@@ -54,15 +55,7 @@ function csv(headers, rows) {
   return lines.join('\n');
 }
 
-// ---------- body field sanitization for markdown bodies ----------
-function sanitizeBody(s) {
-  return s ? sanitizeRich(s) : '';
-}
-
-// ---------- text field (plain) ----------
-function text(s) {
-  return String(s ?? '').replace(/<[^>]+>/g, '').trim();
-}
+const text = F.text;
 
 /**
  * Register /admin routes on the given express app.
@@ -80,6 +73,7 @@ export function registerAdminRoutes(app, { db }) {
       user: req.session.user,
       t: (k) => t('en', k),
       assetUrl,
+      error: null,   // templates read `error` unguarded; callers override it
       ...locals,
     });
     const shell = ejs.render(fs.readFileSync(path.join(views, 'layout.ejs'), 'utf8'), {
@@ -215,378 +209,14 @@ export function registerAdminRoutes(app, { db }) {
     renderAdmin(req, res, 'logins.ejs', { title: 'Login activity', filters, ...data });
   });
 
-  // ---------- Generic list helper ----------
-  function listRows(table, orderBy) {
-    return db.prepare(`SELECT * FROM ${table}${table === 'events' || table === 'slides' || table === 'announcements' ? ' WHERE deleted_at IS NULL' : ''} ORDER BY ${orderBy}`).all();
-  }
-  function getRow(table, id) {
-    return db.prepare(`SELECT * FROM ${table} WHERE id = ?`).get(id);
-  }
+  const getRow = (table, id) => db.prepare(`SELECT * FROM ${table} WHERE id = ?`).get(id);
 
-  // ---------- Announcements ----------
-  app.get('/admin/announcements', (req, res) => {
-    const rows = listRows('announcements', 'published_at DESC');
-    renderAdmin(req, res, 'announcements-list.ejs', { rows });
-  });
-
-  app.get('/admin/announcements/new', (req, res) => {
-    renderAdmin(req, res, 'announcement-edit.ejs', { item: null, docs: listRows('documents', 'title_en') });
-  });
-
-  app.get('/admin/announcements/:id', (req, res) => {
-    const item = getRow('announcements', req.params.id);
-    if (!item) return res.status(404).send('Not found');
-    renderAdmin(req, res, 'announcement-edit.ejs', { item, docs: listRows('documents', 'title_en') });
-  });
-
-  app.post('/admin/announcements', csrfMiddleware, (req, res) => {
-    const b = req.body || {};
-    const slug = text(b.slug) || `ann-${Date.now()}`;
-    const existing = db.prepare('SELECT id FROM announcements WHERE slug = ?').get(slug);
-    if (existing) {
-      const id = existing.id;
-      db.prepare(`
-        UPDATE announcements SET
-          title_en=?, title_zh=?, summary_en=?, summary_zh=?, body_en=?, body_zh=?,
-          kind=?, week_no=?, school_year=?, published_at=?, pinned=?, document_id=?, external_url=?, published=?
-        WHERE id=?
-      `).run(
-        text(b.title_en), text(b.title_zh),
-        text(b.summary_en), text(b.summary_zh),
-        sanitizeBody(b.body_en), sanitizeBody(b.body_zh),
-        ['weekly','news','press','notice'].includes(b.kind) ? b.kind : 'weekly',
-        b.week_no ? Number(b.week_no) : null,
-        text(b.school_year), text(b.published_at) || null,
-        b.pinned ? 1 : 0, b.document_id ? Number(b.document_id) : null,
-        text(b.external_url), b.published ? 1 : 0, id
-      );
-      audit(db, req.session.user.username, 'update', 'announcements', String(id));
-      return res.redirect('/admin/announcements');
-    }
-    const info = db.prepare(`
-      INSERT INTO announcements (slug, title_en, title_zh, summary_en, summary_zh, body_en, body_zh,
-        kind, week_no, school_year, published_at, pinned, document_id, external_url, published)
-      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-    `).run(
-      slug, text(b.title_en), text(b.title_zh),
-      text(b.summary_en), text(b.summary_zh),
-      sanitizeBody(b.body_en), sanitizeBody(b.body_zh),
-      ['weekly','news','press','notice'].includes(b.kind) ? b.kind : 'weekly',
-      b.week_no ? Number(b.week_no) : null,
-      text(b.school_year), text(b.published_at) || null,
-      b.pinned ? 1 : 0, b.document_id ? Number(b.document_id) : null,
-      text(b.external_url), b.published ? 1 : 0
-    );
-    audit(db, req.session.user.username, 'create', 'announcements', String(info.lastInsertRowid));
-    res.redirect('/admin/announcements');
-  });
-
-  app.post('/admin/announcements/:id/delete', csrfMiddleware, (req, res) => {
-    const id = req.params.id;
-    db.prepare('DELETE FROM announcements WHERE id = ?').run(id);
-    audit(db, req.session.user.username, 'delete', 'announcements', id);
-    res.redirect('/admin/announcements');
-  });
-
-  // ---------- Events ----------
-  app.get('/admin/events', (req, res) => {
-    renderAdmin(req, res, 'events-list.ejs', { rows: listRows('events', 'starts_at DESC') });
-  });
-  app.get('/admin/events/new', (req, res) => {
-    renderAdmin(req, res, 'event-edit.ejs', { item: null });
-  });
-  app.get('/admin/events/:id', (req, res) => {
-    const item = getRow('events', req.params.id);
-    if (!item) return res.status(404).send('Not found');
-    renderAdmin(req, res, 'event-edit.ejs', { item });
-  });
-  app.post('/admin/events', csrfMiddleware, (req, res) => {
-    const b = req.body || {};
-    const slug = text(b.slug) || `event-${Date.now()}`;
-    const existing = db.prepare('SELECT id FROM events WHERE slug = ?').get(slug);
-    if (existing) {
-      const id = existing.id;
-      db.prepare(`
-        UPDATE events SET title_en=?, title_zh=?, description_en=?, description_zh=?,
-          starts_at=?, ends_at=?, all_day=?, location=?, category=?, image=?, published=?
-        WHERE id=?
-      `).run(
-        text(b.title_en), text(b.title_zh), sanitizeBody(b.description_en), sanitizeBody(b.description_zh),
-        text(b.starts_at), text(b.ends_at) || null, b.all_day ? 1 : 0,
-        text(b.location), text(b.category), text(b.image), b.published ? 1 : 0, id
-      );
-      audit(db, req.session.user.username, 'update', 'events', String(id));
-    } else {
-      const info = db.prepare(`
-        INSERT INTO events (slug, title_en, title_zh, description_en, description_zh,
-          starts_at, ends_at, all_day, location, category, image, published)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
-      `).run(
-        slug, text(b.title_en), text(b.title_zh), sanitizeBody(b.description_en), sanitizeBody(b.description_zh),
-        text(b.starts_at), text(b.ends_at) || null, b.all_day ? 1 : 0,
-        text(b.location), text(b.category), text(b.image), b.published ? 1 : 0
-      );
-      audit(db, req.session.user.username, 'create', 'events', String(info.lastInsertRowid));
-    }
-    res.redirect('/admin/events');
-  });
-  app.post('/admin/events/:id/delete', csrfMiddleware, (req, res) => {
-    db.prepare('DELETE FROM events WHERE id = ?').run(req.params.id);
-    audit(db, req.session.user.username, 'delete', 'events', req.params.id);
-    res.redirect('/admin/events');
-  });
-
-  // ---------- Slides (home hero carousel) ----------
-  app.get('/admin/slides', (req, res) => {
-    renderAdmin(req, res, 'slides-list.ejs', { rows: listRows('slides', 'sort, id') });
-  });
-  app.get('/admin/slides/new', (req, res) => {
-    renderAdmin(req, res, 'slide-edit.ejs', { item: null });
-  });
-  app.get('/admin/slides/:id', (req, res) => {
-    const item = getRow('slides', req.params.id);
-    if (!item) return res.status(404).send('Not found');
-    renderAdmin(req, res, 'slide-edit.ejs', { item });
-  });
-  app.post('/admin/slides', csrfMiddleware, (req, res) => {
-    const b = req.body || {};
-    const id = text(b.id);
-    if (id) {
-      db.prepare(`
-        UPDATE slides SET image=?, caption_en=?, caption_zh=?, link_url=?, sort=?, published=?
-        WHERE id=?
-      `).run(
-        text(b.image), text(b.caption_en), text(b.caption_zh), text(b.link_url),
-        parseInt(b.sort, 10) || 0, b.published ? 1 : 0, parseInt(id, 10)
-      );
-      audit(db, req.session.user.username, 'update', 'slides', id);
-    } else {
-      const info = db.prepare(`
-        INSERT INTO slides (image, caption_en, caption_zh, link_url, sort, published)
-        VALUES (?,?,?,?,?,?)
-      `).run(
-        text(b.image), text(b.caption_en), text(b.caption_zh), text(b.link_url),
-        parseInt(b.sort, 10) || 0, b.published ? 1 : 0
-      );
-      audit(db, req.session.user.username, 'create', 'slides', String(info.lastInsertRowid));
-    }
-    res.redirect('/admin/slides');
-  });
-  app.post('/admin/slides/:id/delete', csrfMiddleware, (req, res) => {
-    const id = req.params.id;
-    db.prepare('DELETE FROM slides WHERE id = ?').run(id);
-    audit(db, req.session.user.username, 'delete', 'slides', id);
-    res.redirect('/admin/slides');
-  });
-
-  // ---------- Archive photos (Phase 8b) ----------
-  app.get('/admin/archive-photos', (req, res) => {
-    const rows = listRows('archive_photos', 'taken_year DESC, sort, id');
-    renderAdmin(req, res, 'archive-photos-list.ejs', { rows });
-  });
-  app.get('/admin/archive-photos/:id', (req, res) => {
-    const item = getRow('archive_photos', req.params.id);
-    if (!item) return res.status(404).send('Not found');
-    renderAdmin(req, res, 'archive-photo-edit.ejs', { item });
-  });
-  app.post('/admin/archive-photos', csrfMiddleware, (req, res) => {
-    const b = req.body || {};
-    const id = text(b.id);
-    if (id) {
-      db.prepare(
-        'UPDATE archive_photos SET group_en=?, group_zh=?, caption_en=?, caption_zh=?, ' +
-        'taken_year=?, sort=?, published=? WHERE id=?'
-      ).run(
-        text(b.group_en), text(b.group_zh), text(b.caption_en), text(b.caption_zh),
-        parseInt(b.taken_year, 10) || 0, parseInt(b.sort, 10) || 0,
-        b.published ? 1 : 0, parseInt(id, 10)
-      );
-      audit(db, req.session.user.username, 'update', 'archive_photos', id);
-    }
-    res.redirect('/admin/archive-photos');
-  });
-  app.post('/admin/archive-photos/:id/delete', csrfMiddleware, (req, res) => {
-    const id = req.params.id;
-    db.prepare('DELETE FROM archive_photos WHERE id = ?').run(id);
-    audit(db, req.session.user.username, 'delete', 'archive_photos', id);
-    res.redirect('/admin/archive-photos');
-  });
-
-  // ---------- Pages ----------
-  app.get('/admin/pages', (req, res) => {
-    renderAdmin(req, res, 'pages-list.ejs', { rows: listRows('pages', 'nav_order, slug') });
-  });
-  app.get('/admin/pages/new', (req, res) => {
-    renderAdmin(req, res, 'page-edit.ejs', { item: null });
-  });
-  app.get('/admin/pages/:id', (req, res) => {
-    const item = getRow('pages', req.params.id);
-    if (!item) return res.status(404).send('Not found');
-    renderAdmin(req, res, 'page-edit.ejs', { item });
-  });
-  app.post('/admin/pages', csrfMiddleware, (req, res) => {
-    const b = req.body || {};
-    const slug = text(b.slug) || `page-${Date.now()}`;
-    const existing = db.prepare('SELECT id FROM pages WHERE slug = ?').get(slug);
-    if (existing) {
-      const id = existing.id;
-      db.prepare(`
-        UPDATE pages SET title_en=?, title_zh=?, body_en=?, body_zh=?, hero_image=?, nav_section=?, nav_order=?, published=?, body_source='admin'
-        WHERE id=?
-      `).run(
-        text(b.title_en), text(b.title_zh), sanitizeBody(b.body_en), sanitizeBody(b.body_zh),
-        text(b.hero_image), text(b.nav_section), b.nav_order ? Number(b.nav_order) : 0,
-        b.published ? 1 : 0, id
-      );
-      audit(db, req.session.user.username, 'update', 'pages', String(id));
-    } else {
-      const info = db.prepare(`
-        INSERT INTO pages (slug, title_en, title_zh, body_en, body_zh, hero_image, nav_section, nav_order, published)
-        VALUES (?,?,?,?,?,?,?,?,?)
-      `).run(
-        slug, text(b.title_en), text(b.title_zh), sanitizeBody(b.body_en), sanitizeBody(b.body_zh),
-        text(b.hero_image), text(b.nav_section), b.nav_order ? Number(b.nav_order) : 0, b.published ? 1 : 0
-      );
-      audit(db, req.session.user.username, 'create', 'pages', String(info.lastInsertRowid));
-    }
-    res.redirect('/admin/pages');
-  });
-  app.post('/admin/pages/:id/delete', csrfMiddleware, (req, res) => {
-    db.prepare('DELETE FROM pages WHERE id = ?').run(req.params.id);
-    audit(db, req.session.user.username, 'delete', 'pages', req.params.id);
-    res.redirect('/admin/pages');
-  });
-
-  // ---------- Programs ----------
-  app.get('/admin/programs', (req, res) => {
-    renderAdmin(req, res, 'programs-list.ejs', { rows: listRows('programs', 'sort, name_en') });
-  });
-  app.get('/admin/programs/new', (req, res) => { renderAdmin(req, res, 'program-edit.ejs', { item: null }); });
-  app.get('/admin/programs/:id', (req, res) => {
-    const item = getRow('programs', req.params.id);
-    if (!item) return res.status(404).send('Not found');
-    renderAdmin(req, res, 'program-edit.ejs', { item });
-  });
-  app.post('/admin/programs', csrfMiddleware, (req, res) => {
-    const b = req.body || {};
-    const slug = text(b.slug) || `prog-${Date.now()}`;
-    const existing = db.prepare('SELECT id FROM programs WHERE slug = ?').get(slug);
-    if (existing) {
-      const id = existing.id;
-      db.prepare(`
-        UPDATE programs SET name_en=?, name_zh=?, grades_en=?, grades_zh=?, description_en=?, description_zh=?,
-          schedule_en=?, schedule_zh=?, tuition_en=?, tuition_zh=?, sort=?, image=?
-        WHERE id=?
-      `).run(
-        text(b.name_en), text(b.name_zh), text(b.grades_en), text(b.grades_zh),
-        sanitizeBody(b.description_en), sanitizeBody(b.description_zh),
-        sanitizeBody(b.schedule_en), sanitizeBody(b.schedule_zh),
-        text(b.tuition_en), text(b.tuition_zh),
-        b.sort ? Number(b.sort) : 0, text(b.image), id
-      );
-      audit(db, req.session.user.username, 'update', 'programs', String(id));
-    } else {
-      const info = db.prepare(`
-        INSERT INTO programs (slug, name_en, name_zh, grades_en, grades_zh, description_en, description_zh,
-          schedule_en, schedule_zh, tuition_en, tuition_zh, sort, image)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
-      `).run(
-        slug, text(b.name_en), text(b.name_zh), text(b.grades_en), text(b.grades_zh),
-        sanitizeBody(b.description_en), sanitizeBody(b.description_zh),
-        sanitizeBody(b.schedule_en), sanitizeBody(b.schedule_zh),
-        text(b.tuition_en), text(b.tuition_zh),
-        b.sort ? Number(b.sort) : 0, text(b.image)
-      );
-      audit(db, req.session.user.username, 'create', 'programs', String(info.lastInsertRowid));
-    }
-    res.redirect('/admin/programs');
-  });
-  app.post('/admin/programs/:id/delete', csrfMiddleware, (req, res) => {
-    db.prepare('DELETE FROM programs WHERE id = ?').run(req.params.id);
-    audit(db, req.session.user.username, 'delete', 'programs', req.params.id);
-    res.redirect('/admin/programs');
-  });
-
-  // ---------- People ----------
-  app.get('/admin/people', (req, res) => {
-    renderAdmin(req, res, 'people-list.ejs', { rows: listRows('people', 'sort, name_en') });
-  });
-  app.get('/admin/people/new', (req, res) => { renderAdmin(req, res, 'person-edit.ejs', { item: null }); });
-  app.get('/admin/people/:id', (req, res) => {
-    const item = getRow('people', req.params.id);
-    if (!item) return res.status(404).send('Not found');
-    renderAdmin(req, res, 'person-edit.ejs', { item });
-  });
-  app.post('/admin/people', csrfMiddleware, (req, res) => {
-    const b = req.body || {};
-    const group = ['board','staff','teacher','volunteer'].includes(b.group) ? b.group : 'staff';
-    const nameEn = text(b.name_en) || `Person-${Date.now()}`;
-    const existing = db.prepare('SELECT id FROM people WHERE name_en = ?').get(nameEn);
-    if (existing) {
-      const id = existing.id;
-      db.prepare(`
-        UPDATE people SET name_en=?, name_zh=?, role_en=?, role_zh=?, "group"=?, bio_en=?, bio_zh=?, photo=?, sort=?
-        WHERE id=?
-      `).run(
-        nameEn, text(b.name_zh), text(b.role_en), text(b.role_zh), group,
-        sanitizeBody(b.bio_en), sanitizeBody(b.bio_zh), text(b.photo),
-        b.sort ? Number(b.sort) : 0, id
-      );
-      audit(db, req.session.user.username, 'update', 'people', String(id));
-    } else {
-      const info = db.prepare(`
-        INSERT INTO people (name_en, name_zh, role_en, role_zh, "group", bio_en, bio_zh, photo, sort)
-        VALUES (?,?,?,?,?,?,?,?,?)
-      `).run(
-        nameEn, text(b.name_zh), text(b.role_en), text(b.role_zh), group,
-        sanitizeBody(b.bio_en), sanitizeBody(b.bio_zh), text(b.photo),
-        b.sort ? Number(b.sort) : 0
-      );
-      audit(db, req.session.user.username, 'create', 'people', String(info.lastInsertRowid));
-    }
-    res.redirect('/admin/people');
-  });
-  app.post('/admin/people/:id/delete', csrfMiddleware, (req, res) => {
-    db.prepare('DELETE FROM people WHERE id = ?').run(req.params.id);
-    audit(db, req.session.user.username, 'delete', 'people', req.params.id);
-    res.redirect('/admin/people');
-  });
-
-  // ---------- Sponsors ----------
-  app.get('/admin/sponsors', (req, res) => {
-    renderAdmin(req, res, 'sponsors-list.ejs', { rows: listRows('sponsors', 'sort, name') });
-  });
-  app.get('/admin/sponsors/new', (req, res) => { renderAdmin(req, res, 'sponsor-edit.ejs', { item: null }); });
-  app.get('/admin/sponsors/:id', (req, res) => {
-    const item = getRow('sponsors', req.params.id);
-    if (!item) return res.status(404).send('Not found');
-    renderAdmin(req, res, 'sponsor-edit.ejs', { item });
-  });
-  app.post('/admin/sponsors', csrfMiddleware, (req, res) => {
-    const b = req.body || {};
-    const name = text(b.name) || `Sponsor-${Date.now()}`;
-    const existing = db.prepare('SELECT id FROM sponsors WHERE name = ?').get(name);
-    if (existing) {
-      const id = existing.id;
-      db.prepare('UPDATE sponsors SET name=?, logo=?, url=?, tier=?, sort=? WHERE id=?')
-        .run(name, text(b.logo), text(b.url), text(b.tier), b.sort ? Number(b.sort) : 0, id);
-      audit(db, req.session.user.username, 'update', 'sponsors', String(id));
-    } else {
-      const info = db.prepare('INSERT INTO sponsors (name, logo, url, tier, sort) VALUES (?,?,?,?,?)')
-        .run(name, text(b.logo), text(b.url), text(b.tier), b.sort ? Number(b.sort) : 0);
-      audit(db, req.session.user.username, 'create', 'sponsors', String(info.lastInsertRowid));
-    }
-    res.redirect('/admin/sponsors');
-  });
-  app.post('/admin/sponsors/:id/delete', csrfMiddleware, (req, res) => {
-    db.prepare('DELETE FROM sponsors WHERE id = ?').run(req.params.id);
-    audit(db, req.session.user.username, 'delete', 'sponsors', req.params.id);
-    res.redirect('/admin/sponsors');
-  });
+  // ---------- Content entities (announcements, events, slides, archive photos, pages, programs, people, sponsors, media) ----------
+  registerAdminCrud(app, { db, renderAdmin, audit, entities: ENTITIES });
 
   // ---------- Documents ----------
   app.get('/admin/documents', (req, res) => {
-    renderAdmin(req, res, 'documents-list.ejs', { rows: listRows('documents', 'category, title_en') });
+    renderAdmin(req, res, 'documents-list.ejs', { rows: db.prepare('SELECT * FROM documents ORDER BY category, title_en').all() });
   });
   app.get('/admin/documents/new', (req, res) => { renderAdmin(req, res, 'document-edit.ejs', { item: null, file: null }); });
   app.get('/admin/documents/:id', (req, res) => {
@@ -636,39 +266,6 @@ export function registerAdminRoutes(app, { db }) {
     db.prepare('DELETE FROM documents WHERE id = ?').run(req.params.id);
     audit(db, req.session.user.username, 'delete', 'documents', req.params.id);
     res.redirect('/admin/documents');
-  });
-
-  // ---------- Media items ----------
-  app.get('/admin/media', (req, res) => {
-    renderAdmin(req, res, 'media-list.ejs', { rows: listRows('media_items', 'taken_at DESC, id DESC') });
-  });
-  app.get('/admin/media/new', (req, res) => { renderAdmin(req, res, 'media-edit.ejs', { item: null }); });
-  app.get('/admin/media/:id', (req, res) => {
-    const item = getRow('media_items', req.params.id);
-    if (!item) return res.status(404).send('Not found');
-    renderAdmin(req, res, 'media-edit.ejs', { item });
-  });
-  app.post('/admin/media', csrfMiddleware, (req, res) => {
-    const b = req.body || {};
-    const kind = ['photo','video','album'].includes(b.kind) ? b.kind : 'photo';
-    const titleEn = text(b.title_en) || `Media-${Date.now()}`;
-    const existing = db.prepare('SELECT id FROM media_items WHERE title_en = ?').get(titleEn);
-    if (existing) {
-      const id = existing.id;
-      db.prepare('UPDATE media_items SET kind=?, title_en=?, title_zh=?, url=?, image=?, taken_at=? WHERE id=?')
-        .run(kind, titleEn, text(b.title_zh), text(b.url), text(b.image), text(b.taken_at) || null, id);
-      audit(db, req.session.user.username, 'update', 'media_items', String(id));
-    } else {
-      const info = db.prepare('INSERT INTO media_items (kind, title_en, title_zh, url, image, taken_at) VALUES (?,?,?,?,?,?)')
-        .run(kind, titleEn, text(b.title_zh), text(b.url), text(b.image), text(b.taken_at) || null);
-      audit(db, req.session.user.username, 'create', 'media_items', String(info.lastInsertRowid));
-    }
-    res.redirect('/admin/media');
-  });
-  app.post('/admin/media/:id/delete', csrfMiddleware, (req, res) => {
-    db.prepare('DELETE FROM media_items WHERE id = ?').run(req.params.id);
-    audit(db, req.session.user.username, 'delete', 'media_items', req.params.id);
-    res.redirect('/admin/media');
   });
 
   // ---------- Settings ----------

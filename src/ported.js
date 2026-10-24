@@ -1,7 +1,7 @@
-// src/ported.js — Phase DP: shared helper deciding whether a page renders its
+// src/ported.js — shared helper deciding whether a page renders its
 // imported faithful block tree (views/pages/ported.ejs) or its normal template.
 // A page uses blocks when it has a non-empty tree and was not edited in admin
-// after import (body_source='admin' wins, per BUILD-PLAN Phase DP item 5).
+// after import (body_source='admin' wins, per BUILD-PLAN: the imported text yields to admin edits).
 import { bodyFor } from './helpers.js';
 
 export function parseBlocks(pg) {

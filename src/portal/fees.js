@@ -2,6 +2,7 @@
 // Every number comes from the fee table (staff edit it in one place: /portal/fees). Nothing is hard-coded.
 
 import { todayLocal } from '../datetime.js';
+import { withdrawalRules } from '../queries/schoolYears.js';
 
 const cents = (n) => Math.round(Number(n) || 0);
 
@@ -75,7 +76,7 @@ export function computeRegistration(db, { yearId, familyId, registrationId = nul
 
 /** Withdrawal processing fee for an application date (fee rules of the year). */
 export function withdrawalFee(db, yearId, appliedOn) {
-  const rules = db.prepare('SELECT * FROM withdrawal_fee_rules WHERE school_year_id = ? AND deleted_at IS NULL ORDER BY sort, id').all(yearId);
+  const rules = withdrawalRules(db, yearId);
   const hit = rules.find((r) => (!r.from_date || appliedOn >= r.from_date) && (!r.to_date || appliedOn <= r.to_date));
   return hit ? { rule: hit, feeCents: hit.no_refund ? null : cents(hit.fee_cents), noRefund: !!hit.no_refund } : { rule: null, feeCents: 0, noRefund: false };
 }

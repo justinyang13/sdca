@@ -10,6 +10,7 @@ import {
 import { portalHelpers } from './util.js';
 import { makeUploads } from './uploads.js';
 import { todayLocal } from '../datetime.js';
+import { grantRole } from '../queries/users.js';
 
 const SMALL_REF = 150;
 
@@ -117,7 +118,7 @@ export function registerManageRoutes(app, { db, page, requireLogin }) {
     const wanted = new Set([].concat(body.roles || []).map(Number).filter(Boolean));
     const have = db.prepare('SELECT id, role_id FROM user_roles WHERE user_id = ? AND deleted_at IS NULL').all(userId);
     for (const h of have) if (!wanted.has(h.role_id)) db.prepare("UPDATE user_roles SET deleted_at = datetime('now'), updated_by = ? WHERE id = ?").run(actorId, h.id);
-    for (const rid of wanted) if (!have.some((h) => h.role_id === rid)) db.prepare('INSERT INTO user_roles (user_id, role_id, created_by, updated_by) VALUES (?,?,?,?)').run(userId, rid, actorId, actorId);
+    for (const rid of wanted) if (!have.some((h) => h.role_id === rid)) grantRole(db, userId, rid, actorId);
     audit(db, 'user_roles', userId, 'set_roles', null, [...wanted], actorId);
   };
   const rolesFor = (userId) => {

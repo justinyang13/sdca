@@ -2,7 +2,7 @@
 <% const items = (L.b && L.b.items) || []; %>
 <% if (items.length) { %>
 <% const mode = L.b.mode === 'slider' ? 'slider' : 'grid'; %>
-<div class="blk-gallery blk-gallery-<%= mode %><%= L.b.cols ? ' blk-gallery-cols blk-gallery-c' + L.b.cols : '' %>" role="group" aria-label="<%= lang === 'zh' ? '照片集' : 'Photo gallery' %>">
+<div class="blk-gallery blk-gallery-<%= mode %><%= L.b.cols ? ' blk-gallery-cols blk-gallery-c' + L.b.cols : '' %>" role="group" aria-label="<%= pickLang(lang, 'Photo gallery', '照片集') %>">
   <% items.forEach(function(it, i) { %>
     <% if (it && it.src) { %>
     <figure class="blk-gallery-item">
@@ -14,7 +14,7 @@
     <% } %>
   <% }) %>
 </div>
-<div class="lightbox" role="dialog" aria-modal="true" aria-label="<%= lang === 'zh' ? '圖片檢視' : 'Image viewer' %>" hidden>
+<div class="lightbox" role="dialog" aria-modal="true" aria-label="<%= pickLang(lang, 'Image viewer', '圖片檢視') %>" hidden>
   <button class="lb-close" aria-label="<%= t('button.close') %>" data-lb-close>&times;</button>
   <button class="lb-prev" aria-label="Previous" data-lb-prev>‹</button>
   <img class="lb-img" src="" alt="">

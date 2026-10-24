@@ -1,24 +1,18 @@
 // src/app.js — Express app factory
 import express from 'express';
 import path from 'node:path';
-import { AsyncLocalStorage } from 'node:async_hooks';
-import fs from 'node:fs';
-import ejs from 'ejs';
 import { config } from './config.js';
 import { t, SUPPORTED, pickLang, localized } from './i18n/index.js';
 import { applyBaseMiddleware } from './middleware/index.js';
 import { openDb } from './db/open.js';
-import * as H from './helpers.js';
-import { imageManifest, assetUrl, mdToHtml } from './helpers.js';
-import { blockHelpers } from './block-helpers.js';
-import { registerPublicRoutes } from './routes-public.js';
-import { registerPhase5Routes } from './routes-phase5.js';
+import { renderPage, requestFlags, dt } from './web/render.js';
+import { registerPageRoutes } from './routes-pages.js';
+import { registerContentRoutes } from './routes-content.js';
 import { registerChatRoutes } from './chat/routes.js';
 import { registerAdminRoutes } from './admin/routes.js';
 import { registerPortalRoutes } from './portal/index.js';
 import { markPortalButtons } from './portal/public-links.js';
 import { asset } from './asset-version.js';
-import { fmtLong, fmtTime, fmtEventWhen, fmtMonthYear, fmtDate, todayLocal } from './datetime.js';
 import { lookupRedirect } from './redirects.js';
 import { portedCtx } from './ported.js';
 import { buildSitemap } from './sitemap.js';
@@ -33,58 +27,20 @@ function renderError(app, res, status, lang, opts = {}) {
   });
 }
 
-// per-request flags the shared header/footer partials need (is a portal user signed in?)
-const requestFlags = new AsyncLocalStorage();
-
 export function createApp({ db = openDb() } = {}) {
   const app = express();
   app.locals.idleMinutes = config.sessionIdleMinutes;
   app.locals.asset = asset;
-  app.locals.dt = { fmtLong, fmtTime, fmtEventWhen, fmtMonthYear, fmtDate, todayLocal };
+  app.locals.dt = dt;
   app.set('trust proxy', 'loopback');   // Tailscale Funnel (and any local proxy) forwards the real client address / https flag
   app.set('view engine', 'ejs');
   app.set('views', config.viewsDir);
   app.locals.t = t;
+  app.locals.pickLang = pickLang;   // templates choose wording with pickLang(lang, en, zh) / localized(row, 'title', lang)
+  app.locals.localized = localized;
   app.locals.langs = SUPPORTED;
   // every route with a :lang segment: anything but a supported language skips the route (and ends in the 404 page)
   app.param('lang', (req, res, next, lang) => (SUPPORTED.includes(lang) ? next() : next('route')));
-
-  // Helper for templates: render a partial (views/partials/*.ejs) with locals.
-  // Wraps locals as `L` to avoid colliding with partial top-level `const`
-  // declarations of the same name (which would cause TDZ issues).
-  function makeRenderPart(lang) {
-    const tFn = (k) => t(lang, k);
-    function renderPart(file, locals) {
-      const full = path.join(config.viewsDir, file);
-      const src = fs.readFileSync(full, 'utf8');
-      // Block renderer partials (views/blocks/*.ejs) get the DP text helpers as L.h.
-      const L = locals || {};
-      if (file.startsWith('blocks/')) L.h = blockHelpers;
-      return ejs.render(src, { lang, langPath: L.langPath, portalIn: L.portalIn, asset, dt: { fmtLong, fmtTime, fmtEventWhen, fmtMonthYear, fmtDate, todayLocal }, t: tFn, renderPart, L, imageManifest, assetUrl });
-    }
-    return renderPart;
-  }
-
-  // Helper for pages: pre-render header + footer partials for the layout.
-  function renderShell(lang, locals) {
-    const rp = makeRenderPart(lang);
-    const ctx = { langPath: (locals && locals.langPath) || '/', portalIn: !!requestFlags.getStore()?.portalIn };
-    return {
-      header: rp('partials/header.ejs', ctx),
-      footer: rp('partials/footer.ejs', ctx),
-    };
-  }
-
-  // Render markdown to safe HTML (the shared pipeline in helpers.js).
-  const renderMarkdown = mdToHtml;
-
-  // Render a views/pages/*.ejs template with `renderPart` and `renderMarkdown`
-  // available in scope (so page templates can render markdown bodies).
-  function pageView(viewFile, ctx) {
-    const full = path.join(config.viewsDir, 'pages', viewFile);
-    const fullCtx = { renderMarkdown, assetUrl, dt: { fmtLong, fmtTime, fmtEventWhen, fmtMonthYear, fmtDate, todayLocal }, ...ctx };
-    return ejs.render(fs.readFileSync(full, 'utf8'), fullCtx);
-  }
 
   // JSON + form bodies
   app.use(express.json({ limit: '1mb' }));
@@ -140,25 +96,10 @@ export function createApp({ db = openDb() } = {}) {
   // ---------- Style guide (dev only) ----------
   if (!config.isProduction) {
     for (const lang of SUPPORTED) {
-      app.get(`/${lang}/dev/styleguide`, (req, res) => {
-        const tFn = (k) => t(lang, k);
-        const renderPart = makeRenderPart(lang);
-        const body = ejs.render(
-          fs.readFileSync(path.join(config.viewsDir, 'pages', 'styleguide.ejs'), 'utf8'),
-          { lang, t: tFn, renderPart, assetUrl }
-        );
-        const shell = renderShell(lang, { langPath: '/dev/styleguide' });
-        res.render('layouts/main.ejs', {
-          lang,
-          t: tFn,
-          renderPart,
-          title: pickLang(lang, 'SDCA Style Guide', 'SDCA 樣式指南'),
-          description: 'SDCA design system style guide.',
-          body,
-          header: shell.header,
-          footer: shell.footer,
-        });
-      });
+      app.get(`/${lang}/dev/styleguide`, (req, res) => renderPage(res, {
+        lang, view: 'styleguide.ejs', title: pickLang(lang, 'SDCA Style Guide', 'SDCA 樣式指南'),
+        description: 'SDCA design system style guide.', path: '/dev/styleguide', db,
+      }));
     }
   }
 
@@ -182,33 +123,22 @@ export function createApp({ db = openDb() } = {}) {
 
 
   // ---------- School portal (accounts, families, registration, finance, volunteers, roles) ----------
-  registerPortalRoutes(app, { db, makeRenderPart, renderShell, t });
+  registerPortalRoutes(app, { db });
 
-  // ---------- Phase 4 public pages ----------
-  registerPublicRoutes(app, { makeRenderPart, renderShell, pageView, renderMarkdown, t, db, SUPPORTED });
+  // ---------- Main public pages: home, about, programs, enroll, contact, support, sponsors ----------
+  registerPageRoutes(app, { db });
 
-  // ---------- Phase 5 public pages + platform features ----------
-  registerPhase5Routes(app, { makeRenderPart, renderShell, pageView, renderMarkdown, t, db, SUPPORTED });
+  // ---------- Content pages and features: news, events, media, documents, archive, parents, search, legal ----------
+  registerContentRoutes(app, { db });
 
-  // ---------- Phase DP fallback: serve any pages row that has an imported block
+  // ---------- Fallback: serve any pages row that has an imported block
   // tree but no dedicated route (e.g. /en/classroom-map). Runs last, 404s otherwise.
   app.get('/:lang/:slug', function (req, res, next) {
     const lang = req.params.lang;
     const { pg, blocks, useBlocks, adminHtml, bodyNote } = portedCtx(db, req.params.slug, lang);
     if (!pg || !useBlocks) return next();
-    const tFn = (k) => t(lang, k);
-    const renderPart = makeRenderPart(lang);
     const title = localized(pg, 'title', lang);
-    const body = pageView('ported.ejs', { lang, t: tFn, renderPart, db, pg, blocks, useBlocks, adminHtml, bodyNote });
-    res.render('layouts/main.ejs', {
-      lang, t: tFn, renderPart,
-      title, description: title,
-      canonical: `/${lang}/${req.params.slug}`,
-      enUrl: `/en/${req.params.slug}`, zhUrl: `/zh/${req.params.slug}`,
-      jsonLd: null,
-      body,
-      ...renderShell(lang, { langPath: `/${req.params.slug}` }),
-    });
+    renderPage(res, { lang, view: 'ported.ejs', ctx: { pg, blocks, useBlocks, adminHtml, bodyNote }, title, description: title, path: `/${req.params.slug}`, db });
   });
 
   // 404

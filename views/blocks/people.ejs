@@ -2,7 +2,7 @@
 <% const cards = (L.b && L.b.cards) || []; %>
 <% const cols = (L.b && L.b.cols) || 0; %>
 <% if (cards.length) { %>
-<div class="blk-people<%= cols ? ' pcols-' + cols : '' %>" role="list" aria-label="<%= lang === 'zh' ? '成員' : 'Members' %>">
+<div class="blk-people<%= cols ? ' pcols-' + cols : '' %>" role="list" aria-label="<%= pickLang(lang, 'Members', '成員') %>">
   <% cards.forEach(function(cd, i) { %>
   <% const im = cd && cd.image; %>
   <figure class="blk-person" role="listitem">

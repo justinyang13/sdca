@@ -15,7 +15,7 @@
       <img class="ph-logo-badge" src="<%= asset('/brand/logo-1-badge.svg') %>" alt="San Diego Chinese Academy 聖地牙哥中華學苑" width="42" height="50">
     </a>
     <div class="ph-right">
-      <a class="ph-lang" href="<%= altLangUrl %>" lang="<%= lang === 'zh' ? 'en' : 'zh-Hant' %>"><%= altLangLabel %></a>
+      <a class="ph-lang" href="<%= altLangUrl %>" lang="<%= pickLang(lang, 'zh-Hant', 'en') %>"><%= altLangLabel %></a>
       <div class="ph-profile">
         <button type="button" class="ph-icon ph-avatar" data-ph-open="profile" aria-controls="ph-profile-menu" aria-expanded="false" aria-haspopup="true" aria-label="<%= b('Account menu', '帳號選單') %>">
           <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6z"/></svg>

@@ -2,33 +2,15 @@
 // volunteer choices, regular-school information), only while that year is open, only for the family's own parents.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { createFamily, createPerson, addFamilyMember, createUser } from '../src/portal/creators.js';
+import { makeClient } from './support/client.js';
+import { bootPortalApp } from './support/portalApp.js';
 
-let dir, base, server, db, creds;
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+let app, base, db, creds;
 
-before(async () => {
-  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sdca-rereg-'));
-  process.env.NODE_ENV = 'development';
-  process.env.DB_FILE = path.join(dir, 'rereg.db');
-  process.env.DATA_DIR = dir;
-  process.env.LOGIN_RATE_LIMIT = '10000';
-  process.env.RATE_LIMIT = '100000';
-  process.env.PORTAL_LOGINS_FILE = path.join(dir, 'logins.txt');
-  const r = spawnSync('node', ['scripts/portal-seed.js', '--demo'], { cwd: ROOT, env: process.env, encoding: 'utf8' });
-  assert.equal(r.status, 0, r.stderr || r.stdout);
-  creds = Object.fromEntries(fs.readFileSync(process.env.PORTAL_LOGINS_FILE, 'utf8').split('\n').slice(4).filter(Boolean).map((l) => { const [u, , p] = l.trim().split(/\s+/); return [u, p]; }));
-  const { createApp } = await import('../src/app.js');
-  const { openDb } = await import('../src/db/open.js');
-  db = openDb();
-  server = createApp({ db }).listen(0);
-  await new Promise((res) => server.once('listening', res));
-  base = `http://127.0.0.1:${server.address().port}`;
-});
-after(() => { server?.close(); db?.close(); fs.rmSync(dir, { recursive: true, force: true }); });
+before(async () => { app = await bootPortalApp('rereg'); ({ base, db, creds } = app); });
+after(() => app.close());
 
 const Client = makeClient({ base: () => base, creds: () => creds });
 const sql = (q, ...a) => db.prepare(q).all(...a);
@@ -39,8 +21,6 @@ const ct = (code) => one('SELECT id FROM class_types WHERE code = ?', code).id;
 const openNext = (open = 1) => run('UPDATE school_years SET registration_open = ? WHERE label = ?', open, '2027-2028');
 
 // a family with one child enrolled last (current) year in a chosen grade / class type — everything else is neutral
-import { createFamily, createPerson, addFamilyMember, createUser } from '../src/portal/creators.js';
-import { makeClient } from './support/client.js';
 let seq = 0;
 function family({ grade = '三年級(3rd Grade)', type = 'regular', birth = '2018-03-03', status = 'placed' } = {}) {
   seq += 1;

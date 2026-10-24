@@ -1,7 +1,7 @@
 <%
   // header.ejs — 7-item nav with dropdowns, search, lang switch, donate, mobile drawer
   const L = lang;
-  const alt = lang === 'zh' ? 'en' : 'zh';
+  const alt = pickLang(lang, 'zh', 'en');
   const current = (typeof langPath !== 'undefined' && langPath) || '/';
   const isActive = (p) => p === current || current.startsWith(p + '/');
   const href = (p) => `/${L}${p}`;

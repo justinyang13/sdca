@@ -16,8 +16,8 @@ import { registerEventRoutes } from './r-events.js';
 import { registerClassAnnouncementRoutes } from './r-announce.js';
 import { registerFinanceReportRoutes } from './r-finance-reports.js';
 
-export function registerPortalRoutes(app, { db, makeRenderPart, renderShell, t }) {
-  const page = makeRenderer({ makeRenderPart, renderShell, t, db });
+export function registerPortalRoutes(app, { db }) {
+  const page = makeRenderer({ db });
   const isStaticBuild = (req) => req.get('x-static-build') === '1';
 
   // language guard + session user + csrf cookie for every /:lang/portal/* request

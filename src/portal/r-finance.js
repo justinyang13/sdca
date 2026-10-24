@@ -6,12 +6,14 @@ import { ownsFamily, queueEmail } from './auth.js';
 import { audit, refOptions } from './crud.js';
 import { paidSql, registrationPaid } from './money.js';
 import { s, dollars, today, portalHelpers } from './util.js';
+import { familyName } from '../queries/families.js';
+import { registrationById } from '../queries/registrations.js';
 
 
 export function registerFinanceRoutes(app, { db, page, requireLogin }) {
   const { lang, go, forbidden, staffCan } = portalHelpers(page);
   const R = '/:lang/portal';
-  const famName = (fid) => db.prepare(`SELECT p.english_last_name || ' ' || p.english_first_name || ' ' || p.chinese_name AS n FROM family_members fm JOIN persons p ON p.id = fm.person_id WHERE fm.family_id = ? AND fm.relationship = 'parent_one' AND fm.deleted_at IS NULL`).get(fid)?.n || `Family #${fid}`;
+  const famName = (fid) => familyName(db, fid);
   const txOf = (id) => db.prepare(`SELECT t.*, tt.name_en AS type_en, tt.name_zh AS type_zh, tt.is_registration, pm.name_en AS method_en, pm.name_zh AS method_zh,
     (SELECT p.english_first_name || ' ' || p.english_last_name || ' ' || p.chinese_name FROM persons p WHERE p.id = t.executed_by_person_id) AS executed_by,
     (SELECT u.username FROM users u WHERE u.id = t.recorded_by_user_id) AS recorded_by, y.label AS year_label
@@ -77,7 +79,7 @@ export function registerFinanceRoutes(app, { db, page, requireLogin }) {
   });
   app.post(`${R}/finance/payment`, requireLogin, csrfMiddleware, (req, res) => {
     if (!staffCan(req, 'finance.record_payment')) return forbidden(req, res);
-    const reg = db.prepare('SELECT * FROM registrations WHERE id = ? AND deleted_at IS NULL').get(Number(req.body.registration));
+    const reg = registrationById(db, req.body.registration);
     const errors = {}; const cents = dollars(req.body.amount);
     const m = db.prepare('SELECT * FROM payment_methods WHERE id = ?').get(Number(req.body.payment_method_id));
     if (!reg) errors.registration = 'required';

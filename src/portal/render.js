@@ -10,7 +10,8 @@ import { ENTITIES, GROUPS } from './entities.js';
 import { can } from './perm.js';
 import { ensureCsrf } from '../middleware/csrf.js';
 import { money } from './fees.js';
-import { pickLang } from '../i18n/index.js';
+import { t, pickLang, localized } from '../i18n/index.js';
+import { makeRenderPart, renderShell } from '../web/render.js';
 
 const dir = path.join(config.viewsDir, 'portal-app');
 export const esc = (x) => String(x ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -115,7 +116,7 @@ export function buildNav(portal, lang) {
   return { home, profileMenu, drawer };
 }
 
-export function makeRenderer({ makeRenderPart, renderShell, t, db }) {
+export function makeRenderer({ db }) {
   /**
    * page(req, res, view, locals, { status, title, shell })
    * shell: 'app' (sidebar, default when signed in) | 'bare' (public auth pages: centered card)
@@ -133,7 +134,7 @@ export function makeRenderer({ makeRenderPart, renderShell, t, db }) {
     const gl = (label) => { const m = /^(.*?)\s*\((.*)\)\s*$/.exec(label || ''); return m ? (lang === 'zh' ? m[1] : m[2]) : (label || ''); };
     const url = (p = '') => `/${lang}/portal${p}`;
     const base = {
-      lang, t: tFn, b, one, gl, url, idleMinutes: config.sessionIdleMinutes, asset, csrf, flash, money, esc, field: fieldRow, title: opts.title || '',
+      lang, t: tFn, b, one, gl, url, pickLang, localized, idleMinutes: config.sessionIdleMinutes, asset, csrf, flash, money, esc, field: fieldRow, title: opts.title || '',
       csrfField: () => `<input type="hidden" name="_csrf" value="${csrf}">`,
       U: req.portal || null, can: (c) => can(req.portal?.access, c),
       ENTITIES, imgSrc, imageLibrary: () => Object.keys(imageManifest()).sort(), fmtDate, fmtDateTime, fmtLocalDateTime, utcToLocalParts, fmtLong: (v) => fmtLong(v, lang), fmtTime: (v) => fmtTime(v, lang),

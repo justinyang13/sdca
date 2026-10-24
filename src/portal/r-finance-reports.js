@@ -4,6 +4,7 @@ import { audit, csvEscape } from './crud.js';
 import { dailyDeposit, aging, yearSummary, scripReport } from './finance-reports.js';
 import { portalHelpers } from './util.js';
 import { todayLocal, fmtDateTime, nowUtc } from '../datetime.js';
+import { allSchoolYears } from '../queries/schoolYears.js';
 
 const REPORTS = ['daily', 'aging', 'summary', 'scrip'];
 const isDay = (v) => /^\d{4}-\d{2}-\d{2}$/.test(String(v || ''));
@@ -16,7 +17,7 @@ export function registerFinanceReportRoutes(app, { db, page, requireLogin }) {
   app.get(`${R}/finance/reports`, requireLogin, (req, res) => {
     if (!staffCan(req, 'finance.reports')) return forbidden(req, res);
     const report = REPORTS.includes(req.query.report) ? req.query.report : 'daily';
-    const years = db.prepare('SELECT * FROM school_years WHERE deleted_at IS NULL ORDER BY label DESC').all();
+    const years = allSchoolYears(db);
     const year = years.find((y) => y.id === Number(req.query.year)) || currentYear(db);
     const today = todayLocal();
     let from = isDay(req.query.from) ? req.query.from : today; let to = isDay(req.query.to) ? req.query.to : from;

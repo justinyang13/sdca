@@ -5,6 +5,7 @@ import { hashPassword, verifyPassword } from '../admin/auth.js';
 import { audit } from './crud.js';
 import { loadAccess } from './perm.js';
 import { isLocked, recordFailure, clearFailures } from '../auth/lockout.js';
+import { userByUsername } from '../queries/users.js';
 
 export const RESET_HOURS = 6;
 export const INVITE_HOURS = 72;
@@ -25,7 +26,7 @@ export function passwordPolicyError(pw) {
 }
 
 export function attemptLogin(db, username, password, ip = '') {
-  const u = db.prepare('SELECT * FROM users WHERE username = ? AND deleted_at IS NULL').get(String(username || '').trim());
+  const u = userByUsername(db, String(username || '').trim());
   // Always hash, and answer a wrong password the same way whatever the account's state, so the response never reveals
   // whether a username exists, is locked, disabled or pending. Those states show only after the right password.
   const ok = verifyPassword(password, u ? u.password_hash : 'aa:bb');

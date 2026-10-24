@@ -1,6 +1,6 @@
 {
-  "generated": "2026-10-06T04:51:35.766Z",
-  "base": "http://localhost:3100",
+  "generated": "2026-10-24T23:25:29.673Z",
+  "base": "http://localhost:3200",
   "pages": {
     "about": {
       "route": "/about",
@@ -585,7 +585,10 @@
       },
       "links": {
         "old": 8,
-        "missing": []
+        "missing": [
+          "/signin/register",
+          "/signin"
+        ]
       },
       "layout": {
         "expected": "blk-image,blk-heading,blk-richtext,blk-list,blk-button,blk-button,blk-richtext",
@@ -608,7 +611,7 @@
         "wordRecall": 1,
         "words": "74/74"
       },
-      "verdict": "PASS"
+      "verdict": "FAIL: links missing: /signin/register, /signin"
     },
     "contact": {
       "route": "/contact",

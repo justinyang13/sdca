@@ -83,7 +83,7 @@ export function withAssetUrls(html) {
 
 /**
  * Auto-add target="_blank" rel="noopener" to any link whose href is a PDF
- * (local or external). Per Phase 8, every PDF link must open in a new tab.
+ * (local or external). Every PDF link must open in a new tab.
  */
 export function withPdfTargets(html) {
   if (!html) return '';
@@ -123,7 +123,7 @@ export function bodyFor(page, lang) {
 }
 
 /**
- * assetUrl(v) — Phase 9 single source of truth for asset URLs.
+ * assetUrl(v) — the single source of truth for asset URLs.
  * - empty → ''
  * - http(s)://, data:, mailto:, tel:, # → returned unchanged
  * - local paths (img/..., /img/..., storage/..., brand/..., css/..., any

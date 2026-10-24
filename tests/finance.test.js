@@ -2,33 +2,16 @@
 // net-paid maths, access rules and the audit trail. All amounts are integer cents.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { createFamily, createPerson, addFamilyMember, createUser } from '../src/portal/creators.js';
+import { makeClient } from './support/client.js';
+import { bootPortalApp } from './support/portalApp.js';
 
-let dir, base, server, db, creds;
+let app, base, db, creds;
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 
-before(async () => {
-  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sdca-finance-'));
-  process.env.NODE_ENV = 'development';
-  process.env.DB_FILE = path.join(dir, 'finance.db');
-  process.env.DATA_DIR = dir;
-  process.env.LOGIN_RATE_LIMIT = '10000';
-  process.env.RATE_LIMIT = '100000';
-  process.env.PORTAL_LOGINS_FILE = path.join(dir, 'logins.txt');
-  const r = spawnSync('node', ['scripts/portal-seed.js', '--demo'], { cwd: ROOT, env: process.env, encoding: 'utf8' });
-  assert.equal(r.status, 0, r.stderr || r.stdout);
-  creds = Object.fromEntries(fs.readFileSync(process.env.PORTAL_LOGINS_FILE, 'utf8').split('\n').slice(4).filter(Boolean).map((l) => { const [u, , p] = l.trim().split(/\s+/); return [u, p]; }));
-  const { createApp } = await import('../src/app.js');
-  const { openDb } = await import('../src/db/open.js');
-  db = openDb();
-  server = createApp({ db }).listen(0);
-  await new Promise((res) => server.once('listening', res));
-  base = `http://127.0.0.1:${server.address().port}`;
-});
-after(() => { server?.close(); db?.close(); fs.rmSync(dir, { recursive: true, force: true }); });
+before(async () => { app = await bootPortalApp('finance'); ({ base, db, creds } = app); });
+after(() => app.close());
 
 const Client = makeClient({ base: () => base, creds: () => creds });
 const sql = (q, ...a) => db.prepare(q).all(...a);
@@ -39,8 +22,6 @@ const method = (code) => one('SELECT id FROM payment_methods WHERE code = ?', co
 const txType = (code) => one('SELECT id FROM transaction_types WHERE code = ?', code).id;
 
 // every call creates a new family (parent + child + parent login), so each test controls its own money
-import { createFamily, createPerson, addFamilyMember, createUser } from '../src/portal/creators.js';
-import { makeClient } from './support/client.js';
 let famSeq = 0;
 function freshFamily() {
   famSeq += 1;

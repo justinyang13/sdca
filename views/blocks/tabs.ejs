@@ -2,7 +2,7 @@
 <% const tabs = Array.isArray(L.b) ? L.b : []; %>
 <% if (tabs.length) { %>
 <div class="blk-tabs" data-tabs="blk<%= L.idx %>">
-  <div class="blk-tablist" role="tablist" aria-label="<%= lang === 'zh' ? '內容分頁' : 'Content tabs' %>">
+  <div class="blk-tablist" role="tablist" aria-label="<%= pickLang(lang, 'Content tabs', '內容分頁') %>">
     <% tabs.forEach(function(tb, i) { %>
     <button type="button" role="tab" id="bt-<%= L.idx %>-<%= i %>" aria-selected="<%= i === 0 ? 'true' : 'false' %>" aria-controls="bp-<%= L.idx %>-<%= i %>" data-tab="<%= i %>" tabindex="<%= i === 0 ? '0' : '-1' %>"><%= (tb && tb.title) || ('Tab ' + (i + 1)) %></button>
     <% }) %>

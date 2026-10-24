@@ -1,4 +1,4 @@
-// src/block-helpers.js — Phase DP: text helpers for the block renderer.
+// src/block-helpers.js — text helpers for the block renderer.
 // Verbatim old-site text is stored raw in the block tree; these helpers only
 // escape HTML and auto-link bare URLs (never rewrite words).
 const TRAIL = /[.,;:!?)\]}"'’”」』】）]+$/;

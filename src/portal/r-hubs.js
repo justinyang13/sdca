@@ -5,6 +5,7 @@ import { paidSql } from './money.js';
 import { fmtDateTime } from '../datetime.js';
 import { familyView } from './r-home.js';
 import { portalHelpers } from './util.js';
+import { familyWithAddress, familyEmailOfPerson } from '../queries/families.js';
 
 export function registerHubRoutes(app, { db, page, requireLogin }) {
   const { lang: L, P, forbidden } = portalHelpers(page);
@@ -23,7 +24,7 @@ export function registerHubRoutes(app, { db, page, requireLogin }) {
   app.get(`${R}/profile`, requireLogin, (req, res) => {
     const { person, familyIds } = req.portal;
     const fid = familyIds[0];
-    const fam = fid ? db.prepare('SELECT f.*, a.street, a.city, a.state, a.zipcode FROM families f LEFT JOIN addresses a ON a.id = f.address_id WHERE f.id = ?').get(fid) : null;
+    const fam = fid ? familyWithAddress(db, fid) : null;
     const cards = [{ en: 'Personal Information', zh: '個人資料', desc_en: 'Your names, birthday and contact details.', desc_zh: '您的姓名、生日與聯絡方式。', href: P(req, `/people/${person.id}`) },
       { en: 'Edit Personal Information', zh: '編輯個人資料', desc_en: 'Update your own details.', desc_zh: '更新您的個人資料。', href: P(req, `/people/${person.id}/edit`) }];
     if (fid) cards.push({ en: 'Family & Address', zh: '家庭與住址', desc_en: 'Address, phones, email and emergency contact.', desc_zh: '住址、電話、電子郵件與緊急聯絡人。', href: P(req, `/families/${fid}/edit`) });
@@ -39,7 +40,7 @@ export function registerHubRoutes(app, { db, page, requireLogin }) {
 
   app.get(`${R}/account`, requireLogin, (req, res) => {
     const { user, access, person } = req.portal;
-    const email = person.email || db.prepare('SELECT f.email FROM families f JOIN family_members fm ON fm.family_id = f.id WHERE fm.person_id = ? AND fm.deleted_at IS NULL LIMIT 1').get(person.id)?.email || '—';
+    const email = person.email || familyEmailOfPerson(db, person.id) || '—';
     page(req, res, 'hub.ejs', { hubTitle: { en: 'Account', zh: '帳號' }, rows: [
       [{ en: 'User Name', zh: '用戶名稱' }, user.username],
       [{ en: 'Account Status', zh: '帳號狀態' }, user.status],

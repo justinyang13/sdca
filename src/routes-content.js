@@ -1,4 +1,4 @@
-// src/routes-phase5.js — Phase 5 public pages + platform features.
+// src/routes-content.js — content pages and features: news, events, media, documents, archive, parents, search, legal.
 // Routes: /news, /news/:slug, /events + /events/view/month (redirect to /calendar), /events/:slug,
 //         /events/:slug.ics, /calendar, /media, /parents/*, /documents,
 //         /documents/:slug, /search, /privacy, /disclaimer, /sitemap.xml.
@@ -14,14 +14,16 @@ import { lookupRedirect } from './redirects.js';
 import { bodyFor, setting } from './helpers.js';
 import { todayLocal } from './datetime.js';
 import { portedCtx, usePorted } from './ported.js';
-import { pickLang, localized } from './i18n/index.js';
+import { t, pickLang, localized } from './i18n/index.js';
+import { renderPage, renderMarkdown } from './web/render.js';
+import { publishedEvent, heroSlides } from './queries/content.js';
 
 const PER_PAGE = 12;
 const ANN_KINDS = ['all', 'weekly', 'news', 'press', 'notice'];
 const DOC_CATS = ['weekly', 'calendar', 'handbook', 'class-info', 'contest', 'registration', 'event', 'form', 'scrip'];
 
-export function registerPhase5Routes(app, bridge) {
-  const { makeRenderPart, renderShell, pageView, t, db, SUPPORTED, renderMarkdown } = bridge;
+export function registerContentRoutes(app, bridge) {
+  const { db } = bridge;
 
   // ---------- /sitemap.xml ----------
   app.get('/sitemap.xml', function (req, res) {
@@ -31,18 +33,7 @@ export function registerPhase5Routes(app, bridge) {
 
 
   function page(lang, req, res, routePath, viewFile, ctx, title, desc, jsonLd) {
-    const tFn = (key) => t(lang, key);
-    const renderPart = makeRenderPart(lang);
-    const body = pageView(viewFile, { lang, t: tFn, renderPart, db, ...ctx });
-    res.render('layouts/main.ejs', {
-      lang, t: tFn, renderPart,
-      title, description: desc,
-      canonical: `/${lang}${routePath}`,
-      enUrl: `/en${routePath}`, zhUrl: `/zh${routePath}`,
-      jsonLd,
-      body,
-      ...renderShell(lang, { langPath: routePath }),
-    });
+    renderPage(res, { lang, view: viewFile, ctx, title, description: desc, path: routePath, jsonLd, db });
   }
 
   function notFound(req, res) {
@@ -134,7 +125,7 @@ export function registerPhase5Routes(app, bridge) {
     if (!String(req.params.slug || '').endsWith('.ics')) return next();
     const lang = req.params.lang;
     const slug = req.params.slug.slice(0, -4); // strip .ics
-    const ev = db.prepare('SELECT * FROM events WHERE slug = ? AND deleted_at IS NULL AND published = 1').get(slug);
+    const ev = publishedEvent(db, slug);
     if (!ev) return notFound(req, res);
     const ics = icsForEvents([{
       title: localized(ev, 'title', lang),
@@ -153,7 +144,7 @@ export function registerPhase5Routes(app, bridge) {
   // ---------- /events/:slug ----------
   app.get('/:lang/events/:slug', function (req, res) {
     const lang = req.params.lang;
-    const ev = db.prepare('SELECT * FROM events WHERE slug = ? AND deleted_at IS NULL AND published = 1').get(req.params.slug);
+    const ev = publishedEvent(db, req.params.slug);
     if (!ev) return notFound(req, res);
     const bodyHtml = renderMarkdown(
       localized(ev, 'description', lang));
@@ -204,9 +195,9 @@ export function registerPhase5Routes(app, bridge) {
     const photos = db.prepare(`SELECT * FROM media_items WHERE kind = 'photo' AND image != '' ORDER BY taken_at DESC, id`).all();
     const videos = db.prepare(`SELECT * FROM media_items WHERE kind = 'video' AND url != '' ORDER BY id`).all();
     const albums = db.prepare(`SELECT * FROM media_items WHERE kind = 'album' AND url != '' ORDER BY id`).all();
-    const heroSlides = db.prepare('SELECT * FROM slides WHERE published = 1 ORDER BY sort, id').all();
+    const slides = heroSlides(db);
     page(lang, req, res, '/media', usePorted(db, 'media', 'media.ejs'),
-      { photos, videos, albums, heroSlides, ...portedCtx(db, 'media', lang), _pg: db.prepare('SELECT * FROM pages WHERE slug = ?').get('media') || { title_en: 'Media', title_zh: '影音媒體' } },
+      { photos, videos, albums, heroSlides: slides, ...portedCtx(db, 'media', lang), _pg: db.prepare('SELECT * FROM pages WHERE slug = ?').get('media') || { title_en: 'Media', title_zh: '影音媒體' } },
       pickLang(lang, 'Photos & Videos', '照片與影片'),
       pickLang(lang, 'Moments from SDCA classrooms, festivals and events.', 'SDCA 課堂、節慶與活動的精彩瞬間。'),
       {
@@ -216,7 +207,7 @@ export function registerPhase5Routes(app, bridge) {
       });
   });
 
-  // ---------- /media/archive (Phase 8b — uncurated old-site photos) ----------
+  // ---------- /media/archive (uncurated old-site photos) ----------
   app.get('/:lang/media/archive', function (req, res) {
     const lang = req.params.lang;
     const photos = db.prepare(
@@ -296,7 +287,7 @@ export function registerPhase5Routes(app, bridge) {
       pickLang(lang, 'School calendars, handbooks, contest rules, weekly PDFs and more.', '學年行事曆、手冊、比賽規則、每週 PDF 等。'));
   });
 
-  // ---------- Inline PDF delivery (Phase 8) ----------
+  // ---------- Inline PDF delivery  ----------
   // /pdf/:slug — serve any published document's file inline (browser renders
   // PDFs). Used by every PDF link on the site (documents library, news detail,
   // parents, calendar, handbook, scrip, archive, markdown bodies…).
@@ -350,7 +341,7 @@ export function registerPhase5Routes(app, bridge) {
       });
   });
 
-  // ---------- /archive (Phase 8 — content preservation) ----------
+  // ---------- /archive (content preservation) ----------
   app.get('/:lang/archive', function (req, res) {
     const lang = req.params.lang;
     const pg = db.prepare('SELECT * FROM pages WHERE slug = ?').get('archive');

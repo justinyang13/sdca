@@ -45,9 +45,7 @@ const announcements = {
   name: 'announcements',
   audiences: ['public'],
   load(db) {
-    const cols = db.prepare('PRAGMA table_info(announcements)').all().map((c) => c.name);
-    const t = (c) => (cols.includes(c) ? c : "''");
-    const rows = db.prepare(`SELECT ${t('slug')} slug, ${t('title_en')} te, ${t('title_zh')} tz, ${t('body_en')} be, ${t('body_zh')} bz FROM announcements`).all();
+    const rows = db.prepare('SELECT slug, title_en te, title_zh tz, body_en be, body_zh bz FROM announcements WHERE published = 1 AND deleted_at IS NULL').all();
     return rows.filter((r) => (r.be || r.bz)).map((r) => ({
       source: 'announcements', title: r.te || r.tz, text: [r.te, r.tz, r.be, r.bz].filter(Boolean).join('\n'), url: r.slug ? `/en/news/${r.slug}` : '/en/news',
     }));
