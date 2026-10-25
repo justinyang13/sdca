@@ -7,7 +7,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { config } from './config.js';
-import { searchContent } from './search.js';
+import { searchSmart } from './ai/query-expand.js';
 import { icsForEvents } from './ics.js';
 import { buildSitemap } from './sitemap.js';
 import { lookupRedirect } from './redirects.js';
@@ -387,10 +387,10 @@ export function registerContentRoutes(app, bridge) {
   });
 
   // ---------- /search?q= ----------
-  app.get('/:lang/search', function (req, res) {
+  app.get('/:lang/search', async function (req, res) {
     const lang = req.params.lang;
     const q = String(req.query.q || '').trim();
-    const { rows, engine } = searchContent(db, q, { limit: 30, lang });
+    const { rows, engine } = await searchSmart(db, q, { limit: 30, lang });
     page(lang, req, res, '/search', 'search.ejs',
       { q, rows, engine },
       pickLang(lang, 'Search', '搜尋'),

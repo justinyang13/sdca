@@ -17,7 +17,7 @@ CONTEXT:
 ${ctx}`;
 }
 
-/** @yields {{type:'sources',sources:[]}|{type:'delta',text}|{type:'done'}} */
+/** @yields {{type:'sources',sources:[]}|{type:'delta',text}|{type:'unanswered',question}|{type:'done'}} */
 export async function* answer({ message, history = [], lang = 'en', retriever, provider, contact, signal, now = new Date() }) {
   const q = String(message).slice(0, 500);
   // include the previous user turn so follow-ups like "how much is it?" still retrieve well
@@ -27,6 +27,7 @@ export async function* answer({ message, history = [], lang = 'en', retriever, p
 
   if (!strong.length) {
     yield { type: 'delta', text: noAnswerMessage(replyLang(q, lang), contact) };
+    yield { type: 'unanswered', question: q };
     yield { type: 'done' };
     return;
   }

@@ -7,6 +7,10 @@
   <h1><%= b('Finance Reports', '財務報表') %></h1>
   <div class="portal-actions"><a class="btn btn-ghost" href="<%= csvHref %>"><%= b('Download CSV', '下載 CSV') %></a> <button type="button" class="btn btn-ghost" data-print><%= b('Print', '列印') %></button></div>
 </div>
+<form method="get" action="<%= url('/finance/reports/ask') %>" class="portal-toolbar ask-report" role="search">
+  <label class="tb-filter"><span><%= b('Ask', '提問') %></span><input type="text" name="q" maxlength="300" size="48" placeholder="<%= b('e.g. unpaid registrations over 30 days · deposits last Friday', '例如：超過 30 天未付的註冊 · 上週五的存款') %>"></label>
+  <button type="submit" class="btn btn-ghost"><%= b('Show report', '顯示報表') %></button>
+</form>
 <div class="view-tabs finance-tabs" role="tablist">
   <%- tab('daily', 'Daily deposit', '每日存款') %><%- tab('aging', 'Unpaid registrations', '未付註冊') %><%- tab('summary', 'Year summary', '學年總結') %><%- tab('scrip', 'Scrip', '禮券') %>
 </div>
@@ -39,6 +43,7 @@
   <% if (data.voided.length) { %><div class="portal-card"><h2><%= b('Voided in this period (not counted)', '本期作廢 (不計入)') %></h2><ul class="plain"><% data.voided.forEach(function(v){ %><li>#<%= v.id %> · <%= v.transaction_date %> · <%= one(v.type_en, v.type_zh) %> · <%= money(v.amount_cents) %><%= v.void_reason ? ' — ' + v.void_reason : '' %></li><% }) %></ul></div><% } %>
 
 <% } else if (report === 'aging') { %>
+  <% if (minDays) { %><p class="muted"><%= b('Showing only registrations waiting at least ' + minDays + ' days.', '只顯示等待至少 ' + minDays + ' 天的註冊。') %> <a href="<%= url('/finance/reports') %>?report=aging&year=<%= year.id %>"><%= b('Show all', '顯示全部') %></a></p><% } %>
   <div class="stat-grid"><% data.buckets.forEach(function(k){ %><div class="stat"><strong><%= money(k.cents) %></strong><span><%= k.label %> (<%= k.n %>)</span></div><% }) %>
     <div class="stat"><strong><%= money(data.total) %></strong><span><%= b('Total outstanding', '未收總額') %></span></div></div>
   <div class="table-wrap"><table class="portal-table compact"><thead><tr><th>#</th><th><%= b('Family', '家庭') %></th><th><%= b('Submitted', '送出') %></th><th class="num"><%= b('Days', '天數') %></th><th class="num"><%= b('Total', '總額') %></th><th class="num"><%= b('Paid', '已付') %></th><th class="num"><%= b('Balance', '餘額') %></th><th></th></tr></thead><tbody>

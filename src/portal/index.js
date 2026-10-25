@@ -15,6 +15,7 @@ import { registerHubRoutes } from './r-hubs.js';
 import { registerEventRoutes } from './r-events.js';
 import { registerClassAnnouncementRoutes } from './r-announce.js';
 import { registerFinanceReportRoutes } from './r-finance-reports.js';
+import { registerAiRoutes } from './r-ai.js';
 
 export function registerPortalRoutes(app, { db }) {
   const page = makeRenderer({ db });
@@ -58,5 +59,6 @@ export function registerPortalRoutes(app, { db }) {
   registerEventRoutes(app, deps);
   registerClassAnnouncementRoutes(app, deps);
   registerFinanceReportRoutes(app, deps);
+  registerAiRoutes(app, deps);
   registerManageRoutes(app, deps);   // last: its /manage/:entity/:id patterns are the most generic
 }

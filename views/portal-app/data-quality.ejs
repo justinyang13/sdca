@@ -1,0 +1,15 @@
+<div class="portal-head"><h1><%= b('Data Quality', '資料檢查') %></h1></div>
+<p class="muted"><%= b('Possible duplicates and gaps found by simple rules. Nothing is changed here: open each record and merge or fix by hand.', '以簡單規則找出可能重複或缺漏的資料。此頁不會修改任何資料，請開啟紀錄後自行合併或更正。') %></p>
+<div class="portal-card"><h2><%= b('Possible duplicate people', '可能重複的人員') %> (<%= people.length %>)</h2>
+  <% if (!people.length) { %><p class="muted"><%= b('None found. 🎉', '沒有發現。') %></p><% } %>
+  <% people.forEach(function(c){ %><div class="dq-group"><p><span class="pill"><%= c.reasons.join(' · ') %></span></p><ul class="plain">
+    <% c.items.forEach(function(p){ %><li><a href="<%= url('/manage/persons/' + p.id) %>">#<%= p.id %> <%= p.last %> <%= p.first %> <%= p.zh %></a> <span class="muted"><%= p.dob || '' %> <%= p.email || '' %> <%= p.mobile || '' %></span></li><% }) %></ul></div><% }) %></div>
+<div class="portal-card"><h2><%= b('Possible duplicate families', '可能重複的家庭') %> (<%= families.length %>)</h2>
+  <% if (!families.length) { %><p class="muted"><%= b('None found. 🎉', '沒有發現。') %></p><% } %>
+  <% families.forEach(function(c){ %><div class="dq-group"><p><span class="pill"><%= c.reasons.join(' · ') %></span></p><ul class="plain">
+    <% c.items.forEach(function(f){ %><li><a href="<%= url('/manage/families/' + f.id) %>">#<%= f.id %> <%= f.name || '' %></a> <span class="muted"><%= f.email %> <%= f.home_phone %> <%= f.cell_phone %></span></li><% }) %></ul></div><% }) %></div>
+<div class="portal-card"><h2><%= b('Gaps', '缺漏') %></h2>
+  <p><%= b('Students enrolled but not in any family', '已註冊但不屬於任何家庭的學生') %>: <strong><%= orphans.childrenWithoutFamily.length %></strong></p>
+  <ul class="plain"><% orphans.childrenWithoutFamily.forEach(function(p){ %><li><a href="<%= url('/manage/persons/' + p.id) %>">#<%= p.id %> <%= p.last %> <%= p.first %> <%= p.zh %></a></li><% }) %></ul>
+  <p><%= b('Families with no parent or guardian', '沒有家長或監護人的家庭') %>: <strong><%= orphans.familiesWithoutParent.length %></strong></p>
+  <ul class="plain"><% orphans.familiesWithoutParent.forEach(function(f){ %><li><a href="<%= url('/manage/families/' + f.id) %>">#<%= f.id %> <%= f.email %></a></li><% }) %></ul></div>

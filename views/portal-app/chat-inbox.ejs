@@ -1,0 +1,13 @@
+<div class="portal-head"><h1><%= b('Chat Inbox', '聊天信箱') %></h1></div>
+<p class="muted"><%= b('Questions visitors sent to the office from the website assistant, and questions the assistant could not answer (a hint for what the website or FAQ is missing).', '訪客透過網站小幫手轉給辦公室的問題，以及小幫手答不出來的問題（可作為補充網站或常見問題的參考）。') %></p>
+<div class="portal-card"><h2><%= b('Sent to the office', '轉給辦公室的問題') %></h2>
+  <% if (!handoffs.length) { %><p class="muted"><%= b('Nothing yet.', '目前沒有。') %></p><% } else { %>
+  <div class="table-wrap"><table class="portal-table compact"><thead><tr><th><%= b('When', '時間') %></th><th><%= b('From', '來自') %></th><th><%= b('Question', '問題') %></th><th><%= b('Status', '狀態') %></th><th></th></tr></thead><tbody>
+    <% handoffs.forEach(function(h){ %><tr><td class="nw"><%= h.created_at %></td><td><%= h.name %> <a href="mailto:<%= h.email %>"><%= h.email %></a></td><td><%= h.question %></td><td><%= h.status === 'done' ? b('done', '完成') : b('open', '待處理') %></td>
+      <td><% if (h.status === 'open') { %><form method="post" action="<%= url('/chat-inbox/' + h.id + '/done') %>" class="inline"><%- csrfField() %><button type="submit" class="linklike"><%= b('Mark done', '標示完成') %></button></form><% } %></td></tr><% }) %>
+  </tbody></table></div><% } %></div>
+<div class="portal-card"><h2><%= b('Questions the assistant could not answer', '小幫手答不出來的問題') %></h2>
+  <% if (!unanswered.length) { %><p class="muted"><%= b('Nothing yet.', '目前沒有。') %></p><% } else { %>
+  <div class="table-wrap"><table class="portal-table compact"><thead><tr><th class="num">#</th><th><%= b('Question', '問題') %></th><th><%= b('Last asked', '最近') %></th></tr></thead><tbody>
+    <% unanswered.forEach(function(u){ %><tr><td class="num"><%= u.n %></td><td><%= u.question %></td><td class="nw"><%= u.last_at %></td></tr><% }) %></tbody></table></div>
+  <form method="post" action="<%= url('/chat-inbox/clear-unanswered') %>"><%- csrfField() %><button class="btn btn-ghost" type="submit" data-confirm="<%= b('Clear this list?', '清除此清單？') %>"><%= b('Clear list', '清除清單') %></button></form><% } %></div>

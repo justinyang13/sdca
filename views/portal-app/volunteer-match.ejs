@@ -1,0 +1,11 @@
+<div class="portal-head"><h1><%= b('Volunteer Matching', '義工配對') %></h1></div>
+<p class="muted"><%= b('Suggested jobs for families that signed up but are not assigned yet' + (year ? ' (' + year.label + ')' : '') + '. Tick the ones you agree with and press Assign; nothing is saved before that.', '為已報名但尚未指派的家庭建議工作' + (year ? '（' + year.label + '）' : '') + '。勾選同意的項目後按「指派」，在此之前不會儲存。') %></p>
+<div class="portal-card"><h2><%= b('Families currently assigned per job', '各工作目前指派的家庭數') %></h2>
+  <ul class="plain"><% load.forEach(function(l){ %><li><%= one(l.job.name_en, l.job.name_zh) %>: <strong><%= l.assigned %></strong></li><% }) %></ul></div>
+<form method="post" action="<%= url('/volunteer-match/accept') %>" class="portal-card"><%- csrfField() %>
+  <h2><%= b('Suggestions', '建議') %> (<%= suggestions.length %>)</h2>
+  <% if (!suggestions.length) { %><p class="muted"><%= b('Everyone who signed up is already assigned. 🎉', '所有報名的家庭都已指派。') %></p><% } else { %>
+  <div class="table-wrap"><table class="portal-table compact"><thead><tr><th></th><th><%= b('Family', '家庭') %></th><th><%= b('Suggested job', '建議工作') %></th><th><%= b('Why', '原因') %></th></tr></thead><tbody>
+    <% suggestions.forEach(function(s){ %><tr><td><input type="checkbox" name="signup" value="<%= s.signupId %>" checked aria-label="<%= s.family %>"></td><td><a href="<%= url('/manage/families/' + s.familyId) %>"><%= s.family %></a></td><td><%= one(s.job.name_en, s.job.name_zh) %></td><td class="muted"><%= s.why %></td></tr><% }) %></tbody></table></div>
+  <div class="fact"><button class="btn btn-primary" type="submit"><%= b('Assign ticked', '指派已勾選') %></button></div><% } %>
+</form>

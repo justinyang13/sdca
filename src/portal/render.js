@@ -7,7 +7,7 @@ import { asset } from '../asset-version.js';
 import { imageManifest } from '../helpers.js';
 import { fmtDate, fmtDateTime, fmtLocalDateTime, utcToLocalParts, fmtLong, fmtTime } from '../datetime.js';
 import { ENTITIES, GROUPS } from './entities.js';
-import { can } from './perm.js';
+import { can, canAll } from './perm.js';
 import { ensureCsrf } from '../middleware/csrf.js';
 import { money } from './fees.js';
 import { t, pickLang, localized } from '../i18n/index.js';
@@ -79,6 +79,11 @@ export function buildNav(portal, lang) {
     if (can(a, 'slides.list')) special.push({ en: 'Hero Slides', zh: '首頁橫幅', href: P('/manage/slides') });
     if (can(a, 'student_list.list') || can(a, 'volunteer_list.list') || can(a, 'transactions.list')) special.push({ en: 'Reports', zh: '報表', href: P('/reports') });
     if (special.length) groups.push({ title: { en: 'Staff Tools', zh: '員工工具' }, items: special });
+    // Office Tools = the AI-assisted helpers (suggestions that staff confirm)
+    const office = [];
+    if (can(a, 'portal.staff')) office.push({ en: 'Chat Inbox', zh: '聊天信箱', href: P('/chat-inbox') }, { en: 'Data Quality', zh: '資料檢查', href: P('/data-quality') });
+    if (canAll(a, 'volunteer_signups.update')) office.push({ en: 'Volunteer Matching', zh: '義工配對', href: P('/volunteer-match') });
+    if (office.length) groups.push({ title: { en: 'Office Tools', zh: '辦公室工具' }, items: office });
     for (const g of GROUPS) {
       if (g.adminOnly && !can(a, 'roles.manage')) continue;      // the Admin menu is for the admin role only
       const items = Object.entries(ENTITIES)

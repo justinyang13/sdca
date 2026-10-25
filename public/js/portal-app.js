@@ -110,3 +110,24 @@ document.addEventListener('change', (e) => {
   document.addEventListener('click', (e) => { if (panels.profile.dataset.open === 'true' && !e.target.closest('.ph-profile')) set('profile', false); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAll(); });
 })();
+
+// AI translation draft: fills the other-language fields of the announcement form; the author reviews before posting
+(function () {
+  document.querySelectorAll('[data-translate]').forEach((btn) => btn.addEventListener('click', async () => {
+    const form = btn.closest('form'); const msg = form.querySelector('[data-translate-msg]');
+    const to = btn.dataset.translate, from = to === 'zh' ? 'en' : 'zh';
+    const get = (n) => form.querySelector(`[name="${n}"]`);
+    const title = get(`title_${from}`).value, body = get(`body_${from}`).value;
+    if (!title.trim() && !body.trim()) { msg.textContent = from === 'en' ? 'Write the English text first.' : '請先寫中文內容。'; return; }
+    const keep = msg.textContent; btn.disabled = true; msg.textContent = '…';
+    try {
+      const r = await fetch(`${location.pathname.split('/portal')[0]}/portal/ai/translate`, { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json', 'x-csrf-token': form.querySelector('[name=_csrf]').value }, body: JSON.stringify({ title, body, to }) });
+      if (!r.ok) throw new Error(String(r.status));
+      const j = await r.json();
+      if (j.title) get(`title_${to}`).value = j.title;
+      if (j.body) get(`body_${to}`).value = j.body;
+      msg.textContent = to === 'zh' ? '已填入草稿，請檢查後再發佈。' : 'Draft filled in. Please review before posting.';
+    } catch { msg.textContent = keep; alert('The translation helper is not available right now. 翻譯功能目前無法使用。'); }
+    btn.disabled = false;
+  }));
+})();

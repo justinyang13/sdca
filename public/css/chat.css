@@ -16,3 +16,6 @@
 .chat-form input{flex:1;min-width:0;font:inherit;font-size:16px;padding:9px 10px;border:1px solid var(--gray-400,#94A1B8);border-radius:8px}
 .chat-form button{font:inherit;padding:0 14px;border:0;border-radius:8px;background:var(--navy,#0B2545);color:#fff;cursor:pointer}
 .chat-form button:disabled{opacity:.5;cursor:default}
+.chat-handoff{display:grid;gap:6px;margin-top:8px}
+.chat-handoff input{padding:6px 8px;border:1px solid #bbb;border-radius:6px;font:inherit}
+.chat-handoff button{padding:6px 10px;border-radius:6px;border:0;background:var(--blue,#210488);color:#fff;font:inherit;cursor:pointer}

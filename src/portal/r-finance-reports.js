@@ -22,13 +22,15 @@ export function registerFinanceReportRoutes(app, { db, page, requireLogin }) {
     const today = todayLocal();
     let from = isDay(req.query.from) ? req.query.from : today; let to = isDay(req.query.to) ? req.query.to : from;
     if (to < from) [from, to] = [to, from];
+    const minDays = Math.max(0, Number(req.query.min_days) || 0);
     const data = report === 'daily' ? dailyDeposit(db, from, to) : report === 'aging' ? aging(db, year.id, today) : report === 'summary' ? yearSummary(db, year.id) : scripReport(db, year.id);
+    if (report === 'aging' && minDays) { data.rows = data.rows.filter((r) => r.days >= minDays); data.total = data.rows.reduce((t, r) => t + r.balance_cents, 0); }
     if (req.query.format === 'csv') {
       const lines = csvOf(report, data, year);
       audit(db, 'transactions', null, `finance_report_${report}_csv`, null, { from, to, year: year.id }, req.portal.user.id, req.ip);
       return res.type('text/csv; charset=utf-8').set('Content-Disposition', `attachment; filename="finance-${report}-${report === 'daily' ? from + (to !== from ? '_' + to : '') : year.label}.csv"`).send('﻿' + lines.map((l) => l.map(csvEscape).join(',')).join('\r\n'));
     }
-    page(req, res, 'finance-reports.ejs', { report, data, years, year, from, to, today, generated: fmtDateTime(nowUtc()) }, { title: 'Finance Reports' });
+    page(req, res, 'finance-reports.ejs', { report, data, years, year, from, to, today, minDays, generated: fmtDateTime(nowUtc()) }, { title: 'Finance Reports' });
   });
 
   function csvOf(report, d, year) {

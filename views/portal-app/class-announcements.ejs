@@ -25,6 +25,10 @@
     <%- field({ label: b('Title (中文)', '標題 (中文)'), name: 'title_zh', value: val('title_zh') }) %>
     <%- field({ label: b('Message (English)', '內容 (英文)'), name: 'body_en', type: 'textarea', value: val('body_en'), error: e.body_en }) %>
     <%- field({ label: b('Message (中文)', '內容 (中文)'), name: 'body_zh', type: 'textarea', value: val('body_zh') }) %>
+    <div class="frow"><label><%= b('AI translation draft', 'AI 翻譯草稿') %></label><div class="fctl">
+      <button type="button" class="btn btn-ghost" data-translate="zh"><%= b('English → 中文', '英文 → 中文') %></button>
+      <button type="button" class="btn btn-ghost" data-translate="en"><%= b('中文 → English', '中文 → 英文') %></button>
+      <small class="muted" data-translate-msg><%= b('Fills the other language as a draft. Please read and edit it before posting.', '以草稿填入另一種語言，發佈前請自行檢查修改。') %></small></div></div>
     <div class="frow"><label for="f_pinned"><%= b('Pin to the top', '置頂') %></label><div class="fctl"><input type="checkbox" id="f_pinned" name="pinned" value="1" <%= Number(val('pinned')) ? 'checked' : '' %>></div></div>
     <% if (!(edit && edit.id)) { %><div class="frow"><label for="f_notify"><%= b('E-mail the parents', '電郵通知家長') %></label><div class="fctl"><input type="checkbox" id="f_notify" name="notify" value="1"> <small class="muted"><%= b('Queues one e-mail per family of the class (shown in the outbox in demo mode).', '為該班每個家庭排入一封電郵 (示範模式只記錄在寄件匣)。') %></small></div></div><% } %>
     <div class="fact"><button class="btn btn-primary" type="submit"><%= edit && edit.id ? b('Save', '儲存') : b('Post', '發佈') %></button>
